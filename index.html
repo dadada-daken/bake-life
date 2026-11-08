@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>PANIS ET CALAMITAS — ベイク大陸ライフ v8.18</title>
+<title>PANIS ET CALAMITAS — ベイク大陸ライフ v8.19</title>
 <style>
 :root{--bg:#171923;--panel:#222635;--panel2:#2b3042;--ink:#f4f0e8;--muted:#aeb4c5;--gold:#e6c477;--green:#76c9a2;--red:#e58b8b;--line:#3b4257}
 *{box-sizing:border-box}body{margin:0;padding-bottom:env(safe-area-inset-bottom);background:radial-gradient(circle at top,#30364b,#171923 60%);color:var(--ink);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;line-height:1.55}
@@ -246,7 +246,7 @@ main{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 24px)}
  <div class="sub" style="margin-top:9px">※ゲームはこのブラウザ内で動作します。人生の記録と称号は自動保存されます。</div>
 </section>
 </main>
-<footer>BAKE LIFE v8.11 — LAYER CROSSING EXPANSION</footer>
+<footer>BAKE LIFE v8.19 — COLLECTION EXPANSION</footer>
 <button id="pauseQuickBtn" class="pause-quick" onclick="togglePause()" aria-label="一時停止または再開">Ⅱ 一時停止</button>
 <nav id="v8Nav" aria-label="メインメニュー"><button onclick="scrollToPanel(0)"><span>🍪</span><span>人生</span></button><button onclick="scrollToLog()"><span>📖</span><span>記録</span></button><button onclick="showCollection()"><span>🏅</span><span>称号</span></button><button onclick="showRegionInfo()"><span>🗺️</span><span>地域</span></button><button onclick="showMoreMenu()"><span>☰</span><span>その他</span></button></nav>
 <div class="overlay" id="overlay"><div class="modal" id="modal"></div></div><input id="importSaveFile" type="file" accept="application/json,.json" hidden>
@@ -387,7 +387,7 @@ const titleDefs=[
  ["転身の達人","職業分野を三種類以上経験する","work",s=>(s.careerFields||[]).length>=3],
  ["地域の顔役","地域貢献と名声を両立する","social",s=>(s.localAid||0)>=8&&s.fame>=30],
  ["不況を越えて","不況下で生活基盤を維持する","life",s=>(s.recessionSurvived||0)>=2],
- ["復興の担い手","災害後の復興事業に複数回参加する","special",s=>(s.rebuildProjects||0)>=3],
+ ["復興の担い手","厄災後の復興作業に3回以上参加する","special",s=>(s.calamityRebuilds||0)>=3],
  ["境界点の帰還者","境界点の連続事件を最後まで生き延びる","special",s=>!!s.boundaryArcComplete],
  ["人工の生","人工クッキーとして製造・覚醒する","special",s=>s.originType==="人工クッキー"],
  ["義体と共に","義体化を受け入れ、維持を続ける","special",s=>(s.cyberneticLevel||0)>=2],
@@ -1306,7 +1306,7 @@ function deleteSlot(i){const slots=safeRead("bakeSaveSlots",{});if(!slots[i]||!c
 function importSaveDialog(){$ ("importSaveFile").click()}
 $("importSaveFile").addEventListener("change",async ev=>{const file=ev.target.files?.[0];if(!file)return;try{const data=JSON.parse(await file.text());if(!data||typeof data!=="object"||!data.current)throw new Error("セーブデータの形式が違います");if(!confirm(`v${data.version||"?"}のセーブを読み込みます。現在の人生データを置き換えますか？`))return;if(data.secretMeta)storage.set("bakeSecretMeta",JSON.stringify(data.secretMeta));clearInterval(timer);clearInterval(smallTimer);clearTimeout(autoTimer);p=migrateV8State(data.current);for(const [k,v] of Object.entries({bakeDeathCauses:data.deathCauses||[],bakeTitles:data.titles||[],bakeLives:data.lives||[],bakeAscendedLives:data.ascendedLives||[]}))storage.set(k,JSON.stringify(v));storage.set("bakeCurrent",JSON.stringify(p));decision=null;paused=true;$("overlay").style.display="none";$("log").innerHTML="";(p.logs||[]).slice().reverse().forEach(x=>{const e=document.createElement("div");e.className="entry "+(x.type||"");e.innerHTML=`<small>${x.year||p.year}年 / ${x.age??p.age}歳</small>${escapeHtml(x.text||"")}`;$ ("log").append(e)});render();startClock();addLog(`v${data.version||"?"}のセーブデータを読み込んだ。`,"good");}catch(err){alert("読み込みに失敗しました："+err.message)}finally{ev.target.value=""}});
 
-function exportSave(){let data={version:8.7,current:p,deathCauses:JSON.parse(storage.get("bakeDeathCauses","[]")),titles:JSON.parse(storage.get("bakeTitles","[]")),lives:JSON.parse(storage.get("bakeLives","[]")),ascendedLives:JSON.parse(storage.get("bakeAscendedLives","[]"))};let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="bake-continent-life-record.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}
+function exportSave(){let data={version:8.19,current:p,deathCauses:JSON.parse(storage.get("bakeDeathCauses","[]")),titles:JSON.parse(storage.get("bakeTitles","[]")),lives:JSON.parse(storage.get("bakeLives","[]")),ascendedLives:JSON.parse(storage.get("bakeAscendedLives","[]"))};let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="bake-continent-life-record.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}
 window.addEventListener("beforeunload",()=>{if(p)storage.set("bakeCurrent",JSON.stringify(p))});
 try{const cfg=JSON.parse(storage.get("bakeSettings","{}"));if(cfg.font==="large")document.documentElement.style.fontSize="18px";if(cfg.font==="small")document.documentElement.style.fontSize="14px";if(cfg.motion==="simple")document.body.classList.add("reduced-motion");if(cfg.motion==="fast")document.body.classList.add("fast-motion");}catch(e){}
 (function init(){let old=storage.get("bakeCurrent", "");if(old){try{let q=JSON.parse(old);if(q&&!q.dead){p=q;;p.layer=p.layer||layerOfPlace(p.place);p.homeLayer=p.homeLayer||p.layer;p.layerHistory=p.layerHistory||[];p.layerVisitCount=p.layerVisitCount||0;p.layerCrossings=p.layerCrossings||0;p.boundaryIntrusions=p.boundaryIntrusions||0;p.boundaryRewriteCount=p.boundaryRewriteCount||0;delete p.hunger;delete p.hungerCrises;p.titles=(p.titles||[]).map(x=>x==="飢えを知る者"?"困窮を乗り越えた者":x);p.ageMilestones=p.ageMilestones||[];if(!p.personality)p.personality=createPersonality(p.trait);p.butterMangroveEvents=p.butterMangroveEvents||0;p.butterMangroveResearch=p.butterMangroveResearch||false;p.teonanacatlEncounter=p.teonanacatlEncounter||false;p.marmeloTruthSeen=p.marmeloTruthSeen||false;p.directiveCount=p.directiveCount||0;p.directiveHistory=p.directiveHistory||[];p.terraceRelations=p.terraceRelations||{};p.terraceEncountered=p.terraceEncountered||[];p.terraceProtection=p.terraceProtection||"";p.terraceEvents=p.terraceEvents||0;p.isPureAngel=p.isPureAngel===true||(p.isAngel&&p.angelType==="純天使");p.observationEnded=p.observationEnded||false;p.lastObservationPromptAge=p.lastObservationPromptAge||0;p.fallStage=p.fallStage||0;p.inquisitorAlert=p.inquisitorAlert||0;p.instantFall=p.instantFall||false;p.formerColleagueMet=p.formerColleagueMet||false;p.evasionComplete=p.evasionComplete||false;p.mentalCollapseEventSeen=p.mentalCollapseEventSeen||false;p.baroqueRampage=p.baroqueRampage||false;p.baroqueRampageStarted=p.baroqueRampageStarted||false;p.baroqueRampageWins=p.baroqueRampageWins||0;p.baroqueRampageLosses=p.baroqueRampageLosses||0;p.baroqueWhisperResists=p.baroqueWhisperResists||0;p.baroqueWhisperFollowed=p.baroqueWhisperFollowed||0;p.baroqueConfrontations=p.baroqueConfrontations||0;p.baroqueRampageRecovered=p.baroqueRampageRecovered||false;p.baroqueSecretRecovery=p.baroqueSecretRecovery||false;p.calamityRecords=p.calamityRecords||[];p.calamitySurvived=p.calamitySurvived||[];p.calamityArchive=p.calamityArchive||[];p.calamityArrivalCount=p.calamityArrivalCount||0;p.calamityArchive=p.calamityArchive||[];p.calamityArrivalCount=p.calamityArrivalCount||0;p.npcRelations=p.npcRelations||[];p.familySupport=p.familySupport||0;p.friendshipYears=p.friendshipYears||0;p.careerFields=p.careerFields||[];p.regionState=p.regionState||{economy:50,security:50,healthcare:50,technology:50,prosperity:50,disaster:0};p.professionRank=p.professionRank||0;p.rebuildProjects=p.rebuildProjects||0;p.cyberneticLevel=p.cyberneticLevel||0;p.fairyYears=p.fairyYears||0;p.baroqueSocialYears=p.baroqueSocialYears||0;p.terraceCouncil=p.terraceCouncil||0;delete p.hunger;delete p.hungerCrises;
@@ -1398,13 +1398,74 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  const oldMore=showMoreMenu;showMoreMenu=function(){oldMore();let m=$('modal');if(m){let wrap=m.querySelector('.choices');if(wrap){let b=document.createElement('button');b.textContent='秘密の記録・全人生アーカイブ';b.onclick=showSecretArchive;wrap.appendChild(b)}}};
  const oldRegion=showRegionInfo;showRegionInfo=function(){oldRegion();let m=$('modal');if(m){let meta=initSecretMeta();let div=document.createElement('div');div.className='entry';div.innerHTML=`<b>地域の秘密の発見</b><div class="sub">訪問記録：${(meta.regions||[]).length}地域 / 秘密の発見：${(meta.discoveries||[]).length}件。地域ごとの探索や人生を重ねることで、新しい記録が見つかる。</div><button onclick="showSecretArchive()">秘密の記録を見る</button>`;m.appendChild(div)}};
  const oldCollection=showCollection;showCollection=function(){awardSecretTitles();syncSecretTitleLedger();oldCollection();let m=$('modal');if(m){let b=m.querySelector('button:last-child');let x=document.createElement('button');x.textContent='秘密の記録・全人生アーカイブ';x.onclick=showSecretArchive;b?.before(x)}};
- const oldExport=exportSave;exportSave=function(){let data={version:8.7,current:p,deathCauses:JSON.parse(storage.get('bakeDeathCauses','[]')),titles:JSON.parse(storage.get('bakeTitles','[]')),lives:JSON.parse(storage.get('bakeLives','[]')),ascendedLives:JSON.parse(storage.get('bakeAscendedLives','[]')),secretMeta:initSecretMeta()};let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.15.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)};
+ const oldExport=exportSave;exportSave=function(){let data={version:8.19,current:p,deathCauses:JSON.parse(storage.get('bakeDeathCauses','[]')),titles:JSON.parse(storage.get('bakeTitles','[]')),lives:JSON.parse(storage.get('bakeLives','[]')),ascendedLives:JSON.parse(storage.get('bakeAscendedLives','[]')),secretMeta:initSecretMeta()};let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.19.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)};
  // v8.8: robust mobile easter egg. Tap the title seven times within 6 seconds.
  let tapTimer=null,taps=0;const title=document.querySelector('header h1');
  function secretTapFeedback(message){let el=document.getElementById('secretTapHint');if(!el){el=document.createElement('div');el.id='secretTapHint';el.style.cssText='position:fixed;left:50%;bottom:calc(78px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:10001;background:#202536;border:1px solid #b89a59;color:#f4e7bd;padding:9px 14px;border-radius:12px;font-size:13px;box-shadow:0 4px 18px #0009;max-width:90vw;text-align:center;pointer-events:none';document.body.appendChild(el)}el.textContent=message;el.style.display='block';clearTimeout(el._hide);el._hide=setTimeout(()=>{el.style.display='none'},1800)}
  if(title){title.style.cursor='pointer';title.style.userSelect='none';title.setAttribute('role','button');title.setAttribute('aria-label','タイトル。7回タップで秘密の記録');title.addEventListener('click',()=>{taps++;clearTimeout(tapTimer);tapTimer=setTimeout(()=>{if(taps>0&&taps<7)secretTapFeedback('タイトルの反応が消えた……もう一度試してみよう');taps=0},6000);if(taps===3)secretTapFeedback('何かが反応している……');if(taps>=7){taps=0;clearTimeout(tapTimer);secretTapFeedback('記録の外側へ接続しました');setTimeout(showSecretCheat,250)}})}
  // Restore and record the current life region without overwriting existing game state.
  if(p){p.secretDiscoveries=p.secretDiscoveries||[];if(!p.afterlife){let m=initSecretMeta();if(!m.regions.includes(p.place)){m.regions.push(p.place);saveSecretMeta(m)}}}
+})();
+
+
+// v8.19 COLLECTION EXPANSION / CONSISTENCY PATCH
+(function installCollectionExpansion(){
+ // 追加称号。既存の獲得処理（人生終了・昇天使生活終了）にそのまま接続する。
+ const extraTitles=[
+  ["地域復興の立役者","厄災後の復興作業に5回以上参加する","social",s=>(s.calamityRebuilds||0)>=5],
+  ["暮らしを守る人","地域支援や救援に10回以上関わる","social",s=>(s.localAid||0)>=10],
+  ["境界を記録する者","境界点の調査と生還をそれぞれ経験する","special",s=>(s.boundaryResearch||0)>=1&&(s.boundaryEscapes||0)>=1],
+  ["義体と生きる","義体化を進めた状態で20年以上生活する","special",s=>(s.cyberneticLevel||0)>=2&&s.age>=20],
+  ["信仰との距離","グロリア聖糖信仰について自分なりの立場を持つ","angel",s=>!!(s.faith&&s.faith.practice&&s.faith.practice!=="未定")],
+  ["再会を重ねて","同じ人生で友人との再会を重ねる","social",s=>!!s.reunionSeen&&(s.friendshipYears||0)>=5],
+  ["厄災後の再建者","厄災の後に復興事業へ3回以上参加する","calamity",s=>(s.calamityRebuilds||0)>=3],
+  ["異常の目撃者","境界点・厄災・バロックのうち2種類以上を経験する","special",s=>Number(!!s.boundarySurvived)+Number(!!s.disaster)+Number((s.baroqueStage||0)>=1)>=2],
+  ["静かな余生","65歳以降に引退し、10年以上生きる","life",s=>!!s.retiredAfter65&&s.age>=75],
+  ["記録を残す者","人生の重要イベントを20回以上経験する","special",s=>(s.events||0)>=20],
+  ["多くの縁に恵まれて","友人15人以上と関係を築く","social",s=>(s.friends||0)>=15],
+  ["生涯現役","60歳以上で仕事を続けたまま人生を終える","work",s=>s.age>=60&&s.job!=="無職"&&s.job!=="子ども"]
+ ];
+ const existing=new Set(titleDefs.map(x=>x[0]));extraTitles.forEach(x=>{if(!existing.has(x[0]))titleDefs.push(x)});
+ const read=(key,fallback=[])=>{try{const v=JSON.parse(storage.get(key,JSON.stringify(fallback)));return Array.isArray(v)?v:fallback}catch(e){return fallback}};
+ const rarityOrder={secret:6,legendary:5,epic:4,rare:3,uncommon:2,common:1};
+ // 称号図鑑：全体進捗・レアリティ別進捗を表示。既存のソート・絞り込みは維持。
+ const oldShowCollection=showCollection;
+ showCollection=function(){oldShowCollection();const modal=$('modal');if(!modal)return;
+  const earned=new Set(read('bakeTitles',[]));const counts={};Object.keys(rarityNames).forEach(k=>counts[k]={got:0,total:0});
+  titleDefs.forEach(x=>{const r=getTitleRarity(x[0]);counts[r].total++;if(earned.has(x[0]))counts[r].got++});
+  const panel=document.createElement('div');panel.className='entry';panel.style.margin='10px 0';
+  panel.innerHTML=`<b>収集進捗</b><div class="sub">全体：${[...earned].filter(n=>titleDefs.some(x=>x[0]===n)).length} / ${titleDefs.length} 種類</div><div class="info-grid" style="margin-top:8px">${Object.entries(counts).sort((a,b)=>rarityOrder[b[0]]-rarityOrder[a[0]]).map(([r,v])=>`<div class="info-card"><small>${rarityNames[r]}</small><b>${v.got} / ${v.total}</b></div>`).join('')}</div>`;
+  const heading=modal.querySelector('h2');heading?.after(panel);
+ };
+ // 死因図鑑：発見数だけでなく、人生アーカイブに基づく遭遇回数も表示。
+ showDeathCollection=function(){
+  const found=read('bakeDeathCauses',[]),lives=read('bakeLives',[]);
+  const counts={};lives.forEach(x=>{if(x&&x.cause)counts[x.cause]=(counts[x.cause]||0)+1});
+  const groups=Object.entries(deathCauseGroups);const discovered=deathCauses.filter(c=>found.includes(c)||counts[c]>0).length;
+  $('overlay').style.display='grid';$('modal').innerHTML=`<button class="modal-close" aria-label="閉じる" onclick="closeV8Modal()">×</button><h2>死因図鑑</h2><p class="sub">確認した死因：${discovered} / ${deathCauses.length}種類　／　人生記録：${lives.length}件</p><div class="death-grid">${groups.map(([group,items])=>`<div class="death-category">${escapeHtml(group)}</div>${items.map(c=>{const n=counts[c]||0,got=found.includes(c)||n>0;return `<div class="death-item ${got?'found':''}">${got?'◆':'◇'} ${escapeHtml(c)} <small style="opacity:.75">${n?`${n}回`:'未確認'}</small></div>`}).join('')}`).join('')}${found.filter(c=>!deathCauses.includes(c)).map(c=>`<div class="death-item found">◆ ${escapeHtml(c)}（旧記録・回数不明）</div>`).join('')}</div><p class="sub">回数は保存済みの人生記録から集計します。古いセーブに人生記録が残っていない場合、発見済みでも回数は不明です。</p><div class="controls"><button onclick="showLifeArchive()">人生記録を見る</button><button onclick="showAscendedCollection()">昇天使記録</button></div>`;
+ };
+ // 全人生アーカイブ：通常の人生記録を検索・並べ替えできるようにする。
+ window.showLifeArchive=function(sort='newest',filter='all'){
+  const lives=read('bakeLives',[]).slice();
+  if(filter==='ascended'){} // filterは下の選択UIから再描画する
+  const sorted=lives.map((x,i)=>({...x,_i:i}));
+  if(sort==='age')sorted.sort((a,b)=>(b.age||0)-(a.age||0));
+  else if(sort==='name')sorted.sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'ja'));
+  else sorted.sort((a,b)=>a._i-b._i);
+  const list=sorted.filter(x=>filter==='all'||(filter==='ascended'?x.ascended:filter==='special'?x.specialLife:!x.ascended&&!x.specialLife));
+  $('overlay').style.display='grid';$('modal').innerHTML=`<button class="modal-close" aria-label="閉じる" onclick="closeV8Modal()">×</button><h2>人生記録アーカイブ</h2><p class="sub">保存件数：${lives.length} / 最大100件</p><div class="info-grid"><label>並び替え<select id="lifeArchiveSort" onchange="showLifeArchive(this.value,document.getElementById('lifeArchiveFilter').value)"><option value="newest" ${sort==='newest'?'selected':''}>新しい記録順</option><option value="age" ${sort==='age'?'selected':''}>生涯年齢順</option><option value="name" ${sort==='name'?'selected':''}>名前順</option></select></label><label>表示対象<select id="lifeArchiveFilter" onchange="showLifeArchive(document.getElementById('lifeArchiveSort').value,this.value)"><option value="all" ${filter==='all'?'selected':''}>すべて</option><option value="ordinary" ${filter==='ordinary'?'selected':''}>通常人生</option><option value="special" ${filter==='special'?'selected':''}>既存個体</option><option value="ascended" ${filter==='ascended'?'selected':''}>昇天した人生</option></select></label></div><div style="max-height:58vh;overflow:auto">${list.length?list.map(x=>`<details class="entry"><summary><b>${escapeHtml(x.name||'名無し')}</b> — ${Number(x.age)||0}歳 / ${escapeHtml(x.place||'不明')} <span class="sub">${x.ascended?'✧昇天':x.specialLife?'専用人生':'通常人生'}</span></summary><div class="sub">死因：${escapeHtml(x.cause||'不明')}<br>職業：${escapeHtml(x.job||'不明')} / 生年：${escapeHtml(String(x.year||'不明'))}<br>昇天判定：${x.ascended?`${x.ascensionChance??'—'}%`:'対象外または非昇天'}<br>昇天後：${x.afterlifeYears||0}年 ${x.afterlifeComplete?'（完了）':''}<br>称号：${(x.titles||[]).map(escapeHtml).join('、')||'なし'}<br>固有イベント：${(x.specialLifeEventsDone||[]).length}件<br>バロック：${x.baroque?.stage?`段階${x.baroque.stage}・${escapeHtml(x.baroque.type||'型不明')}`:'記録なし'}</div></details>`).join(''):'<p class="sub">該当する人生記録はありません。</p>'}</div><button onclick="showDeathCollection()">死因図鑑へ戻る</button>`;
+ };
+ // その他メニューにアーカイブへの導線を追加。
+ const oldMore=showMoreMenu;showMoreMenu=function(){oldMore();const wrap=$('modal')?.querySelector('.choices');if(wrap&&!wrap.querySelector('[data-life-archive]')){const b=document.createElement('button');b.textContent='人生記録アーカイブ';b.dataset.lifeArchive='1';b.onclick=()=>showLifeArchive();wrap.appendChild(b)}};
+ // 死亡記録の整合性：死因図鑑の発見済みリストと人生記録の死因を相互補完。
+ const oldDie=die;die=function(cause){if(p&&!p.dead){const causes=read('bakeDeathCauses',[]);if(cause&&!causes.includes(cause)){causes.push(cause);storage.set('bakeDeathCauses',JSON.stringify(causes))}}return oldDie(cause)};
+ // 昇天後150年を終えた際、対応する人生記録の完了状態を再同期。
+ const oldFinish=finishAfterlife;finishAfterlife=function(){oldFinish();if(p){const lives=read('bakeLives',[]);let rec=lives.find(x=>x.name===p.name&&x.ascended&&!x.afterlifeComplete&&(x.year===p.year-151||x.year===p.year-150));if(!rec)rec=lives.find(x=>x.name===p.name&&x.ascended);if(rec){rec.afterlifeComplete=true;rec.afterlifeYears=150;rec.afterlifeJob=p.job;rec.holyFavor=p.holyFavor||0;rec.afterlifeTitles=(p.titles||[]).slice();storage.set('bakeLives',JSON.stringify(lives.slice(0,100)))}}};
+ // 古い保存データの欠落・重複を補正。人生記録から死因の発見状態を復元する。
+ const known=read('bakeDeathCauses',[]);const lives=read('bakeLives',[]);let changed=false;
+ lives.forEach(x=>{if(x?.cause&&!known.includes(x.cause)){known.push(x.cause);changed=true}});
+ if(changed)storage.set('bakeDeathCauses',JSON.stringify([...new Set(known)]));
+ const titles=read('bakeTitles',[]);const normalized=[...new Set(titles.filter(x=>typeof x==='string'))];if(normalized.length!==titles.length)storage.set('bakeTitles',JSON.stringify(normalized));
 })();
 
 </script>

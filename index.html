@@ -581,6 +581,94 @@ const specialStoryEvents={
  marumelo:[{age:1,title:"記録官長の悪戯",desc:"記録官長としての権限を持ちながら、規範の隙間を見つけては周囲をからかう。",opts:["職務の範囲で遊ぶ","禁忌に近づく"],effects:[()=>{p.knowledge=clamp(p.knowledge+6);p.happiness=clamp(p.happiness+5)},()=>{p.fallStage=1;p.inquisitorAlert=clamp((p.inquisitorAlert||0)+10);p.stress=clamp(p.stress+6)}]},{age:3,title:"禁じられた果実",desc:"欲望と規範の境界にある果実。手を伸ばせば、これまでの立場を失うかもしれない。",opts:["果実を口にする","手を引く"],effects:[()=>{p.fallen=true;p.fallStage=3;p.job="堕天使";p.holyFavor=0},()=>{p.knowledge=clamp(p.knowledge+5);p.stress=clamp(p.stress-2)}]}],
  busbusa:[{age:1,title:"きな粉砂漠の女王の残響",desc:"自分には覚えのない誇りや復讐心が、ふと胸の奥から湧き上がる。",opts:["感情の出所を調べる","自分の人格とは分けて考える"],effects:[()=>{p.knowledge=clamp(p.knowledge+8);p.mind=clamp(p.mind-3)},()=>{p.egoStability=clamp(p.egoStability+8)}]},{age:20,title:"テオナナカトルの記録",desc:"森の怪王について記録する機会が訪れる。記録官として、何を残すべきだろう。",opts:["公的な事実を残す","本人の言葉も記す"],effects:[()=>{p.knowledge=clamp(p.knowledge+7)},()=>{p.social=clamp(p.social+7);p.happiness=clamp(p.happiness+3)}]}]
 };
+/* v8.13: additional dedicated character-life stories */
+const specialStorySupplement={
+ celestial:[
+  {age:8,title:"創造主の気まぐれ",desc:"セレスティアルとして過ごす日々は、神の責務と個人的な好奇心がいつも隣り合っている。今日は大陸の住民から、思いがけない願いが届いた。",opts:["願いを叶えてみる","あえて成り行きを見守る"],effects:[()=>{p.holyFavor=(p.holyFavor||0)+5;p.happiness=clamp(p.happiness+4);addLog("住民の願いに応えた。小さな変化もまた、世界の一部だ。","good")},()=>{p.knowledge=clamp(p.knowledge+7);p.stress=clamp(p.stress-2);addLog("すぐには手を出さず、世界が選ぶ結果を観測した。","event")}]},
+  {age:25,title:"統一された祈り",desc:"各地の信仰と土地神の影響が、グロリア聖糖信仰の統一を妨げている。どこまで介入するべきだろう。",opts:["信仰の統一を進める","地域の信仰を尊重する"],effects:[()=>{p.holyFavor=(p.holyFavor||0)+8;p.stress=clamp(p.stress+5);addLog("信仰の統一を推し進めた。反発もまた、神の記録に残る。","event")},()=>{p.social=clamp(p.social+8);p.happiness=clamp(p.happiness+3);addLog("地域ごとの信仰を認め、対話の余地を残した。","good")}]}
+ ],
+ pandora:[
+  {age:8,title:"創造の余白",desc:"セレスティアルと共に創った世界には、まだ意図していない余白が残っている。そこへ何を置くかは、あなたの気分次第だ。",opts:["新しい可能性を仕込む","今ある世界を観察する"],effects:[()=>{p.knowledge=clamp(p.knowledge+8);p.fame+=3;addLog("世界に小さな仕掛けを残した。誰が気づくかは分からない。","event")},()=>{p.mind=clamp(p.mind+4);p.knowledge=clamp(p.knowledge+4);addLog("手を加えず、世界が自ら変わる様子を眺めた。","good")}]},
+  {age:25,title:"人災という名",desc:"あなたの行動は、誰かにとっては奇跡であり、別の誰かにとっては災厄になる。責任をどう扱う？",opts:["結果を引き受ける","観測者として距離を取る"],effects:[()=>{p.stress=clamp(p.stress+7);p.egoStability=clamp(p.egoStability+5);addLog("自らが招いた結果から目を逸らさないことにした。","event")},()=>{p.mind=clamp(p.mind+5);p.social=clamp(p.social-3);addLog("世界との距離を保ち、次の変化を待つことにした。","event")}]}
+ ],
+ bahal:[
+  {age:8,title:"水底に集う命",desc:"海や水脈に暮らす者たちが、あなたを母のように慕っている。守ることと、自由にさせることは同じではない。",opts:["庇護する","自立を見守る"],effects:[()=>{p.helped+=4;p.social=clamp(p.social+6);addLog("水底の者たちを庇護し、安住の場所を与えた。","good")},()=>{p.knowledge=clamp(p.knowledge+6);p.happiness=clamp(p.happiness+3);addLog("彼ら自身の選択を尊重し、遠くから見守った。","event")}]},
+  {age:25,title:"水禍の封印",desc:"古き王とセレスティアルが、あなたを止めるために動き始めた。力を振るえば世界は沈む。退けば、あなた自身が封じられる。",opts:["最後まで抗う","封印を受け入れる"],effects:[()=>{p.skill=clamp(p.skill+10);p.health=clamp(p.health-15);p.stress=clamp(p.stress+8);addLog("水禍として最後まで抗った。","bad")},()=>{p.egoStability=clamp(p.egoStability+8);p.stress=clamp(p.stress-5);addLog("封印を受け入れ、世界に残る命を守る道を選んだ。","event")}]}
+ ],
+ terra:[
+  {age:8,title:"星の機構",desc:"この星に生きるものたちを、あなたは資源や構成要素として観測している。彼らの営みを、どこまで理解する必要がある？",opts:["機構として解析する","個体の意思を観察する"],effects:[()=>{p.knowledge=clamp(p.knowledge+10);p.social=clamp(p.social-4);addLog("生命を構成する機構の解析を進めた。","event")},()=>{p.knowledge=clamp(p.knowledge+5);p.egoStability=clamp(p.egoStability+5);addLog("個体ごとの意思と反応を観察対象に加えた。","good")}]},
+  {age:25,title:"地災の侵蝕",desc:"大地そのものを再構成する計画が進む。抵抗する者たちの存在は、計算上の誤差として扱えるだろうか。",opts:["計画を実行する","抵抗の理由を調べる"],effects:[()=>{p.skill=clamp(p.skill+10);p.stress=clamp(p.stress+6);p.terraConflict=true;addLog("地殻の再構成を進めた。世界の形が変わり始める。","bad")},()=>{p.knowledge=clamp(p.knowledge+9);p.mind=clamp(p.mind+3);addLog("抵抗する者たちの理由を調べ、計画を一時停止した。","event")}]}
+ ],
+ abaddon:[
+  {age:8,title:"満たされない器",desc:"食料や資源が不足する地域を見ている。欠乏をなくすことと、欠乏を利用すること。どちらも可能だ。",opts:["不足を分配する","不足を力に変える"],effects:[()=>{p.helped+=4;p.social=clamp(p.social+6);addLog("資源を分配し、困窮する者たちを支えた。","good")},()=>{p.money+=40;p.stress=clamp(p.stress+5);addLog("不足を利用して影響力を広げた。","event")}]},
+  {age:25,title:"二重契約",desc:"複数の組織から相反する依頼が届いた。双方に利益をもたらすことも、双方を裏切ることもできる。",opts:["両方の契約を維持する","片方を切り捨てる"],effects:[()=>{p.money+=50;p.stress=clamp(p.stress+10);p.knowledge=clamp(p.knowledge+4);addLog("二重契約を維持した。綱渡りのような均衡が続く。","event")},()=>{p.fame+=4;p.skill=clamp(p.skill+5);addLog("片方の契約を切り捨て、立場を明確にした。","event")}]}
+ ],
+ jechi:[
+  {age:8,title:"戦場の秩序",desc:"争いが広がるほど、あなたの存在感も増していく。戦う理由を持たない者まで巻き込む必要はあるだろうか。",opts:["戦場を拡大する","民間人を戦火から遠ざける"],effects:[()=>{p.skill=clamp(p.skill+9);p.stress=clamp(p.stress+7);addLog("戦場を拡大し、力による決着を目指した。","bad")},()=>{p.helped+=4;p.social=clamp(p.social+5);addLog("民間人を避難させ、戦場の外に逃がした。","good")}]},
+  {age:25,title:"勝利の代償",desc:"勝利を重ねた先に、守るべきものが残っているとは限らない。戦いを終わらせる方法を選ぶ時が来た。",opts:["最後の決戦を求める","停戦の可能性を探る"],effects:[()=>{p.fame+=8;p.health=clamp(p.health-10);addLog("最後の決戦を求めた。勝敗は新たな戦禍を呼ぶかもしれない。","event")},()=>{p.social=clamp(p.social+7);p.stress=clamp(p.stress-3);addLog("停戦交渉の可能性を探り、戦場に猶予を作った。","good")}]}
+ ],
+ venenum:[
+  {age:8,title:"病の観測者",desc:"症状の広がり方に、通常の感染症とは異なる規則性が見える。治療と変異のどちらを優先する？",opts:["治療法を探す","変異の仕組みを解明する"],effects:[()=>{p.helped+=3;p.knowledge=clamp(p.knowledge+6);addLog("治療法の研究に協力し、患者の支援を優先した。","good")},()=>{p.knowledge=clamp(p.knowledge+10);p.stress=clamp(p.stress+5);addLog("病の変異機構を調べるため、観測を続けた。","event")}]},
+  {age:25,title:"キメラの選択",desc:"複数の生物的特徴を組み合わせる実験が可能になった。倫理と生存の境界は曖昧だ。",opts:["実験を進める","被験者の同意を優先する"],effects:[()=>{p.skill=clamp(p.skill+8);p.baroqueRisk=clamp(p.baroqueRisk+8);addLog("キメラ化の実験を進めた。","bad")},()=>{p.social=clamp(p.social+5);p.knowledge=clamp(p.knowledge+5);p.stress=clamp(p.stress+2);addLog("同意のない実験を避け、協力者の意思を確認した。","good")}]}
+ ],
+ gloriosa:[
+  {age:8,title:"古王の責務",desc:"古い王として、民の安寧と世界規模の脅威のどちらにも目を配らなければならない。",opts:["民の暮らしを整える","脅威への備えを優先する"],effects:[()=>{p.helped+=4;p.localAid+=4;p.social=clamp(p.social+5);addLog("民の暮らしを整え、王としての信頼を得た。","good")},()=>{p.skill=clamp(p.skill+6);p.knowledge=clamp(p.knowledge+5);addLog("外敵への備えを整えた。","event")}]},
+  {age:25,title:"盟友との約束",desc:"セレスティアルと交わした約束が、今もあなたの判断を左右している。神の意志と王の判断が食い違った時、何を選ぶ？",opts:["盟友の意志を尊重する","王として独自に判断する"],effects:[()=>{p.holyFavor=(p.holyFavor||0)+5;p.social=clamp(p.social+4);addLog("盟友との約束を守ることにした。","event")},()=>{p.knowledge=clamp(p.knowledge+6);p.egoStability=clamp(p.egoStability+5);addLog("王として独自の判断を下す覚悟を決めた。","good")}]}
+ ],
+ pulmonbargo:[
+  {age:8,title:"異端審問官の後始末",desc:"デクルシヴァたちが起こした外交上の問題を、あなたが調停することになった。規則だけでは収まらない相手もいる。",opts:["正式な手続きで収める","個人的な交渉で丸く収める"],effects:[()=>{p.knowledge=clamp(p.knowledge+6);p.professionRank=3;addLog("正式な手続きで問題を整理した。","event")},()=>{p.social=clamp(p.social+8);p.stress=clamp(p.stress-3);addLog("個人的な交渉で双方の面子を保った。","good")}]},
+  {age:25,title:"双子の外交官",desc:"双子の兄弟アカマツリとの連携が必要になった。普段は気弱な彼も、譲れない局面では激しい一面を見せる。",opts:["兄弟を信頼して任せる","自分が前面に立つ"],effects:[()=>{p.characterBonds=p.characterBonds||[];p.characterBonds.push("アカマツリ");p.social=clamp(p.social+6);addLog("アカマツリと連携し、外交局の仕事を進めた。","good")},()=>{p.skill=clamp(p.skill+6);p.stress=clamp(p.stress+3);addLog("自分が交渉の前面に立った。","event")}]}
+ ],
+ edam:[
+  {age:8,title:"大陸からの指令",desc:"出所の分からない指令が、またひとつ届いた。文面は短く、意図は読み取れない。",opts:["そのまま伝達する","背景を調べてから伝える"],effects:[()=>{p.directiveCount=(p.directiveCount||0)+1;addLog("指令を改変せずに伝達した。","event")},()=>{p.directiveCount=(p.directiveCount||0)+1;p.knowledge=clamp(p.knowledge+7);addLog("指令の背景を調べてから伝達した。","good")}]},
+  {age:25,title:"伝令官長の責任",desc:"指令を受け取る者たちは、その意味をあなたに尋ねる。しかし、あなた自身にも答えは知らされていない。",opts:["分からないと正直に伝える","自分なりの解釈を添える"],effects:[()=>{p.social=clamp(p.social+5);p.stress=clamp(p.stress-2);addLog("分からないことを正直に伝え、受け手の判断を尊重した。","good")},()=>{p.knowledge=clamp(p.knowledge+5);p.stress=clamp(p.stress+4);addLog("自分の解釈を添えて指令を伝えた。","event")}]}
+ ],
+ fruitcheese:[
+  {age:8,title:"後継者のいない役目",desc:"リライトという役職には、あなた以外の担い手がいない。堕天した今も指令だけは届き続ける。",opts:["役目を続ける","指令を受け取らない方法を探す"],effects:[()=>{p.directiveCount=(p.directiveCount||0)+1;p.knowledge=clamp(p.knowledge+5);addLog("堕天後もリライトの役目を続けた。","event")},()=>{p.stress=clamp(p.stress-4);p.mind=clamp(p.mind+4);addLog("指令との距離を取る方法を探し始めた。","good")}]},
+  {age:25,title:"誰にも届かない翻訳",desc:"翻訳した指令が、誰にも知られないまま現実を変えていく。自分の仕事に意味はあるのだろうか。",opts:["記録に残らなくても続ける","自分の言葉で意味を与える"],effects:[()=>{p.egoStability=clamp(p.egoStability+6);p.stress=clamp(p.stress+2);addLog("誰にも知られなくても、役目を続けることにした。","event")},()=>{p.fame+=2;p.social=clamp(p.social+4);addLog("自分の解釈を記録に残し、役目の意味を示そうとした。","good")}]}
+ ],
+ corpse:[
+  {age:8,title:"門番隊長の流儀",desc:"グロリアスゲートを訪れる者の中には、善意を装った危険な存在もいる。門を守るとは、何を守ることなのか。",opts:["規則を徹底する","相手の事情を見極める"],effects:[()=>{p.skill=clamp(p.skill+7);p.knowledge=clamp(p.knowledge+3);addLog("門の審査基準を整えた。","event")},()=>{p.social=clamp(p.social+6);p.knowledge=clamp(p.knowledge+4);addLog("相手の事情を聞き、危険性を個別に判断した。","good")}]},
+  {age:25,title:"門の外の流行",desc:"地上の流行や文化が門の向こうから届く。門番隊長として、職務中もつい気になってしまう。",opts:["職務外の交流を楽しむ","門の警備に集中する"],effects:[()=>{p.happiness=clamp(p.happiness+7);p.social=clamp(p.social+5);addLog("地上の流行を取り入れ、門番たちとの交流を楽しんだ。","good")},()=>{p.skill=clamp(p.skill+6);addLog("職務に集中し、警備体制を強化した。","event")}]}
+ ],
+ tropical:[
+  {age:8,title:"古参の右腕",desc:"長く仕えてきた主のそばで、ベイクドームの変化を見続けてきた。忠誠と自分自身の意思をどう両立させる？",opts:["主の判断を支える","必要なら異を唱える"],effects:[()=>{p.holyFavor=(p.holyFavor||0)+4;p.social=clamp(p.social+4);addLog("主の判断を支え、右腕としての役目を果たした。","good")},()=>{p.knowledge=clamp(p.knowledge+5);p.egoStability=clamp(p.egoStability+5);addLog("必要な時には異を唱える覚悟を決めた。","event")}]},
+  {age:25,title:"門を守る理由",desc:"門を守る日々の中で、誰を通し、誰を止めるのかという問いに何度も向き合う。",opts:["秩序を優先する","個々の事情を優先する"],effects:[()=>{p.skill=clamp(p.skill+7);addLog("秩序を守るため、審査を厳格にした。","event")},()=>{p.social=clamp(p.social+6);p.happiness=clamp(p.happiness+3);addLog("個々の事情を聞き、柔軟な対応を続けた。","good")}]}
+ ],
+ fizzcrack:[
+  {age:8,title:"義体の維持費",desc:"魔導義体の維持には金がかかる。性能を上げれば仕事は増えるが、故障時の損失も大きくなる。",opts:["高性能部品へ交換する","修理しやすさを優先する"],effects:[()=>{p.cyberneticLevel=(p.cyberneticLevel||0)+1;p.skill=clamp(p.skill+6);p.money=Math.max(0,p.money-25);addLog("高性能部品を導入した。維持費は増えたが仕事の幅が広がった。","event")},()=>{p.health=clamp(p.health+4);p.money=Math.max(0,p.money-10);addLog("修理しやすい部品を選び、安定性を優先した。","good")}]},
+  {age:25,title:"利益と信用",desc:"高額だが危険な依頼が舞い込んだ。合理的に考えれば受ける価値はあるが、信用を失う可能性もある。",opts:["報酬を優先する","長期的な信用を優先する"],effects:[()=>{p.money+=60;p.stress=clamp(p.stress+7);addLog("高額依頼を引き受けた。利益は出たが、後味は悪い。","event")},()=>{p.social=clamp(p.social+7);p.fame+=3;addLog("依頼を断り、信用を守った。","good")}]}
+ ],
+ shadowqueen:[
+  {age:8,title:"効率化の代償",desc:"数字の上では成功している改革が、現場の疲弊を生んでいる。効率と人員のどちらを優先する？",opts:["目標達成を優先する","現場の負担を見直す"],effects:[()=>{p.skill=clamp(p.skill+7);p.money+=30;p.stress=clamp(p.stress+6);addLog("目標達成を優先し、効率をさらに高めた。","event")},()=>{p.social=clamp(p.social+7);p.stress=clamp(p.stress-5);addLog("現場の負担を見直し、長期的な運用を選んだ。","good")}]},
+  {age:25,title:"アストラとの決別",desc:"かつて所属した組織との関係を整理する時が来た。過去のやり方を捨てるか、経験として残すか。",opts:["完全に距離を置く","使える知識だけ持ち帰る"],effects:[()=>{p.mind=clamp(p.mind+4);p.stress=clamp(p.stress-3);addLog("過去の組織と距離を置いた。","good")},()=>{p.knowledge=clamp(p.knowledge+8);p.money+=20;addLog("過去の経験を知識として活用することにした。","event")}]}
+ ],
+ tunkaron:[
+  {age:8,title:"トラブルメーカーの評判",desc:"行く先々で騒ぎを起こすあなたの名前が、便利屋たちの間でも知られ始めた。評判をどう使う？",opts:["面白そうな依頼に乗る","信用を取り戻す"],effects:[()=>{p.skill=clamp(p.skill+6);p.stress=clamp(p.stress+5);addLog("面白そうな依頼に飛びつき、また騒動を起こした。","event")},()=>{p.social=clamp(p.social+6);p.fame+=2;addLog("少しだけ真面目に働き、信用を取り戻そうとした。","good")}]},
+  {age:25,title:"騒ぎの後始末",desc:"自分が始めた騒動で、仲間や依頼人に迷惑がかかった。逃げることも、責任を取ることもできる。",opts:["責任を取る","別の騒ぎでうやむやにする"],effects:[()=>{p.helped+=2;p.social=clamp(p.social+5);p.stress=clamp(p.stress+3);addLog("騒動の後始末を引き受けた。","good")},()=>{p.happiness=clamp(p.happiness+3);p.fame+=2;addLog("別の騒ぎを起こして、話題を逸らした。","event")}]}
+ ],
+ kadaif:[
+  {age:8,title:"記録官の見習い",desc:"記録塔で、膨大な人生の記録を整理する仕事を任された。事実だけでは伝わらないものもある。",opts:["事実を正確に記す","当事者の感情も残す"],effects:[()=>{p.knowledge=clamp(p.knowledge+8);addLog("記録の正確性を優先し、資料を整理した。","event")},()=>{p.social=clamp(p.social+5);p.knowledge=clamp(p.knowledge+4);addLog("当事者の感情や背景も記録に残した。","good")}]},
+  {age:25,title:"記録から消すべきもの",desc:"記録の中に、残せば誰かを傷つける情報が見つかった。記録官としてどう扱う？",opts:["原本を保存する","閲覧制限を設ける"],effects:[()=>{p.knowledge=clamp(p.knowledge+7);p.stress=clamp(p.stress+4);addLog("原本を保存し、事実を後世へ残すことにした。","event")},()=>{p.social=clamp(p.social+4);p.stress=clamp(p.stress-2);addLog("閲覧制限を設け、記録の保全と安全を両立させた。","good")}]}
+ ],
+ nitrocellulose:[
+  {age:8,title:"危険物の保管庫",desc:"技術官として、取り扱いを誤れば大事故につながる物質の管理を任された。",opts:["厳重な管理体制を敷く","研究効率を落とさず管理する"],effects:[()=>{p.knowledge=clamp(p.knowledge+6);p.skill=clamp(p.skill+5);addLog("保管庫の安全基準を引き上げた。","good")},()=>{p.skill=clamp(p.skill+8);p.stress=clamp(p.stress+5);addLog("研究効率を維持しながら、最低限の管理体制を整えた。","event")}]},
+  {age:25,title:"技術の公開範囲",desc:"開発した技術を公開すれば多くの者が恩恵を受ける一方、悪用される可能性もある。",opts:["広く公開する","限定された部署に留める"],effects:[()=>{p.fame+=5;p.social=clamp(p.social+4);addLog("技術を公開し、広い分野での応用を促した。","event")},()=>{p.knowledge=clamp(p.knowledge+6);p.stress=clamp(p.stress-2);addLog("利用者を限定し、安全性の検証を続けた。","good")}]}
+ ],
+ akamatsuri:[
+  {age:8,title:"外交局長の会談",desc:"複数の勢力が参加する会談で、あなたの発言が求められた。気弱さと激しさ、その両方が試される。",opts:["慎重に意見を述べる","強硬な姿勢を示す"],effects:[()=>{p.social=clamp(p.social+6);p.knowledge=clamp(p.knowledge+4);addLog("慎重に意見を述べ、会談をまとめた。","good")},()=>{p.skill=clamp(p.skill+7);p.stress=clamp(p.stress+5);addLog("譲れない条件を強硬に主張した。","event")}]},
+  {age:25,title:"兄弟との役割分担",desc:"双子の兄弟プルンバーゴと、難しい案件を分担することになった。信頼して任せるか、自分で抱えるか。",opts:["兄弟に任せる","自分が引き受ける"],effects:[()=>{p.characterBonds=p.characterBonds||[];p.characterBonds.push("プルンバーゴ");p.stress=clamp(p.stress-4);addLog("プルンバーゴに案件を任せ、互いの得意分野を活かした。","good")},()=>{p.skill=clamp(p.skill+6);p.stress=clamp(p.stress+5);addLog("自分が案件を引き受け、責任を果たした。","event")}]}
+ ],
+ voidharlight:[
+  {age:8,title:"囁きの最初の届き先",desc:"あなたの囁きは、まだ誰にも正体を知られていない。届いた相手の精神が揺らぎ、世界の記録に小さな歪みが生じる。",opts:["囁きを強める","反応を観測する"],effects:[()=>{p.voidWhisper=true;p.baroqueRisk=100;p.mind=clamp(p.mind-5);addLog("囁きを強めた。遠くで誰かの理性が揺らいだ。","bad")},()=>{p.knowledge=100;p.stress=clamp(p.stress-2);addLog("囁きを抑え、世界に生じる反応を観測した。","event")}]},
+  {age:25,title:"記録外の干渉",desc:"あなたを記録しようとする試みが現れた。観測されることは、あなたにとって脅威なのか、興味深い遊戯なのか。",opts:["記録を破壊する","観測者を泳がせる"],effects:[()=>{p.boundaryRewriteCount=(p.boundaryRewriteCount||0)+1;p.stress=clamp(p.stress+5);addLog("記録を破壊し、観測者の記憶に空白を残した。","bad")},()=>{p.knowledge=100;p.fame+=3;addLog("観測者を泳がせ、どこまで真実に近づくかを眺めた。","event")}]}
+ ]
+};
+for(const [id,events] of Object.entries(specialStorySupplement)){
+ if(!specialStoryEvents[id])specialStoryEvents[id]=[];
+ specialStoryEvents[id].push(...events);
+ specialStoryEvents[id].sort((a,b)=>a.age-b.age);
+}
 function triggerSpecialLifeStoryEvent(){if(!p||!p.specialLife)return false;const list=specialStoryEvents[p.specialLifeId]||[];const done=p.specialLifeStoryDone||(p.specialLifeStoryDone=[]);const ev=list.find(x=>p.age>=x.age&&!done.includes(x.age));if(!ev)return false;done.push(ev.age);bigDecision(ev.title,ev.desc,ev.opts,ev.effects);return true}
 function triggerSpecialLifeMilestone(){if(!p||!p.specialLife||!Array.isArray(p.specialLifeMilestones))return false;const done=p.specialLifeEventsDone||[];const m=p.specialLifeMilestones.find(x=>p.age>=x.age&&!done.includes(x.age));if(!m)return false;p.specialLifeEventsDone=[...done,m.age];bigDecision(m.title,m.desc,m.opts,m.effects);return true}
 function startClock(){clearInterval(timer);lastTick=Date.now();clockCarry=0;timer=setInterval(()=>{let now=Date.now();if(!paused&&!decision&&p&&!p.dead){clockCarry+=(now-lastTick)*speed;if(clockCarry>=15000){clockCarry-=15000;advanceSeason();if(decision||paused)clockCarry=0}}lastTick=now},100)}
@@ -1217,7 +1305,7 @@ function showSecretArchive(){let m=initSecretMeta();let discoveries=m.discoverie
 function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','記録の外側','タイトル画面に隠された操作から秘密の記録へ到達した。');awardSecretTitles();showSecretArchive()}
 (function installSecretExpansion(){
  initSecretMeta();
- const oldBeginLife=beginLife;beginLife=function(name){oldBeginLife(name);if(p){let m=initSecretMeta();m.runs++;p.secretArchived=false;if(!m.regions.includes(p.place)&&!p.afterlife)m.regions.push(p.place);saveSecretMeta(m);p.secretDiscoveries=p.secretDiscoveries||[];p.secretEventCount=0;p.dejaVuSeen=false;let prior=m.archive?.[0];if(prior&&prior.place===p.place&&Math.random()<.12){p.mind=clamp(p.mind+2);addLog('初めて訪れたはずの土地なのに、どこか懐かしい。','event')}}};
+ const oldBeginLife=beginLife;beginLife=function(name,specialMatch=null){oldBeginLife(name,specialMatch);if(p){let m=initSecretMeta();m.runs++;p.secretArchived=false;if(!m.regions.includes(p.place)&&!p.afterlife)m.regions.push(p.place);saveSecretMeta(m);p.secretDiscoveries=p.secretDiscoveries||[];p.secretEventCount=0;p.dejaVuSeen=false;let prior=m.archive?.[0];if(prior&&prior.place===p.place&&Math.random()<.12){p.mind=clamp(p.mind+2);addLog('初めて訪れたはずの土地なのに、どこか懐かしい。','event')}}};
  const oldRandomEvent=randomEvent;randomEvent=function(){if(secretChanceEvent()){p.recentEvents=p.recentEvents||[];p.recentEvents.push('秘密の遭遇');p.recentEvents=p.recentEvents.slice(-7);return;}oldRandomEvent()};
  const oldAngelEvent=angelEvent;angelEvent=function(){if(secretChanceEvent())return;oldAngelEvent()};
  const oldDie=die;die=function(cause){if(p&&!p.dead){secretArchiveLife(cause);awardSecretTitles()}oldDie(cause);let m=initSecretMeta();if(p&&m.archive?.length){m.archive[0].titles=(p.titles||[]).slice();m.archive[0].ascended=!!p.ascended;m.archive[0].cause=cause;saveSecretMeta(m)}};
@@ -1226,7 +1314,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  const oldMore=showMoreMenu;showMoreMenu=function(){oldMore();let m=$('modal');if(m){let wrap=m.querySelector('.choices');if(wrap){let b=document.createElement('button');b.textContent='秘密の記録・全人生アーカイブ';b.onclick=showSecretArchive;wrap.appendChild(b)}}};
  const oldRegion=showRegionInfo;showRegionInfo=function(){oldRegion();let m=$('modal');if(m){let meta=initSecretMeta();let div=document.createElement('div');div.className='entry';div.innerHTML=`<b>地域の秘密の発見</b><div class="sub">訪問記録：${(meta.regions||[]).length}地域 / 秘密の発見：${(meta.discoveries||[]).length}件。地域ごとの探索や人生を重ねることで、新しい記録が見つかる。</div><button onclick="showSecretArchive()">秘密の記録を見る</button>`;m.appendChild(div)}};
  const oldCollection=showCollection;showCollection=function(){awardSecretTitles();oldCollection();let m=$('modal');if(m){let b=m.querySelector('button:last-child');let x=document.createElement('button');x.textContent='秘密の記録・全人生アーカイブ';x.onclick=showSecretArchive;b?.before(x)}};
- const oldExport=exportSave;exportSave=function(){let data={version:8.7,current:p,deathCauses:JSON.parse(storage.get('bakeDeathCauses','[]')),titles:JSON.parse(storage.get('bakeTitles','[]')),lives:JSON.parse(storage.get('bakeLives','[]')),ascendedLives:JSON.parse(storage.get('bakeAscendedLives','[]')),secretMeta:initSecretMeta()};let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.10.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)};
+ const oldExport=exportSave;exportSave=function(){let data={version:8.7,current:p,deathCauses:JSON.parse(storage.get('bakeDeathCauses','[]')),titles:JSON.parse(storage.get('bakeTitles','[]')),lives:JSON.parse(storage.get('bakeLives','[]')),ascendedLives:JSON.parse(storage.get('bakeAscendedLives','[]')),secretMeta:initSecretMeta()};let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.13.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)};
  // v8.8: robust mobile easter egg. Tap the title seven times within 6 seconds.
  let tapTimer=null,taps=0;const title=document.querySelector('header h1');
  function secretTapFeedback(message){let el=document.getElementById('secretTapHint');if(!el){el=document.createElement('div');el.id='secretTapHint';el.style.cssText='position:fixed;left:50%;bottom:calc(78px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:10001;background:#202536;border:1px solid #b89a59;color:#f4e7bd;padding:9px 14px;border-radius:12px;font-size:13px;box-shadow:0 4px 18px #0009;max-width:90vw;text-align:center;pointer-events:none';document.body.appendChild(el)}el.textContent=message;el.style.display='block';clearTimeout(el._hide);el._hide=setTimeout(()=>{el.style.display='none'},1800)}

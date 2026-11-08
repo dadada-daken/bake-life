@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>PANIS ET CALAMITAS — ベイク大陸ライフ v8.23</title>
+<title>PANIS ET CALAMITAS — ベイク大陸ライフ v8.24</title>
 <style>
 :root{--bg:#171923;--panel:#222635;--panel2:#2b3042;--ink:#f4f0e8;--muted:#aeb4c5;--gold:#e6c477;--green:#76c9a2;--red:#e58b8b;--line:#3b4257}
 *{box-sizing:border-box}body{margin:0;padding-bottom:env(safe-area-inset-bottom);background:radial-gradient(circle at top,#30364b,#171923 60%);color:var(--ink);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;line-height:1.55}
@@ -1306,7 +1306,7 @@ function deleteSlot(i){const slots=safeRead("bakeSaveSlots",{});if(!slots[i]||!c
 function importSaveDialog(){$ ("importSaveFile").click()}
 $("importSaveFile").addEventListener("change",async ev=>{const file=ev.target.files?.[0];if(!file)return;try{const data=JSON.parse(await file.text());if(!data||typeof data!=="object"||!data.current)throw new Error("セーブデータの形式が違います");if(!confirm(`v${data.version||"?"}のセーブを読み込みます。現在の人生データを置き換えますか？`))return;if(data.secretMeta)storage.set("bakeSecretMeta",JSON.stringify(data.secretMeta));clearInterval(timer);clearInterval(smallTimer);clearTimeout(autoTimer);p=migrateV8State(data.current);for(const [k,v] of Object.entries({bakeDeathCauses:data.deathCauses||[],bakeTitles:data.titles||[],bakeLives:data.lives||[],bakeAscendedLives:data.ascendedLives||[]}))storage.set(k,JSON.stringify(v));storage.set("bakeCurrent",JSON.stringify(p));decision=null;paused=true;$("overlay").style.display="none";$("log").innerHTML="";(p.logs||[]).slice().reverse().forEach(x=>{const e=document.createElement("div");e.className="entry "+(x.type||"");e.innerHTML=`<small>${x.year||p.year}年 / ${x.age??p.age}歳</small>${escapeHtml(x.text||"")}`;$ ("log").append(e)});render();startClock();addLog(`v${data.version||"?"}のセーブデータを読み込んだ。`,"good");}catch(err){alert("読み込みに失敗しました："+err.message)}finally{ev.target.value=""}});
 
-function exportSave(){let data={version:8.23,current:p,deathCauses:JSON.parse(storage.get("bakeDeathCauses","[]")),titles:JSON.parse(storage.get("bakeTitles","[]")),lives:JSON.parse(storage.get("bakeLives","[]")),ascendedLives:JSON.parse(storage.get("bakeAscendedLives","[]"))};let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="bake-continent-life-record.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}
+function exportSave(){let data={version:8.24,current:p,deathCauses:JSON.parse(storage.get("bakeDeathCauses","[]")),titles:JSON.parse(storage.get("bakeTitles","[]")),lives:JSON.parse(storage.get("bakeLives","[]")),ascendedLives:JSON.parse(storage.get("bakeAscendedLives","[]"))};let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="bake-continent-life-record.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}
 window.addEventListener("beforeunload",()=>{if(p)storage.set("bakeCurrent",JSON.stringify(p))});
 try{const cfg=JSON.parse(storage.get("bakeSettings","{}"));if(cfg.font==="large")document.documentElement.style.fontSize="18px";if(cfg.font==="small")document.documentElement.style.fontSize="14px";if(cfg.motion==="simple")document.body.classList.add("reduced-motion");if(cfg.motion==="fast")document.body.classList.add("fast-motion");}catch(e){}
 (function init(){let old=storage.get("bakeCurrent", "");if(old){try{let q=JSON.parse(old);if(q&&!q.dead){p=q;;p.layer=p.layer||layerOfPlace(p.place);p.homeLayer=p.homeLayer||p.layer;p.layerHistory=p.layerHistory||[];p.layerVisitCount=p.layerVisitCount||0;p.layerCrossings=p.layerCrossings||0;p.boundaryIntrusions=p.boundaryIntrusions||0;p.boundaryRewriteCount=p.boundaryRewriteCount||0;delete p.hunger;delete p.hungerCrises;p.titles=(p.titles||[]).map(x=>x==="飢えを知る者"?"困窮を乗り越えた者":x);p.ageMilestones=p.ageMilestones||[];if(!p.personality)p.personality=createPersonality(p.trait);p.butterMangroveEvents=p.butterMangroveEvents||0;p.butterMangroveResearch=p.butterMangroveResearch||false;p.teonanacatlEncounter=p.teonanacatlEncounter||false;p.marmeloTruthSeen=p.marmeloTruthSeen||false;p.directiveCount=p.directiveCount||0;p.directiveHistory=p.directiveHistory||[];p.terraceRelations=p.terraceRelations||{};p.terraceEncountered=p.terraceEncountered||[];p.terraceProtection=p.terraceProtection||"";p.terraceEvents=p.terraceEvents||0;p.isPureAngel=p.isPureAngel===true||(p.isAngel&&p.angelType==="純天使");p.observationEnded=p.observationEnded||false;p.lastObservationPromptAge=p.lastObservationPromptAge||0;p.fallStage=p.fallStage||0;p.inquisitorAlert=p.inquisitorAlert||0;p.instantFall=p.instantFall||false;p.formerColleagueMet=p.formerColleagueMet||false;p.evasionComplete=p.evasionComplete||false;p.mentalCollapseEventSeen=p.mentalCollapseEventSeen||false;p.baroqueRampage=p.baroqueRampage||false;p.baroqueRampageStarted=p.baroqueRampageStarted||false;p.baroqueRampageWins=p.baroqueRampageWins||0;p.baroqueRampageLosses=p.baroqueRampageLosses||0;p.baroqueWhisperResists=p.baroqueWhisperResists||0;p.baroqueWhisperFollowed=p.baroqueWhisperFollowed||0;p.baroqueConfrontations=p.baroqueConfrontations||0;p.baroqueRampageRecovered=p.baroqueRampageRecovered||false;p.baroqueSecretRecovery=p.baroqueSecretRecovery||false;p.calamityRecords=p.calamityRecords||[];p.calamitySurvived=p.calamitySurvived||[];p.calamityArchive=p.calamityArchive||[];p.calamityArrivalCount=p.calamityArrivalCount||0;p.calamityArchive=p.calamityArchive||[];p.calamityArrivalCount=p.calamityArrivalCount||0;p.npcRelations=p.npcRelations||[];p.familySupport=p.familySupport||0;p.friendshipYears=p.friendshipYears||0;p.careerFields=p.careerFields||[];p.regionState=p.regionState||{economy:50,security:50,healthcare:50,technology:50,prosperity:50,disaster:0};p.professionRank=p.professionRank||0;p.rebuildProjects=p.rebuildProjects||0;p.cyberneticLevel=p.cyberneticLevel||0;p.fairyYears=p.fairyYears||0;p.baroqueSocialYears=p.baroqueSocialYears||0;p.terraceCouncil=p.terraceCouncil||0;delete p.hunger;delete p.hungerCrises;
@@ -1398,7 +1398,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  const oldMore=showMoreMenu;showMoreMenu=function(){oldMore();let m=$('modal');if(m){let wrap=m.querySelector('.choices');if(wrap){let b=document.createElement('button');b.textContent='秘密の記録・全人生アーカイブ';b.onclick=showSecretArchive;wrap.appendChild(b)}}};
  const oldRegion=showRegionInfo;showRegionInfo=function(){oldRegion();let m=$('modal');if(m){let meta=initSecretMeta();let div=document.createElement('div');div.className='entry';div.innerHTML=`<b>地域の秘密の発見</b><div class="sub">訪問記録：${(meta.regions||[]).length}地域 / 秘密の発見：${(meta.discoveries||[]).length}件。地域ごとの探索や人生を重ねることで、新しい記録が見つかる。</div><button onclick="showSecretArchive()">秘密の記録を見る</button>`;m.appendChild(div)}};
  const oldCollection=showCollection;showCollection=function(){awardSecretTitles();syncSecretTitleLedger();oldCollection();let m=$('modal');if(m){let b=m.querySelector('button:last-child');let x=document.createElement('button');x.textContent='秘密の記録・全人生アーカイブ';x.onclick=showSecretArchive;b?.before(x)}};
- const oldExport=exportSave;exportSave=function(){let data={version:8.23,current:p,deathCauses:JSON.parse(storage.get('bakeDeathCauses','[]')),titles:JSON.parse(storage.get('bakeTitles','[]')),lives:JSON.parse(storage.get('bakeLives','[]')),ascendedLives:JSON.parse(storage.get('bakeAscendedLives','[]')),secretMeta:initSecretMeta()};let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.19.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)};
+ const oldExport=exportSave;exportSave=function(){let data={version:8.24,current:p,deathCauses:JSON.parse(storage.get('bakeDeathCauses','[]')),titles:JSON.parse(storage.get('bakeTitles','[]')),lives:JSON.parse(storage.get('bakeLives','[]')),ascendedLives:JSON.parse(storage.get('bakeAscendedLives','[]')),secretMeta:initSecretMeta()};let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.19.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)};
  // v8.8: robust mobile easter egg. Tap the title seven times within 6 seconds.
  let tapTimer=null,taps=0;const title=document.querySelector('header h1');
  function secretTapFeedback(message){let el=document.getElementById('secretTapHint');if(!el){el=document.createElement('div');el.id='secretTapHint';el.style.cssText='position:fixed;left:50%;bottom:calc(78px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:10001;background:#202536;border:1px solid #b89a59;color:#f4e7bd;padding:9px 14px;border-radius:12px;font-size:13px;box-shadow:0 4px 18px #0009;max-width:90vw;text-align:center;pointer-events:none';document.body.appendChild(el)}el.textContent=message;el.style.display='block';clearTimeout(el._hide);el._hide=setTimeout(()=>{el.style.display='none'},1800)}
@@ -1482,7 +1482,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
 <script>
 (function installChroniclesOfBake(){
  'use strict';
- const VERSION='8.23', DEX_KEY='bakeEventDex', LEGACY_KEY='bakeLegacyLedger', REGION_KEY='bakeRegionalChronicle';
+ const VERSION='8.24', DEX_KEY='bakeEventDex', LEGACY_KEY='bakeLegacyLedger', REGION_KEY='bakeRegionalChronicle';
  const read=(k,d)=>{try{const x=JSON.parse(storage.get(k,JSON.stringify(d)));return x??d}catch(e){return d}};
  const write=(k,v)=>storage.set(k,JSON.stringify(v));
  const ensure=(obj,key,def)=>{if(obj[key]===undefined||obj[key]===null)obj[key]=def;return obj[key]};
@@ -1626,12 +1626,68 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  // メニュー導線を追加
  const oldMore=showMoreMenu;showMoreMenu=function(){oldMore();const wrap=$('modal')?.querySelector('.choices');if(wrap){[['人生の出来事図鑑',()=>showEventDex()],['この人生の特別な記録',()=>showChronicleHistory()],['境界点探索',()=>showBoundaryExpedition()]].forEach(([label,fn])=>{if([...wrap.querySelectorAll('button')].some(b=>b.textContent===label))return;const b=document.createElement('button');b.textContent=label;b.onclick=fn;wrap.appendChild(b)})}};
  // セーブデータへの追加メタ保存・読み込み時の移行
- const oldExport=exportSave;exportSave=function(){const original=storage.get;const data={version:8.23,current:p,deathCauses:read('bakeDeathCauses',[]),titles:read('bakeTitles',[]),lives:read('bakeLives',[]),ascendedLives:read('bakeAscendedLives',[]),secretMeta:read('bakeSecretMeta',{}),eventDex:dex(),legacyLedger:read(LEGACY_KEY,[]),regionalChronicle:read(REGION_KEY,{})};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.23.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)};
+ const oldExport=exportSave;exportSave=function(){const original=storage.get;const data={version:8.24,current:p,deathCauses:read('bakeDeathCauses',[]),titles:read('bakeTitles',[]),lives:read('bakeLives',[]),ascendedLives:read('bakeAscendedLives',[]),secretMeta:read('bakeSecretMeta',{}),eventDex:dex(),legacyLedger:read(LEGACY_KEY,[]),regionalChronicle:read(REGION_KEY,{})};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.24.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)};
  const oldImport=$('importSaveFile')?.onchange;
  // import listener already uses changeEventListener; capture through a second listener after its handler.
  $('importSaveFile')?.addEventListener('change',async ev=>{const f=ev.target.files?.[0];if(!f)return;try{const data=JSON.parse(await f.text());if(data.eventDex)write(DEX_KEY,data.eventDex);if(data.legacyLedger)write(LEGACY_KEY,data.legacyLedger);if(data.regionalChronicle)write(REGION_KEY,data.regionalChronicle)}catch(e){}});
  // 起動時の既存セーブ移行
  migrate();
+})();
+</script>
+
+
+<!-- BAKE LIFE v8.24 : DEATH RESULT FAILSAFE -->
+<script>
+(function installDeathResultFailsafe(){
+ 'use strict';
+ const previousDieV824=die;
+ function stopLifeTimers(){
+  try{clearInterval(timer)}catch(e){}
+  try{clearInterval(smallTimer)}catch(e){}
+  try{clearTimeout(autoTimer)}catch(e){}
+  try{paused=true}catch(e){}
+ }
+ function ensureDeathResult(cause){
+  if(!p)return;
+  const finalCause=cause||p.cause||'原因不明';
+  p.dead=true;p.cause=finalCause;stopLifeTimers();
+  try{storage.set('bakeCurrent',JSON.stringify(p))}catch(e){}
+  try{
+   const known=JSON.parse(storage.get('bakeDeathCauses','[]'));
+   if(finalCause&&!known.includes(finalCause)){known.push(finalCause);storage.set('bakeDeathCauses',JSON.stringify(known))}
+  }catch(e){}
+  try{
+   const lives=JSON.parse(storage.get('bakeLives','[]'));
+   const already=lives.some(x=>x&&x.name===p.name&&x.cause===finalCause&&x.year===p.year);
+   if(!already){
+    lives.unshift({name:p.name,age:p.age,place:p.place,cause:finalCause,titles:(p.titles||[]).slice(),year:p.year,ascended:!!p.ascended,ascensionChance:p.ascensionChance||0,job:p.job,specialLife:!!p.specialLife,specialLifeId:p.specialLifeId||'',afterlifeYears:p.afterlifeAge||0,afterlifeComplete:!!p.afterlifeComplete,legacyOutcome:p.legacyOutcome||'',legacyInfluence:p.legacyInfluence||0,baroque:{stage:p.baroqueStage||0,type:p.baroqueType||'',ability:p.baroqueAbility||'',history:p.baroqueHistory||[]}});
+    storage.set('bakeLives',JSON.stringify(lives.slice(0,100)));
+   }
+  }catch(e){}
+  try{
+   const overlay=document.getElementById('overlay'),modal=document.getElementById('modal');
+   if(!overlay||!modal)return;
+   const alreadyRendered=(modal.textContent||'').includes('LIFE COMPLETE');
+   if(alreadyRendered)return;
+   const safe=(v)=>typeof escapeHtml==='function'?escapeHtml(String(v??'')):String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+   const titles=(p.titles||[]).map(x=>typeof titleBadge==='function'?titleBadge(x):safe(x)).join('')||'称号なし';
+   overlay.style.display='grid';
+   modal.innerHTML=`<div class="dead"><div class="sub">LIFE COMPLETE / 人生の終わり</div><h2>${safe(p.name)}</h2><div style="font-size:2rem;color:var(--gold)">${safe(p.age)}歳</div><p>${safe(finalCause)}により、その一生を終えた。</p><p>生まれた場所：${safe(p.place)}<br>職業：${safe(p.job)}</p><p class="sub">${p.ascended?'昇天使としてグロリアスベイクドームへ迎えられた。':'死後の人生判定を記録しました。'}</p><h3 style="color:var(--gold)">獲得称号</h3><div class="titlelist" style="justify-content:center">${titles}</div><p class="sub">※追加記録処理で問題が発生したため、簡易リザルトを表示しています。人生の終了自体は保存されました。</p><button class="primary" onclick="closeDeath()">人生の総括を見る</button><button onclick="newLife()">新しい人生を始める</button></div>`;
+  }catch(e){
+   try{const modal=document.getElementById('modal'),overlay=document.getElementById('overlay');if(overlay)overlay.style.display='grid';if(modal)modal.innerHTML='<div class="dead"><h2>LIFE COMPLETE</h2><p>人生は終了しました。</p><p>死因：'+String(finalCause).replace(/[&<>]/g,'')+'</p><button onclick="newLife()">新しい人生を始める</button></div>'}catch(_e){}
+  }
+ }
+ die=function(cause){
+  if(!p||p.dead)return;
+  let thrown=null;
+  try{previousDieV824(cause)}catch(err){thrown=err;try{p.deathProcessingError=String(err&&err.message||err)}catch(e){}}
+  if(p&&!p.dead){ensureDeathResult(cause)}
+  else{
+   stopLifeTimers();
+   const modal=document.getElementById('modal');
+   if(!modal||(modal.textContent||'').indexOf('LIFE COMPLETE')<0)ensureDeathResult(cause||p.cause);
+  }
+ };
 })();
 </script>
 

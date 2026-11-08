@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PANIS ET CALAMITAS — ベイク大陸ライフ v8.3</title>
+<style>
+:root{--bg:#171923;--panel:#222635;--panel2:#2b3042;--ink:#f4f0e8;--muted:#aeb4c5;--gold:#e6c477;--green:#76c9a2;--red:#e58b8b;--line:#3b4257}
+*{box-sizing:border-box}body{margin:0;padding-bottom:env(safe-area-inset-bottom);background:radial-gradient(circle at top,#30364b,#171923 60%);color:var(--ink);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;line-height:1.55}
+header{padding:22px 18px 14px;text-align:center;border-bottom:1px solid var(--line)}header .eyebrow{letter-spacing:.2em;color:var(--gold);font-size:.72rem}h1{font-family:Georgia,serif;font-size:clamp(1.5rem,5vw,2.5rem);margin:5px 0}header p{color:var(--muted);margin:0;font-size:.88rem}
+main{max-width:1400px;margin:auto;padding:10px 14px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:stretch}.panel{max-height:calc(100dvh - 118px);overflow:auto;scrollbar-width:thin}
+.panel{background:linear-gradient(145deg,var(--panel),#1e2230);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 10px 30px #0002}
+.panel h2{font-size:1rem;margin:0 0 12px;color:var(--gold);letter-spacing:.04em}.hero{display:flex;gap:14px;align-items:center}.avatar{width:76px;height:76px;border-radius:22px;background:linear-gradient(135deg,#f0d99d,#b77f9c);display:grid;place-items:center;font-size:2.5rem;flex:none;box-shadow:inset 0 0 0 3px #ffffff22}.name{font-size:1.35rem;font-weight:750}.sub{color:var(--muted);font-size:.82rem}.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.chip{font-size:.72rem;border:1px solid var(--line);padding:3px 8px;border-radius:99px;color:var(--muted)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat{background:var(--panel2);padding:9px 10px;border-radius:10px}.statline{display:flex;justify-content:space-between;font-size:.8rem}.bar{height:6px;background:#171b27;border-radius:9px;margin-top:6px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,#71b99b,#e4c47c);border-radius:9px}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.time-controls{gap:4px}.time-controls button{padding:5px 8px;min-height:32px;font-size:.76rem;flex:0 0 auto}.time-controls #pauseBtn{flex:1 1 auto}.time-controls #autoBtn{border-color:#8d9a70}.controls button,button{background:#353d53;color:var(--ink);border:1px solid #515b75;padding:9px 12px;border-radius:10px;cursor:pointer;font:inherit;font-size:.84rem}button:hover{filter:brightness(1.18)}button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;min-height:42px} .panel{min-width:0} .log{overscroll-behavior:contain} input,button{font-size:16px}button.primary{background:#806b3c;border-color:#b89a59}button:disabled{opacity:.45;cursor:not-allowed}
+.log{height:calc(100dvh - 390px);min-height:180px;overflow:auto;display:flex;flex-direction:column;gap:8px;padding-right:4px}.entry{background:#292e3e;border-left:3px solid #69748e;padding:9px 11px;border-radius:7px;font-size:.84rem}.entry.event{border-left-color:var(--gold)}.entry.good{border-left-color:var(--green)}.entry.bad{border-left-color:var(--red)}.entry .plus{color:#83d7ad;font-weight:650}.entry .minus{color:#f09a9a;font-weight:650}.entry small{display:block;color:var(--muted);font-size:.7rem;margin-bottom:3px}
+.eventbox{border:1px solid #927c4d;background:#332f2a;border-radius:13px;padding:14px;margin-top:12px}.eventbox h3{margin:0 0 5px;font-size:1rem}.eventbox p{margin:0 0 12px;color:#e0d9ca;font-size:.88rem}.choices{display:grid;gap:7px}.choices button{text-align:left;background:#49402f;border-color:#786747}
+.meta{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.meta div{background:var(--panel2);padding:9px;border-radius:9px}.meta b{display:block;font-size:1rem}.meta span{font-size:.7rem;color:var(--muted)}
+.titlelist{display:flex;flex-wrap:wrap;gap:6px}.delta{font-size:.78rem;margin-top:8px;padding:8px 10px;border-radius:8px;background:#202536}.delta .plus{color:#83d7ad}.delta .minus{color:#f09a9a}.seasonpill{display:inline-block;padding:3px 9px;border:1px solid #8f7a4d;border-radius:99px;color:#f0d99d;font-size:.76rem}.baroquePanel{margin-top:14px;padding:12px;border:1px solid #775e68;border-radius:12px;background:linear-gradient(135deg,#30232d,#252536)}.baroquePanel h3{margin:0 0 7px;color:#e6b2bd;font-size:.95rem}.titlebadge{border:1px solid #9b8551;background:#3a3428;color:#f0d99d;padding:4px 8px;border-radius:7px;font-size:.74rem}
+footer{text-align:center;color:var(--muted);font-size:.72rem;padding:10px 18px 28px}
+.overlay{position:fixed;inset:0;background:#090b12d9;display:none;place-items:center;padding:18px;z-index:50}.modal{max-width:520px;width:100%;background:#242938;border:1px solid #a88d51;border-radius:18px;padding:22px;box-shadow:0 20px 80px #0009}.modal h2{color:var(--gold);margin-top:0}.modal-close{position:sticky;top:0;float:right;margin:-10px -10px 4px 8px;min-width:34px;min-height:34px;padding:2px 8px;border-radius:50%;font-size:1.2rem;z-index:2}.modal p{color:#ddd6c8}.modal .choices button{background:#3a4052;border-color:#68718a}.timer{height:5px;background:#171b27;border-radius:9px;overflow:hidden;margin:10px 0}.timer i{display:block;height:100%;width:100%;background:var(--gold)}
+@keyframes calamityPulse{from{box-shadow:0 0 0 2px #b65c6844,0 20px 80px #000b}to{box-shadow:0 0 0 5px #b65c6822,0 20px 90px #000d}}.calamity-modal{animation:calamityPulse 1.8s ease-in-out infinite alternate;border:1px solid #b65c68!important;background:radial-gradient(circle at top,#49313b,#24202a 68%)!important;box-shadow:0 0 0 2px #b65c6844,0 20px 80px #000b!important}.calamity-modal h2{color:#f0a2a8!important;text-shadow:0 0 18px #e66b7755}.calamity-stamp{letter-spacing:.22em;color:#e98f9a;font-size:.72rem;margin-bottom:8px}.calamity-scene{display:flex;align-items:center;gap:12px;padding:12px;margin:8px 0 14px;border:1px solid #b65c6877;border-radius:12px;background:linear-gradient(110deg,#4a303c99,#171923cc);animation:sceneReveal .9s ease-out both}.calamity-scene .scene-mark{font-size:2rem;color:#f0a2a8;text-shadow:0 0 18px #e66b77aa;min-width:42px;text-align:center}.calamity-scene b{display:block;color:#f0d6d1;font-size:.9rem}.calamity-scene small{display:block;color:#d4aeb2;font-size:.68rem;letter-spacing:.06em}@keyframes sceneReveal{from{opacity:0;transform:translateY(8px);filter:blur(4px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}.calamity-scene{display:flex;align-items:center;gap:12px;padding:12px;margin:8px 0 14px;border:1px solid #b65c6877;border-radius:12px;background:linear-gradient(110deg,#4a303c99,#171923cc);animation:sceneReveal .9s ease-out both}.calamity-scene .scene-mark{font-size:2rem;color:#f0a2a8;text-shadow:0 0 18px #e66b77aa;min-width:42px;text-align:center}.calamity-scene b{display:block;color:#f0d6d1;font-size:.9rem}.calamity-scene small{display:block;color:#d4aeb2;font-size:.68rem;letter-spacing:.06em}@keyframes sceneReveal{from{opacity:0;transform:translateY(8px);filter:blur(4px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}.dead{border:1px solid #a88d51;background:#302b27;padding:18px;border-radius:14px;text-align:center}.dead h2{font-size:1.5rem}
+@media(max-width:760px){
+ header{padding:calc(7px + env(safe-area-inset-top)) 10px 7px}header p{font-size:.72rem}main{grid-template-columns:1fr 1fr;padding:5px;gap:5px}.panel{padding:8px;border-radius:10px;max-height:calc(100dvh - 92px);overflow:auto}.log{height:calc(100dvh - 350px);min-height:130px}.hero{align-items:flex-start}.avatar{width:46px;height:46px;font-size:1.7rem}.meta{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.meta div{padding:8px 6px}.meta b{font-size:.88rem}.stats{gap:5px}.stat{padding:6px}.panel h2{margin-bottom:8px;font-size:.9rem}.hero{gap:9px}.avatar{width:52px;height:52px;font-size:1.9rem}.meta div{padding:6px}.controls{gap:5px}.controls button{min-height:36px;padding:6px 5px;font-size:.78rem}.controls button{flex:1 1 42%;padding:6px 4px;font-size:.72rem;min-height:34px}.choices button{min-height:48px}.modal{max-height:90dvh;overflow:auto;padding:18px}.overlay{padding:10px}footer{display:none;padding-bottom:calc(20px + env(safe-area-inset-bottom))}
+}
+@media(max-width:420px){main{grid-template-columns:1fr}.panel{max-height:none}.log{height:160px}}
+
+/* v6.5: compact single-screen layout, especially for phones */
+@media (max-width:600px){
+  html,body{height:100%;min-height:100%;overflow:hidden}
+  body{display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom)}
+  header{display:none}
+  main{flex:1;min-height:0;height:100dvh;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1.16fr) minmax(0,.84fr);gap:5px;padding:5px 6px 6px}
+  .panel{min-height:0;max-height:none;overflow:auto;padding:7px 8px;border-radius:10px;overscroll-behavior:contain}
+  .panel:first-child{display:block}
+  .panel h2{font-size:.72rem;margin:0 0 5px;line-height:1.2}
+  .hero{gap:7px;align-items:center}
+  .avatar{width:34px;height:34px;border-radius:10px;font-size:1.25rem}
+  .name{font-size:.95rem;line-height:1.15}
+  .sub{font-size:.65rem;line-height:1.25}
+  .chips{gap:3px;margin-top:3px}
+  .chip{font-size:.58rem;padding:1px 5px}
+  .meta{grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin-top:5px!important}
+  .meta div{padding:4px 5px;border-radius:6px}
+  .meta span{font-size:.57rem}
+  .meta b{font-size:.78rem;line-height:1.2}
+  .stats{grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+  .stat{padding:4px 5px;border-radius:6px;min-width:0}
+  .statline{font-size:.63rem;gap:2px}
+  .bar{height:4px;margin-top:3px}
+  .baroquePanel{margin-top:5px!important;padding:6px;border-radius:7px}
+  .baroquePanel h3{font-size:.68rem;margin-bottom:2px}
+  .controls{gap:4px}
+  .controls button,button{font-size:.68rem;min-height:30px;padding:4px 6px;border-radius:7px}
+  .controls button{flex:1 1 calc(25% - 4px);min-width:0}
+  #pauseBtn{flex:1 1 calc(50% - 4px)}
+  .panel:first-child > div[style*="height:15px"]{height:5px!important}
+  .panel:first-child > div[style*="height:14px"]{height:5px!important}
+  #clockInfo{font-size:.59rem!important;margin-top:3px!important}
+  #seasonInfo{font-size:.61rem;padding:1px 6px}
+  .titlelist{gap:3px}
+  .titlebadge{font-size:.59rem;padding:2px 5px}
+  .panel:nth-child(2){display:flex;flex-direction:column;overflow:hidden}
+  .panel:nth-child(2) h2{flex:none}
+  .log{flex:1 1 auto;height:auto;min-height:0;max-height:none;gap:4px;padding-right:2px}
+  .entry{font-size:.72rem;line-height:1.38;padding:5px 7px;border-radius:5px}
+  .entry small{font-size:.59rem;margin-bottom:1px}
+  #eventArea{flex:none;max-height:32%;overflow:auto}
+  .eventbox{padding:8px;margin-top:6px;border-radius:8px}
+  .eventbox h3{font-size:.8rem}
+  .eventbox p{font-size:.72rem;margin-bottom:7px}
+  .choices{gap:4px}
+  .choices button{min-height:34px;font-size:.72rem}
+  .panel:nth-child(2) > div[style*="height:14px"]{height:5px!important}
+  .panel:nth-child(2) .controls{flex:none}
+  .panel:nth-child(2) .controls button{flex:1 1 calc(33.333% - 4px);font-size:.63rem}
+  .panel:nth-child(2) .sub{font-size:.57rem;margin-top:4px!important}
+  footer{display:none}
+  .modal{max-height:88dvh;overflow:auto;padding:14px}
+  .overlay{padding:8px}
+}
+@media (max-width:380px){
+  main{grid-template-rows:minmax(0,1.2fr) minmax(0,.8fr);padding:4px;gap:4px}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .panel{padding:6px}
+  .panel:nth-child(2) .controls button{flex:1 1 calc(50% - 4px)}
+}
+@media (min-width:601px) and (max-width:900px){
+  main{gap:7px;padding:7px}
+  .panel{padding:10px}
+  .log{height:calc(100dvh - 330px)}
+}
+
+
+/* v8.0 mobile-first usability layer */
+/* v8.1 choice forecasts, diverse death outcomes and compact records */
+:root{--nav-h:64px}
+html{scroll-behavior:smooth}
+body{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 18px)}
+main{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.panel{max-height:none;overflow:visible}
+.log{height:clamp(220px,45vh,620px);min-height:180px}
+.stat{min-width:0}
+.statline span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.time-controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));width:100%}
+.time-controls button{min-height:40px;font-size:.82rem}
+.time-controls #pauseBtn{grid-column:span 2}
+.time-controls #autoBtn{grid-column:span 2}
+#v8Nav{position:fixed;z-index:20;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:6px 7px calc(6px + env(safe-area-inset-bottom));background:#171b27f2;border-top:1px solid var(--line);backdrop-filter:blur(12px)}
+#v8Nav button{min-width:0;min-height:48px;padding:4px 2px;font-size:.68rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
+#v8Nav button span:first-child{font-size:1rem}
+#eventArea{scroll-margin-top:12px}
+.panel h2{scroll-margin-top:12px}
+.modal{max-height:min(88dvh,850px);overflow:auto;overscroll-behavior:contain}
+.modal-close{position:sticky;top:0}
+.filterbar{display:flex;gap:5px;overflow-x:auto;padding:3px 0 8px;scrollbar-width:thin}
+.filterbar button{white-space:nowrap;flex:0 0 auto;min-height:34px;padding:5px 9px;font-size:.72rem}
+.info-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.info-card{background:var(--panel2);border-radius:9px;padding:9px;min-width:0}
+.info-card small{display:block;color:var(--muted)}
+@media(max-width:760px){
+ html,body{height:auto;min-height:100%;overflow-x:hidden;overflow-y:auto}
+ body{display:block;padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 12px)}
+ header{display:block;padding:calc(10px + env(safe-area-inset-top)) 12px 9px}
+ header .eyebrow{font-size:.62rem}header h1{font-size:1.4rem}header p{font-size:.72rem}
+ main{display:flex;flex-direction:column;gap:9px;padding:8px 8px 12px;overflow:visible;height:auto}
+ .panel{display:block!important;max-height:none;min-height:0;overflow:visible;padding:11px;border-radius:12px}
+ .panel h2{font-size:.82rem;margin:0 0 8px}
+ .hero{gap:9px;align-items:center}.avatar{width:48px;height:48px;font-size:1.7rem;border-radius:13px}.name{font-size:1.05rem}.sub{font-size:.7rem}
+ .meta{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin-top:8px!important}
+ .meta div{padding:7px 6px}.meta span{font-size:.62rem}.meta b{font-size:.82rem;overflow-wrap:anywhere}
+ .stats{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+ .stat{padding:7px 6px}.statline{font-size:.7rem}.bar{height:5px}
+ .baroquePanel{margin-top:9px!important;padding:9px}.baroquePanel h3{font-size:.78rem}
+ .time-controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+ .time-controls button{min-height:42px;font-size:.76rem;padding:6px 3px}
+ .time-controls #pauseBtn,.time-controls #autoBtn{grid-column:span 2}
+ .panel:first-child>div[style*="height:15px"],.panel:first-child>div[style*="height:14px"]{height:10px!important}
+ .log{height:auto;max-height:none;min-height:160px;overflow:visible;gap:6px}
+ .entry{font-size:.78rem;padding:8px 9px}.entry small{font-size:.64rem}
+ .controls{gap:5px}.controls button{flex:1 1 calc(50% - 5px);min-height:42px;font-size:.76rem}
+ .modal{padding:14px}.overlay{padding:8px}
+ footer{display:block;padding:8px 8px calc(var(--nav-h) + 12px);font-size:.62rem}
+}
+@media(min-width:761px){#v8Nav{display:none}body{padding-bottom:0}}
+.fast-motion .calamity-modal{animation-duration:.45s}.reduced-motion *{animation:none!important;transition:none!important}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+
+/* v8.1 compact information + choice forecast */
+.stats{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+.stat{padding:6px 7px;border-radius:8px}
+.statline{font-size:.7rem;line-height:1.2}
+.bar{height:4px;margin-top:4px}
+.hero{gap:8px}.avatar{width:54px;height:54px}
+.meta{gap:5px}.meta div{padding:6px 7px}
+.compact-section-title{display:flex;align-items:center;justify-content:space-between;margin:7px 0 4px}
+.compact-section-title h2{margin:0!important}
+.choice-forecast{display:flex;flex-wrap:wrap;gap:3px 6px;margin:3px 0 4px;padding:3px 7px 5px 9px;border-left:2px solid #77829a;color:var(--muted);font-size:.68rem;line-height:1.35}
+.choice-forecast .forecast-label{width:100%;font-size:.59rem;letter-spacing:.04em;opacity:.8}
+.choice-forecast .plus{color:#83d7ad;font-weight:700}.choice-forecast .minus{color:#f09a9a;font-weight:700}
+.choice-forecast .uncertain{color:#e6c477}
+.choices button{padding:7px 9px;min-height:38px}
+.person-list{display:grid;gap:4px;max-height:62vh;overflow:auto}
+.person-row{background:#292e3e;border:1px solid #3b4257;border-radius:7px;padding:5px 8px;font-size:.74rem}
+.person-row summary{cursor:pointer;list-style:none;display:flex;gap:6px;align-items:center;min-width:0}
+.person-row summary::-webkit-details-marker{display:none}
+.person-row summary:after{content:'＋';margin-left:auto;color:var(--muted);flex:none}
+.person-row[open] summary:after{content:'－'}
+.person-row .person-name{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.person-row .person-meta{color:var(--muted);font-size:.66rem;white-space:nowrap}
+.person-row .person-detail{padding:5px 2px 2px;color:var(--muted);font-size:.68rem;line-height:1.4}
+.death-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;max-height:60vh;overflow:auto}
+.death-item{padding:5px 7px;border-radius:6px;background:#292e3e;font-size:.7rem;line-height:1.3}
+.death-item.found{border-left:2px solid var(--green)}
+.death-category{grid-column:1/-1;color:var(--gold);font-size:.68rem;font-weight:700;padding:5px 2px 1px;border-bottom:1px solid var(--line)}
+@media(max-width:600px){
+ .stats{grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+ .stat{padding:5px 5px}.statline{font-size:.65rem}.bar{height:3px;margin-top:3px}
+ .meta div{padding:5px}.meta span{font-size:.58rem}.meta b{font-size:.76rem}
+ .hero .avatar{width:42px;height:42px;font-size:1.5rem}
+ .baroquePanel{padding:7px;margin-top:6px!important}
+ .choice-forecast{font-size:.64rem;padding:2px 5px 4px 7px}
+ .choices button{min-height:34px;padding:5px 7px}
+ .person-list{max-height:65vh}.person-row{padding:5px 7px}
+ .death-grid{grid-template-columns:1fr;max-height:64vh}
+ .death-category{grid-column:1}
+}
+
+
+/* v8.3: retry shortcut, choice-name history and safe bottom navigation */
+.restart-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0 2px}
+.restart-shortcut{min-height:36px!important;padding:6px 12px!important;font-size:.78rem!important;border-radius:999px!important}
+#v8Nav{min-height:calc(var(--nav-h) + env(safe-area-inset-bottom));padding-bottom:calc(6px + env(safe-area-inset-bottom));}
+body{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 24px)}
+main{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 24px)}
+.log{scroll-margin-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 16px)}
+#v8Nav button{position:relative;z-index:1}
+.pause-quick{z-index:60}
+@media(min-width:761px){body,main{padding-bottom:0}}
+@media(max-width:600px){
+ .restart-row{margin:7px 0 2px;gap:5px}
+ .restart-row .sub{font-size:.62rem}
+ main{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 34px)}
+ .log{scroll-margin-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 22px)}
+}
+
+/* v8.2: compact foldouts, one-column phone status, always-accessible pause */
+.fold-section{margin:7px 0;border:1px solid var(--line);border-radius:9px;background:#202536;padding:0 8px}
+.fold-section summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;min-height:36px;font-size:.78rem;font-weight:700;color:var(--gold)}
+.fold-section summary::-webkit-details-marker{display:none}.fold-section summary:after{content:'＋';margin-left:auto;color:var(--muted)}.fold-section[open] summary:after{content:'－'}
+.fold-section summary small{font-size:.63rem;color:var(--muted);font-weight:400}.fold-section .titlelist{padding:3px 0 8px}
+.pause-quick{position:fixed;right:12px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:30;background:#806b3c!important;border:1px solid #d0b36e!important;box-shadow:0 4px 18px #0008;font-weight:750;padding:9px 13px!important;min-height:42px!important;border-radius:999px!important}
+@media(max-width:600px){.stats{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:3px!important}.stat{display:block;min-width:0;padding:5px 2px!important;text-align:center}.statline{display:flex;flex-direction:column;align-items:center;gap:1px;font-size:.56rem!important;line-height:1.2;white-space:nowrap}.statline b{font-size:.62rem;white-space:nowrap}.bar{display:block;width:100%;height:3px!important;margin:3px 0 0!important}.pause-quick{right:10px;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 10px);font-size:.78rem!important}}
+</style>
+</head>
+<body>
+<header><div class="eyebrow">A LIFE SIMULATION IN BAKE CONTINENT</div><h1>PANIS ET CALAMITAS</h1><p>ひとつの生地に、ひとつの人生。——あなたは、その一生を見届ける。</p></header>
+<main>
+<section class="panel">
+ <h2>PERSONAL RECORD / 人物記録</h2>
+ <div class="hero"><div class="avatar" id="avatar">🍪</div><div><div class="name" id="name">未生成</div><div class="sub" id="identity">新しい人生を始めてください</div><div class="chips" id="traits"></div></div></div>
+ <div class="restart-row"><button class="primary restart-shortcut" onclick="newLife()">↻ 新しい人生を始める</button><span class="sub">別の人生を始めたいときはここから</span></div>
+ <div style="height:7px"></div><div class="meta"><div><span>年齢</span><b id="age">—</b></div><div><span>所持金</span><b id="money">—</b></div><div><span>職業</span><b id="job">—</b></div></div>
+ <div style="height:7px"></div><h2>STATUS / 状態</h2><div class="stats" id="stats"></div><div class="baroquePanel" id="baroquePanel"><h3>BAROQUE / バロック記録</h3><div id="baroqueInfo" class="sub">現在、確認されている異常はありません。</div></div>
+ <div style="height:7px"></div>
+ <details class="fold-section" id="timeFold"><summary><span>TIME / 時間操作</span><small>速度・AUTO・季節進行</small></summary>
+ <div class="controls time-controls"><button id="pauseBtn" onclick="togglePause()">Ⅱ 一時停止</button><button onclick="setSpeed(1)">×1</button><button onclick="setSpeed(3)">×3</button><button onclick="setSpeed(30)">×30</button><button onclick="setSpeed(60)">×60</button><button onclick="advanceYear()">＋1年</button><button id="autoBtn" onclick="toggleAuto()">AUTO OFF</button></div>
+ <div class="sub" style="margin-top:8px" id="clockInfo">1季節＝現実時間15秒（1×）</div></details>
+ <div style="margin-top:7px"><span class="seasonpill" id="seasonInfo">春 / 1年目</span></div>
+ <details class="fold-section" id="titleFold"><summary><span>COLLECTION / 称号</span><small id="titleCount">獲得称号</small></summary><div class="titlelist" id="titles"><span class="sub">まだ称号はありません。</span></div></details>
+</section>
+<section class="panel">
+ <h2>CHRONICLE / 人生の記録</h2><div class="filterbar" id="logFilters"><button onclick="filterLogs('all')">すべて</button><button onclick="filterLogs('good')">良い出来事</button><button onclick="filterLogs('bad')">困難</button><button onclick="filterLogs('event')">重要記録</button></div><div class="log" id="log"><div class="entry"><small>PROLOGUE</small>新しい人生を始めると、ここに日々の記録が刻まれます。</div></div>
+ 
+ <div style="height:14px"></div><div class="controls"><button onclick="showCollection()">称号図鑑</button><button onclick="showDeathCollection()">死因図鑑</button><button onclick="showAscendedCollection()">昇天使記録</button><button onclick="exportSave()">記録を書き出す</button><button onclick="importSaveDialog()">記録を読み込む</button><button onclick="showSettings()">設定</button></div>
+ <div class="sub" style="margin-top:9px">※ゲームはこのブラウザ内で動作します。人生の記録と称号は自動保存されます。</div>
+</section>
+</main>
+<footer>BAKE LIFE v8.3 — HUNGER SYSTEM REMOVAL & NAVIGATION UPDATE</footer>
+<button id="pauseQuickBtn" class="pause-quick" onclick="togglePause()" aria-label="一時停止または再開">Ⅱ 一時停止</button>
+<nav id="v8Nav" aria-label="メインメニュー"><button onclick="scrollToPanel(0)"><span>🍪</span><span>人生</span></button><button onclick="scrollToLog()"><span>📖</span><span>記録</span></button><button onclick="showCollection()"><span>🏅</span><span>称号</span></button><button onclick="showRegionInfo()"><span>🗺️</span><span>地域</span></button><button onclick="showMoreMenu()"><span>☰</span><span>その他</span></button></nav>
+<div class="overlay" id="overlay"><div class="modal" id="modal"></div></div><input id="importSaveFile" type="file" accept="application/json,.json" hidden>
+<script>
+const places=[
+ {n:"都市部",risk:2,desc:"高度な技術と巨大な市場が集まる一方、豊かさと貧困が隣り合う大都市。"},
+ {n:"バターマングローブ地方",risk:3,desc:"古いマングローブの森と湿地が広がる地方。独特の生態系と古い伝承が残る。"},
+ {n:"城塞跡地",risk:4,desc:"かつての戦争と王朝の痕跡が残る廃墟地帯。探索者や移住者が暮らしている。"},
+ {n:"天空都市マシュマリア",risk:1,desc:"空に浮かぶ高度な都市。快適な生活の裏で、居住資格や身分による格差もある。"},
+ {n:"和風文化圏エリア",risk:2,desc:"古い街並みや祭礼、伝統工芸が今も暮らしに根付く文化圏。"},
+ {n:"ワンダークリーム地方",risk:3,desc:"幻想的な観光地や遊興施設が点在する、不思議な出来事の多い地方。"},
+ {n:"ブルーハワイ諸島",risk:2,desc:"青い海と島々が連なる地域。漁業や観光が盛んだが、海と天候は気まぐれ。"},
+ {n:"セイクレッドシュガー地方",risk:1,desc:"グロリア聖糖信仰の影響が強く、聖堂や巡礼地を中心に街が発展した地方。"},
+ {n:"グロリアスベイクドーム",risk:1,desc:"地上の生を終えた昇天使と、純天使たちが暮らす黄金色の領域。"}
+];
+const first=["マカロン","カヌレ","ピスタチオ","メレンゲ","カスタード","黒糖","ミルフィーユ","アーモンド","ベリー","シナモン","バニラ","ココア","ローズ","レモン","ヘーゼルナッツ"];
+const last=["味クッキー","クリームクッキー","シュガークッキー","タルトクッキー","ブリュレクッキー"];
+const traits=["好奇心旺盛","慎重","社交的","内向的","負けず嫌い","お人好し","気まぐれ","努力家","臆病","大胆","頑固","楽天家"];
+const angelJobs=["記録官","異端審問官","技術官","外交官","伝令官","門番隊"];
+const angelRoster=["カダイフタトゥルス味クッキー","マルメロ味クッキー","アンジェリカ・デクルシヴァ味クッキー","セネシオ エンジェルウィングス味クッキー","ニトロセルロース味クッキー","アカマツリ味クッキー","プルンバーゴ味クッキー","エダムチーズ味クッキー","コープスリバイバー味クッキー","トロピカルブリーズ味クッキー","ビャクシ味クッキー"];
+const jobs=["無職","見習い","パン職人","商店員","農業従事者","教師","研究者","便利屋","警備員","料理人","職人","商人","医療従事者","芸術家","役人","冒険者","バロック研究員","バロック専門医","隔離区画管理人","発症者支援員"];
+const titleDefs=[
+ ["平穏無事","大きな事件や災害に巻き込まれずに30年以上生きる","life",s=>s.age>=30&&s.events<3],
+ ["長寿の祝福","80歳以上まで生きる","life",s=>s.age>=80],
+ ["大往生","90歳以上で自然な最期を迎える","life",s=>s.age>=90&&s.cause==="老衰"],
+ ["波乱万丈","人生で重要イベントを12回以上経験する","life",s=>s.events>=12],
+ ["働き者","同じ職業を20年以上続ける","work",s=>s.jobYears>=20],
+ ["転職マニア","職業を6回以上変える","work",s=>s.jobChanges>=6],
+ ["街の人気者","友人・知人との関係を深める","social",s=>s.friends>=8],
+ ["大家族の長","子どもを3人以上持つ","social",s=>s.children>=3],
+ ["境界点の生還者","境界点の危険イベントを生き延びる","special",s=>s.boundarySurvived],
+ ["厄災を目撃した者","厄災に関する出来事を経験する","special",s=>s.disaster],
+ ["誰かの恩人","他者を助ける選択を3回以上行う","social",s=>s.helped>=3],
+ ["幸福な一生","幸福度75以上で人生を終える","life",s=>s.happiness>=75],
+ ["短くも濃い人生","35歳未満で重要イベントを5回以上経験する","life",s=>s.age<35&&s.events>=5],
+ ["何者でもなかった者","大きな名声も財産もなく静かに生涯を終える","life",s=>s.age>=45&&s.fame<10&&s.money<500],
+ ["歴史に名を刻んだ者","名声80以上に到達する","fame",s=>s.fame>=80],
+ ["無遅刻無欠勤","勤続10年以上、健康を大きく損なわない","work",s=>s.jobYears>=10&&s.health>=45],
+ ["異常の始まり","バロックの前兆または発症を経験する","baroque",s=>s.baroqueStage>=1],
+ ["変わり果てた姿","バロックが進行段階に達する","baroque",s=>s.baroqueStage>=3],
+ ["それでも自分","発症後も自我安定度70以上で生涯を終える","baroque",s=>s.baroqueStage>=1&&s.egoStability>=70],
+ ["異形の英雄","発症後に他者を助ける","baroque",s=>s.baroqueStage>=2&&s.baroqueRescued],
+ ["研究対象","研究施設への協力を重ねる","baroque",s=>(s.researchRecognition||0)>=30],
+ ["病と共に","発症後20年以上生きる","baroque",s=>s.baroqueStage>=1&&s.age>=20&&s.baroqueHistory.some(h=>h.event==="前兆")],
+ ["失われた境界","自我安定度が20以下になる","baroque",s=>s.baroqueStage>=2&&s.egoStability<=20],
+ ["奇跡の回復","治療によって大きく状態を改善する","baroque",s=>s.baroqueRecovered],
+ ["変異の使い手","能力制御70以上で生涯を終える","baroque",s=>s.baroqueStage>=2&&s.baroqueControl>=70],
+ ["研究者の良心","倫理的に問題のある実験を拒否・告発する","baroque",s=>s.ethicalResearchRefused],
+ ["見捨てなかった者","発症した友人を支援する","baroque",s=>s.supportedAffected],
+ ["友を失った日","発症をきっかけに友人との関係を失う","baroque",s=>s.lostFriend],
+ ["境界を越える者","複合型変異を経験する","baroque",s=>s.baroqueType==="複合型"],
+ ["ありふれた明日","発症後も幸福度65以上で生活する","baroque",s=>s.baroqueStage>=1&&s.happiness>=65],
+ ["無名の症例","発症歴があり名声10未満で人生を終える","baroque",s=>s.baroqueStage>=1&&s.fame<10],
+ ["原因不明","発症の原因を特定できないまま人生を終える","baroque",s=>s.baroqueStage>=1&&!s.baroqueCauseKnown],
+ ["名もなき善行","名声を求めず、誰かを10回以上助ける","social",s=>(s.helped||0)>=10&&s.fame<35],
+ ["地域の守り手","地域に関わる事件を5回以上解決する","social",s=>(s.localAid||0)>=5],
+ ["境界の観測者","境界点の調査を3回以上経験する","special",s=>(s.boundaryResearch||0)>=3],
+ ["境界点踏破者","境界点から3回以上生還する","special",s=>(s.boundaryEscapes||0)>=3],
+ ["便利屋の看板","便利屋の依頼を10件完遂する","work",s=>(s.contractsCompleted||0)>=10],
+ ["交渉上手","依頼の条件交渉を3回以上成立させる","work",s=>(s.contractNegotiations||0)>=3],
+ ["天使の友人","ベイクドームの天使と深い交流を持つ","special",s=>(s.characterBonds||[]).some(x=>["デクルシヴァ","セネシオ","マルメロ","カダイフタトゥルス","ニトロセルロース","アカマツリ","プルンバーゴ","エダムチーズ","コープスリバイバー","トロピカルブリーズ","ビャクシ"].includes(x))],
+ ["異端審問官の理解者","デクルシヴァまたはセネシオの任務に協力する","special",s=>(s.characterFlags||[]).includes("inquisitor_help")],
+ ["記録塔の協力者","クロノス記録塔の記録調査に協力する","special",s=>(s.characterFlags||[]).includes("record_tower")],
+ ["水禍を越えて","バハルクッキーの災厄から生還する","calamity",s=>(s.calamitySurvived||[]).includes("バハルクッキー")],
+ ["戦禍の生存者","オダマキ味クッキーの戦禍から生還する","calamity",s=>(s.calamitySurvived||[]).includes("オダマキ味クッキー")],
+ ["病禍の証人","ヴェネーヌムクッキーの病禍を経験する","calamity",s=>(s.calamitySurvived||[]).includes("ヴェネーヌムクッキー")],
+ ["地殻の記憶","テラクッキーの侵蝕から生還する","calamity",s=>(s.calamitySurvived||[]).includes("テラクッキー")],
+ ["飢餓を拒む者","アバドンクッキーの飢餓を乗り越える","calamity",s=>(s.calamitySurvived||[]).includes("アバドンクッキー")],
+ ["人災の目撃者","魔女・パンドラが関わる事件を経験する","calamity",s=>(s.calamitySurvived||[]).includes("魔女・パンドラ")],
+ ["六厄災の記録者","六つの厄災すべての事件を記録する","calamity",s=>(s.calamityRecords||[]).length>=6],
+ ["厄災の救援者","厄災イベントで救援を選ぶ","calamity",s=>(s.calamityRescues||0)>=1],
+ ["厄災の交渉人","厄災の存在と交渉・対話を試みる","calamity",s=>(s.calamityTalks||0)>=1],
+ ["天界の寵愛","セレスティアルの寵愛を30以上得る","angel",s=>(s.holyFavor||0)>=30],
+ ["自由な昇天使","昇天使として20年以上を自由に過ごす","angel",s=>s.afterlifeComplete&&s.afterlifeAge>=20&&s.angelJobUnlocked!==true],
+ ["堕天の記録","堕天使として地上で人生を送る","angel",s=>s.fallen===true],
+ ["家族の肖像","結婚し、子どもを2人以上育てる","social",s=>s.married&&s.children>=2],
+ ["孤独を選んだ者","生涯独身で60歳以上まで生きる","life",s=>s.age>=60&&!s.married&&s.friends<2],
+ ["生き延びることが仕事","危険地域で20年以上生きる","life",s=>s.age>=20&&s.risk>=4],
+ ["路地裏育ち","幼少期に困窮や治安悪化を経験する","life",s=>(s.hardshipCount||0)>=3],
+ ["困窮を乗り越えた者","生活困窮による困難を3回以上経験する","life",s=>(s.hardshipCount||0)>=3],
+ ["傷だらけの履歴書","事故や襲撃で負傷する出来事を5回以上経験する","life",s=>(s.injuryCount||0)>=5],
+ ["学び舎の記憶","学齢期に学び舎での出来事を経験する","life",s=>(s.ageMilestones||[]).includes("school")],
+ ["早すぎる自立","18歳未満で家計を支える","life",s=>s.age<18&&(s.childLabor||false)],
+ ["働き盛り","30歳から49歳まで同じ職業を続ける","work",s=>s.age>=40&&s.jobYears>=15],
+ ["静かな引退","65歳以降に仕事を引退する","work",s=>s.retiredAfter65===true],
+ ["老いたる旅人","70歳以上で危険地域を旅する","special",s=>s.age>=70&&s.risk>=3],
+ ["災害の後に立つ者","厄災の後始末・復興に協力する","calamity",s=>(s.calamityRebuilds||0)>=1],
+ ["傷痕を抱えて","厄災後の後遺症を抱えながら生きる","calamity",s=>(s.calamityTrauma||0)>=1],
+ ["水底の記憶","バハルクッキーの災害後に復興へ協力する","calamity",s=>(s.calamityRebuildsBy||[]).includes("バハルクッキー")],
+ ["戦場の置き土産","オダマキ味クッキーの戦禍後に負傷・喪失を経験する","calamity",s=>(s.calamityTraumaBy||[]).includes("オダマキ味クッキー")],
+ ["病禍の隔離記録","ヴェネーヌムクッキーの病禍で隔離・検疫を経験する","calamity",s=>(s.calamityTraumaBy||[]).includes("ヴェネーヌムクッキー")],
+ ["結晶化した故郷","テラクッキーの侵蝕で住居・土地を失う","calamity",s=>(s.calamityTraumaBy||[]).includes("テラクッキー")],
+ ["最後の配給","アバドンクッキーの飢餓で配給に頼る","calamity",s=>(s.calamityTraumaBy||[]).includes("アバドンクッキー")],
+ ["魔女の気まぐれ","魔女・パンドラから二度目の接触を受ける","calamity",s=>s.calamitySecondContact===true],
+ ["誰も助けてくれない","困窮時に支援を得られず、健康を失う","life",s=>s.abandonedDuringHardship===true],
+ ["生きた証言者","厄災の詳細な記録を残す","calamity",s=>(s.calamityRecords||[]).length>=3&&s.fame>=20],
+ ["バターマングローブの来訪者","バターマングローブ地方の出来事を経験する","special",s=>s.butterMangroveEvents>=1],
+ ["腐食樹林の観測者","パラニ・クアウトラの異常を調査する","special",s=>s.butterMangroveResearch===true],
+ ["怪王との邂逅","テオナナカトル味クッキーと遭遇する","special",s=>s.teonanacatlEncounter===true],
+ ["届いた指令","伝令官からの指令を受け取る","angel",s=>(s.directiveCount||0)>=1],
+ ["裏の秩序を知る者","五大テラスのうち三組織以上と接触する","terrace",s=>(s.terraceEncountered||[]).length>=3],
+ ["怪物の庇護","いずれかのテラスの保護下に入る","terrace",s=>!!s.terraceProtection],
+ ["五つの影","五大テラスすべてと接触する","terrace",s=>(s.terraceEncountered||[]).length>=5],
+ ["規則の内側","キマイラの規則を受け入れ、保護下で暮らす","terrace",s=>(s.terraceProtection||"")==="キマイラ"],
+ ["身内の証","ケルベロスから仲間として認められる","terrace",s=>(s.terraceProtection||"")==="ケルベロス"],
+ ["創造の代償","ヒュドラの研究に協力する","terrace",s=>!!s.hydraResearch],
+ ["見られている","ゴルゴンの監視対象となる","terrace",s=>!!s.gorgonWatched],
+ ["災害の余波","テュポーンの活動による地域再編を経験する","terrace",s=>!!s.typhoonAftermath],
+ ["長命なる観察者","純天使として150歳以上まで観察を続ける","angel",s=>s.isPureAngel===true&&s.age>=150],
+ ["悠久の記録","純天使として300歳以上まで観察を続ける","angel",s=>s.isPureAngel===true&&s.age>=300],
+ ["観察を終えた者","純天使として100歳以上で観察を終える","angel",s=>s.isPureAngel===true&&s.observationEnded===true&&s.age>=100],
+ ["家族の支柱","家族イベントで支援・養育を重ねる","social",s=>(s.familySupport||0)>=5],
+ ["古い友人","同じ友人との関係を長く保つ","social",s=>(s.friendshipYears||0)>=20],
+ ["再会の奇跡","離れて暮らした友人・家族と再会する","social",s=>!!s.reunionSeen],
+ ["次代へ託す","子どもや後継者へ仕事・財産を引き継ぐ","life",s=>!!s.legacyPassed],
+ ["小さな店の主","自分の店を開業する","work",s=>!!s.ownBusiness],
+ ["熟練の職人","専門職で技能を高める","work",s=>(s.professionRank||0)>=3],
+ ["転身の達人","職業分野を三種類以上経験する","work",s=>(s.careerFields||[]).length>=3],
+ ["地域の顔役","地域貢献と名声を両立する","social",s=>(s.localAid||0)>=8&&s.fame>=30],
+ ["不況を越えて","不況下で生活基盤を維持する","life",s=>(s.recessionSurvived||0)>=2],
+ ["復興の担い手","災害後の復興事業に複数回参加する","special",s=>(s.rebuildProjects||0)>=3],
+ ["境界点の帰還者","境界点の連続事件を最後まで生き延びる","special",s=>!!s.boundaryArcComplete],
+ ["人工の生","人工クッキーとして製造・覚醒する","special",s=>s.originType==="人工クッキー"],
+ ["義体と共に","義体化を受け入れ、維持を続ける","special",s=>(s.cyberneticLevel||0)>=2],
+ ["妖精の客人","フェアリーレイヤーで長期滞在する","special",s=>(s.fairyYears||0)>=5],
+ ["異形と暮らす","バロック変異後も社会生活を続ける","baroque",s=>s.baroqueStage>=2&&(s.baroqueSocialYears||0)>=5],
+ ["裏社会の仲介人","複数のテラス間の調整に関わる","terrace",s=>!!s.terraceMediator],
+ ["五大の均衡","代表会談の調整に三回関わる","terrace",s=>(s.terraceCouncil||0)>=3],
+ ["長命の純天使","純天使として500歳以上を生きる","angel",s=>s.isPureAngel===true&&s.age>=500],
+ ["千年の観測者","純天使として1000歳以上を生きる","angel",s=>s.isPureAngel===true&&s.age>=1000]
+];
+let p=null,timer=null,paused=true,speed=1,lastTick=0,clockCarry=0,smallTimer=null,smallDeadline=0,decision=null,autoTimer=null,autoChoice=false,activeLogFilter="all";
+const deathCauseGroups={
+ "自然・病気":["老衰","感染症","急性疾患","慢性疾患","心疾患","呼吸器疾患","乳幼児期の疾患","病気・衰弱","栄養失調","過労・過労死"],
+ "事故・環境":["交通事故","労働災害","設備事故","転落事故","火災","溺水・海難事故","熱中症","低体温症","食中毒・中毒事故","義体・機械故障","医療事故","事故"],
+ "暴力・社会":["戦闘・襲撃","犯罪被害","暴動・紛争","飢餓・困窮","孤立・支援途絶"],
+ "異常現象・厄災":["境界点災害","厄災","水災被害","戦災被害","病災被害","地災被害","飢災被害","人災・因果改変","バロック暴走","バロック合併症","研究事故・実験災害"],
+ "特殊な最期":["観察終了","人工生命維持停止","老衰による自然死"]
+};
+const deathCauses=[...new Set(Object.values(deathCauseGroups).flat())];
+function resolveHealthDeathCause(){
+ if(p.baroqueStage>=3&&((p.egoStability||100)<20||p.stress>85))return Math.random()<.55?"バロック暴走":"バロック合併症";
+ if(p.lastInjuryCause&&p.health<=0&&(p.injuryCount||0)>0)return p.lastInjuryCause;
+ if(p.originType==="人工クッキー"&&p.cyberneticLevel>=2&&Math.random()<.12)return "人工生命維持停止";
+ if(p.money<=0&&(p.friends||0)===0&&(p.mind||0)<15&&(p.hardshipCount||0)>=2)return "孤立・支援途絶";
+ if(p.money<=0&&(p.hardshipCount||0)>=4)return Math.random()<.65?"栄養失調":"飢餓・困窮";
+ if(p.stress>85&&p.job!=="無職"&&p.job!=="子ども"&&(p.jobYears||0)>=5)return "過労・過労死";
+ if(p.injuryCount>=3&&p.health<=0)return "慢性疾患";
+ if(p.age<5)return "乳幼児期の疾患";
+ if(p.age>=65)return rand(["慢性疾患","心疾患","呼吸器疾患","感染症"]);
+ return rand(["感染症","急性疾患","呼吸器疾患","病気・衰弱"]);
+}
+function resolveAccidentDeathCause(){
+ const place=p.place||"";
+ const season=seasons[p.seasonIndex]||"";
+ if(p.job==="バロック研究員"&&p.baroqueStage>=1&&Math.random()<.35)return "研究事故・実験災害";
+ if(p.job==="医療従事者"&&Math.random()<.2)return "医療事故";
+ if((p.cyberneticLevel||0)>=2&&Math.random()<.2)return "義体・機械故障";
+ if(season==="夏"&&p.health<35&&Math.random()<.35)return "熱中症";
+ if(season==="冬"&&p.health<35&&Math.random()<.35)return "低体温症";
+ if(place.includes("ブルーハワイ"))return rand(["溺水・海難事故","低体温症","設備事故"]);
+ if(place.includes("マシュマリア"))return rand(["転落事故","設備事故","交通事故"]);
+ if(place.includes("城塞跡地")||place.includes("バターマングローブ"))return rand(["転落事故","労働災害","設備事故"]);
+ if(place.includes("ワンダークリーム"))return rand(["食中毒・中毒事故","設備事故","転落事故"]);
+ if(p.job==="農業従事者"||p.job==="職人"||p.job==="工場勤務")return "労働災害";
+ return rand(["交通事故","設備事故","火災"]);
+}
+function resolveNaturalDeathCause(){
+ if(p.age>=95)return rand(["老衰","老衰による自然死","慢性疾患"]);
+ if(p.age>=75)return rand(["老衰","慢性疾患","心疾患","呼吸器疾患"]);
+ return rand(["慢性疾患","心疾患","感染症"]);
+}
+const seasons=["春","夏","秋","冬"];
+const deltaKeys={health:"健康",mind:"精神",knowledge:"知識",social:"社交性",skill:"技術",happiness:"幸福",fame:"名声",stress:"ストレス",money:"所持金",friends:"友人数",children:"子ども",egoStability:"自我安定度",baroqueControl:"能力制御",};
+const $=id=>document.getElementById(id),rand=a=>a[Math.floor(Math.random()*a.length)],ri=(a,b)=>Math.floor(Math.random()*(b-a+1))+a,clamp=(v,a=0,b=100)=>Math.max(a,Math.min(b,v));
+const storage={get(k,fallback="[]"){try{return localStorage.getItem(k)??fallback}catch(e){return fallback}},set(k,v){try{localStorage.setItem(k,v);return true}catch(e){return false}}};
+// 旧称号名を、空腹ゲージ廃止後の生活困窮記録に合わせて引き継ぐ。
+try{const oldTitles=JSON.parse(storage.get("bakeTitles","[]"));const migrated=oldTitles.map(x=>x==="飢えを知る者"?"困窮を乗り越えた者":x);storage.set("bakeTitles",JSON.stringify([...new Set(migrated)]))}catch(e){}
+function addLog(text,type=""){if(!p)return;let e=document.createElement("div");e.className="entry "+type;if(activeLogFilter!=="all"&&!e.classList.contains(activeLogFilter))e.style.display="none";e.innerHTML=`<small>${p.year}年 / ${p.age}歳</small>${escapeHtml(text)}`;$("log").prepend(e);p.logs.unshift({year:p.year,age:p.age,text,type});if(p.logs.length>500)p.logs.pop()}
+function addDeltaLog(changes,choiceLabel="選択内容"){if(!p)return;const e=document.createElement("div");e.className="entry event";if(activeLogFilter!=="all"&&!e.classList.contains(activeLogFilter))e.style.display="none";const parts=changes.map(x=>{const m=x.match(/^(.*?)([+-]\d+(?:\.\d+)?)$/);if(!m)return escapeHtml(x);const positive=m[2].startsWith("+");return `<span class="${positive?"plus":"minus"}">${escapeHtml(m[1])}${escapeHtml(m[2])}</span>`});const line=`選択：${choiceLabel} / `+(changes.length?"数値変動："+changes.join(" / "):"数値変動なし");e.innerHTML=`<small>${p.year}年 / ${p.age}歳</small><b>選択：${escapeHtml(choiceLabel)}</b><div>${changes.length?parts.join(" / "):"数値変動なし"}</div>`;$ ("log").prepend(e);p.logs.unshift({year:p.year,age:p.age,text:line,type:"event"});if(p.logs.length>500)p.logs.pop()}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function newLife(){
+ if(p&&!p.dead&&!confirm("現在の人生を終了して、新しい人生を始めますか？"))return;
+ clearInterval(timer);clearInterval(smallTimer);clearTimeout(autoTimer);decision=null;
+ $("overlay").style.display="grid";
+ $("modal").innerHTML=`<h2>新しい人生の準備</h2><p>このクッキーの名前を決めてください。自分で入力することも、従来どおりランダムに決めることもできます。</p><label style="display:block;margin:10px 0 5px;color:var(--muted)">名前（任意）</label><input id="customCookieName" maxlength="24" placeholder="例：マカロン味クッキー" style="width:100%;padding:12px;border-radius:9px;border:1px solid #68718a;background:#171b27;color:#fff"><div class="choices" style="margin-top:12px"><button class="primary" onclick="beginLifeFromInput()">この名前で始める</button><button onclick="beginLifeRandom()">名前をランダムに決める</button><button onclick="$('overlay').style.display='none'">キャンセル</button></div>`;
+}
+function beginLifeFromInput(){const value=($("customCookieName")?.value||"").trim();if(!value){alert("名前を入力するか、ランダム命名を選んでください。");return}beginLife(value)}
+function beginLifeRandom(){beginLife(rand(first)+rand(last))}
+function beginLife(chosenName){
+ let place=rand(places),isAngel=place.n.includes("ベイクドーム");
+ p={name:chosenName,age:0,year:ri(2000,2030),place:place.n,risk:place.risk,desc:place.desc,trait:rand(traits),health:ri(65,100),mind:ri(55,90),knowledge:ri(5,25),social:ri(10,35),skill:ri(5,25),happiness:ri(45,75),money:ri(0,180),fame:0,job:"子ども",jobYears:0,jobChanges:0,careerLocked:false,recentEvents:[],recentChoices:[],friends:0,children:0,events:0,helped:0,boundarySurvived:false,disaster:false,dead:false,cause:"",isAngel,married:false,partner:false,history:[],logs:[],titles:[],lastEvent:0,stress:ri(0,20),seasonIndex:0,quietSeasons:0,yearHadEvent:false,contractsCompleted:0,contractsFailed:0,contractNegotiations:0,localAid:0,boundaryResearch:0,boundaryEscapes:0,characterBonds:[],characterFlags:[],calamityRecords:[],calamitySurvived:[],calamityRescues:0,calamityTalks:0,calamityAftermath:null,calamityTrauma:0,calamityRebuilds:0,calamityRebuildsBy:[],calamityTraumaBy:[],hardshipCount:0,injuryCount:0,ageMilestones:[],childLabor:false,retiredAfter65:false,abandonedDuringHardship:false,calamitySecondContact:false,butterMangroveEvents:0,butterMangroveResearch:false,teonanacatlEncounter:false,marmeloTruthSeen:false,directiveCount:0,lastDirectiveYear:0,terraceRelations:{},terraceEncountered:[],terraceProtection:"",terraceEvents:0,hydraResearch:false,gorgonWatched:false,typhoonAftermath:false,isPureAngel:isAngel,observationEnded:false,lastObservationPromptAge:0,disaster:false,baroqueRisk:ri(0,8),baroqueStage:0,baroqueType:"",baroqueAbility:"",baroqueControl:0,egoStability:100,baroqueHistory:[],baroqueRescued:false,baroqueRecovered:false,ethicalResearchRefused:false,supportedAffected:false,lostFriend:false,baroqueCauseKnown:false,family:rand(["温かな家庭","裕福な家庭","質素な家庭","片親の家庭","孤児として育つ","研究者の家庭","旅人の家庭"]),npcRelations:[],familySupport:0,friendshipYears:0,reunionSeen:false,legacyPassed:false,ownBusiness:false,professionRank:0,careerFields:[],recessionSurvived:0,rebuildProjects:0,boundaryArcComplete:false,originType:"通常",cyberneticLevel:0,fairyYears:0,baroqueSocialYears:0,terraceMediator:false,terraceCouncil:0,regionState:{economy:50,security:50,healthcare:50,technology:50,prosperity:50,disaster:0}};
+ $("overlay").style.display="none";$ ("log").innerHTML="";addLog(`${p.name}が${p.place}で生まれた。${p.desc} 家庭環境：${p.family}。`,"good");
+ p.npcRelations=[{name:"ミルクティー味クッキー",role:"幼馴染",bond:ri(8,22),alive:true,location:p.place,years:0},{name:"アーモンドタルト味クッキー",role:"近所の友人",bond:ri(3,18),alive:true,location:p.place,years:0},{name:"黒糖ビスケット味クッキー",role:"家族ぐるみの知人",bond:ri(5,20),alive:true,location:p.place,years:0}];
+ if(isAngel){p.job="見習い天使";p.angelType="純天使";p.isPureAngel=true;p.knowledge+=15;p.holyFavor=ri(0,12);addLog("純天使として生を受けた。地上のクッキーとは異なる規範と文化の中で育っていく。","event")}
+ render();paused=true;startClock();showModal("誕生","あなたは"+p.place+"で生まれた。"+p.family+"。どんな人生になるのだろう。",["人生を見守る"],[()=>addLog("あなたはこのクッキーの人生を見守ることにした。","good")],false);
+}
+function startClock(){clearInterval(timer);lastTick=Date.now();clockCarry=0;timer=setInterval(()=>{let now=Date.now();if(!paused&&!decision&&p&&!p.dead){clockCarry+=(now-lastTick)*speed;if(clockCarry>=15000){clockCarry-=15000;advanceSeason();if(decision||paused)clockCarry=0}}lastTick=now},100)}
+function setSpeed(s){speed=s;$("clockInfo").textContent=p&&p.afterlife?`昇天使の余生：200年 / ${s}×`:`1季節＝現実時間${15/s}s（${s}×）`;lastTick=Date.now();clockCarry=0}
+function toggleAuto(){autoChoice=!autoChoice;clearTimeout(autoTimer);const b=$("autoBtn");if(b){b.textContent=autoChoice?"AUTO ON · バランス":"AUTO OFF";b.style.background=autoChoice?"#52654e":"#353d53"}if(autoChoice&&decision)autoHandleDecision();}
+function autoIsMajor(title){try{if(JSON.parse(storage.get("bakeSettings","{}" )).confirm==="all")return true}catch(e){}return /厄災|降臨|バロック|変異|死亡|死|結婚|離婚|出産|移住|契約|独立|進路|観察終了|堕天|昇天|代表会談|境界点|テラス/.test(String(title||""));}
+function autoScore(label,title){const t=String(label),s=p;let score=0;
+ if(/休む|休息|治療|安全|慎重|保留|見送る|避難|支援|助ける|記録|相談/.test(t))score+=2;
+ if(/危険|潜る|突入|賭ける|挑戦|無理/.test(t))score-=3;
+ if(s.health<35&&/休|治療|安全|避難|医療/.test(t))score+=9;else if(s.health<55&&/休|治療|安全|避難/.test(t))score+=4;
+ if(s.mind<25&&/休|相談|支援|帰|断る/.test(t))score+=8;else if(s.mind<45&&/休|相談|支援|帰|断る/.test(t))score+=4;
+ if(s.money<30&&/稼|働|仕事|依頼|売る/.test(t))score+=6;
+ if(s.stress>65&&/休|帰|断る|趣味|交流/.test(t))score+=5;
+ if(/引き受ける|参加する|進む/.test(t))score+=.5;
+ if(/攻撃|戦う|突撃|強行/.test(t))score-=2;
+ return score;}
+function autoHandleDecision(){if(!autoChoice||!decision||!p)return;const title=$("modal").querySelector("h2")?.textContent||"";if(autoIsMajor(title)){paused=true;syncPauseButtons();const note=$("modal").querySelector(".sub");if(note)note.textContent="AUTO PAUSED / 重要な選択のため確認してください";return;}
+ const buttons=[...$("modal").querySelectorAll("#choices button:not(:disabled)")];if(!buttons.length){autoChoice=false;$("autoBtn").textContent="AUTO OFF";return;}
+ const ranked=buttons.map(b=>({b,score:autoScore(b.textContent,title)})).sort((a,b)=>b.score-a.score);
+ const best=ranked[0];autoTimer=setTimeout(()=>{if(autoChoice&&decision&&best.b.isConnected)best.b.click()},650);
+}
+function togglePause(){if(!p||p.dead)return;paused=!paused;syncPauseButtons();lastTick=Date.now();clockCarry=0}
+function syncPauseButtons(){const label=paused?"▶ 再開":"Ⅱ 一時停止";["pauseBtn","pauseQuickBtn"].forEach(id=>{const b=$(id);if(b){b.textContent=label;b.disabled=!!p?.dead}})}
+function advanceYear(){if(!p||p.dead||decision)return;for(let i=0;i<4;i++){if(p.dead||decision)break;seasonTick()}render()}
+function advanceSeason(){if(!p||p.dead||decision)return;seasonTick();render()}
+function seasonTick(){
+ if(!p||p.dead)return;
+ const season=seasons[p.seasonIndex];
+ p.seasonIndex=(p.seasonIndex+1)%4;
+ if(p.afterlife){if(p.seasonIndex===0){p.afterlifeAge=(p.afterlifeAge||0)+1;p.age=p.afterlifeAge;p.year++;p.happiness=clamp(p.happiness+ri(-1,3)+2);p.mind=clamp(p.mind+ri(-1,2));p.stress=clamp(p.stress-ri(0,3));p.money+=ri(0,3);if(p.afterlifeAge%10===0)addLog(`ベイクドームでの暮らしも${p.afterlifeAge}年目。気の向くままに過ごし、地上とは異なる時間を重ねている。`,`good`);if(p.afterlifeAge>=200){finishAfterlife();return}}if(Math.random()<.08)angelEvent();return;}
+ if(p.seasonIndex===0){p.age++;p.year++;p.jobYears+=(p.job!=="無職"&&p.job!=="子ども")?1:0;
+  let natural=p.isPureAngel?(p.age<65?ri(-1,1):ri(-1,0)):(p.age<6?ri(-2,1):p.age<15?ri(-1,2):p.age<50?ri(-2,1):p.age<65?ri(-4,0):ri(-6,-1));
+  const environmentalWear=p.isPureAngel?0:(p.risk>=4?ri(1,3):p.risk>=3?ri(0,1):0);
+  const recovery=p.isPureAngel?ri(0,2):(p.age<50?ri(1,3):p.age<70?ri(0,2):ri(0,1));
+  p.health=clamp(p.health+natural+recovery-environmentalWear);
+  if(p.health<75&&Math.random()<.22){p.health=clamp(p.health+ri(2,5));if(Math.random()<.25)addLog("十分な休息を取れたことで、体調が少し持ち直した。","good")}
+  p.mind=clamp(p.mind+ri(-2,2)-Math.floor(p.stress/32));p.happiness=clamp(p.happiness+ri(-3,1)+(p.money>500?1:0));
+  const adultWorker=p.age>=18&&!p.isAngel;
+  const wage=p.job==="子ども"?0:(p.job==="無職"?0:adultWorker?ri(5,12):p.age>=15?ri(1,4):0);
+  const livingCost=p.age<6?ri(0,2):p.age<18?ri(1,4):p.age>60?ri(2,7):ri(2,6);
+  const familyAllowance=p.age<18&&p.family!=="孤児として育つ"?ri(1,4):0;
+  p.money=Math.max(0,p.money+wage+familyAllowance-livingCost);
+  if(p.age>=6&&p.age<=17&&p.money===0&&Math.random()<.08){p.health=clamp(p.health-2);p.stress=clamp(p.stress+3);p.hardshipCount=(p.hardshipCount||0)+1;addLog("家計に余裕がなく、学用品や食事を切り詰めることになった。","bad")}
+  if(p.age===6)addLog("家族と相談し、学び舎に通い始めた。","good");
+  if(p.age===13)addLog("身体つきも考え方も、少しずつ大人に近づいてきた。");
+  if(p.age===3){addLog("まだ世界の仕組みも分からない。大人たちの表情や家の空気が、あなたの毎日を決めている。","event")}
+  if(p.age===10){p.ageMilestones=p.ageMilestones||[];p.ageMilestones.push("school");addLog("学び舎で、自分の家と周囲の暮らしの違いを意識し始めた。","event")}
+  if(p.age===15){addLog("子ども扱いされなくなり始めた一方で、選べる道はまだ多くない。","event")}
+  if(p.age===30)addLog("若さだけでは乗り切れない責任が増え、暮らしの基盤を問われる時期になった。","event");
+  if(p.age===50)addLog("身体の衰えや家族・仕事の変化が、少しずつ現実味を帯びてきた。","event");
+  if(p.age===70)addLog("かつて当たり前だったことが難しくなった。経験は増えたが、失うものも増えている。","event");
+  if(p.isPureAngel&&p.age>=100&&p.age%50===0&&p.lastObservationPromptAge!==p.age){
+   p.lastObservationPromptAge=p.age;
+   addLog(`純天使として${p.age}年を生きた。地上のクッキーとは異なる長い時間の中で、あなたは世界を見続けてきた。`,"event");
+   bigDecision(`${p.age}年目の観察`,"これからもベイク大陸とベイクドームの変化を観察し続けますか？ 観察を終えることは、純天使としての生を自ら閉じることを意味します。",["観察を続ける","観察を終える"],[()=>{p.observationEnded=false;p.health=clamp(p.health+10);p.mind=clamp(p.mind+5);addLog(`あなたは観察を続けることにした。次の節目は${p.age+50}年後。`,"good")},()=>{p.observationEnded=true;addLog(`あなたは${p.age}年で観察を終えることにした。昇天使として迎えられることはなく、純天使としての生を閉じる。`,"event");die("観察終了")}]);
+   return;
+  }
+  if(p.age===18&&p.isAngel&&!p.afterlife){addLog("純天使としての教導課程を終え、配属先を選ぶ時期が来た。","event");bigDecision("天使としての配属","グロリアスベイクドームで、どの役目を担いますか？",angelJobs,[...angelJobs.map(j=>()=>{p.job=j;p.jobYears=0;p.careerLocked=true;p.angelRole=j;addLog(`あなたは${j}に配属された。`,`good`)} )]);return}
+  if(p.age===18&&!p.isAngel){p.job="見習い";addLog("学び舎を離れ、これからの進路を決める時期が来た。","event");bigDecision("進路を選ぶ","これから何をして生きていく？",["職人・商店で働く","学問を続ける","便利屋や冒険者を目指す","特に決めず、流れに任せる"],[()=>setJob("見習い"),()=>{p.knowledge+=15;p.money-=30;setJob("研究者見習い")},()=>setJob("便利屋"),()=>setJob("無職")]);return}
+  if(p.age===20&&p.job==="見習い")setJob(rand(jobs.slice(2)),"firstCareer");
+  if(p.age>=65&&p.job!=="無職"&&Math.random()<.12){bigDecision("引退の時","長く続けてきた仕事。そろそろ身を引くことも考えられる。",["引退して余生を過ごす","まだ働き続ける"],[()=>{setJob("無職","retire");if(p.age>=65)p.retiredAfter65=true;addLog("仕事から引退した。","good")},()=>{p.health-=5;addLog("もうしばらく現役を続けることにした。")}]);return}
+ }
+ // 仕事・生活環境に由来する突発的な事故
+ if(p.risk>=3&&Math.random()<(p.risk>=4?.012:.006)){p.health=clamp(p.health-ri(8,22));p.stress=clamp(p.stress+9);p.injuryCount=(p.injuryCount||0)+1;p.lastInjuryCause=rand(["戦闘・襲撃","犯罪被害",...(p.risk>=4?["暴動・紛争"]:[])]);addLog("移動中に襲撃に遭い、負傷した。治安の悪さは日常の一部になっている。","bad");if(p.health<=0){die(p.lastInjuryCause);return}}
+ if(Math.random()<.004+(p.risk>=3?.003:0)){p.health=clamp(p.health-ri(10,28));p.injuryCount=(p.injuryCount||0)+1;p.lastInjuryCause=resolveAccidentDeathCause();addLog("老朽化した設備、整備されていない道、あるいは不注意。日常の事故に巻き込まれた。","bad");if(p.health<=0){die(p.lastInjuryCause);return}}
+ if(p.money===0&&p.age>12&&Math.random()<.012){p.health=clamp(p.health-ri(5,16));p.stress=clamp(p.stress+10);p.hardshipCount=(p.hardshipCount||0)+1;if(p.age<18)p.childLabor=true;addLog("生活困窮により、医療・学用品・住環境など必要な支出を切り詰める時期が続いた。必要な支援は、いつも届くとは限らない。","bad");if(p.health<=0){die("飢餓・困窮");return}}
+ // 年齢・能力に応じた臨時収入。未成年は家事や手伝い中心、成人は短期仕事や技能仕事。
+ if(!p.isAngel&&!p.afterlife&&p.age>=8&&p.seasonIndex===0&&Math.random()<(p.age<13?.10:p.age<18?.16:.13)){
+  let options=p.age<13?["近所の手伝い","家の仕事を手伝う"]:p.age<18?["配達や店番の手伝い","季節労働に参加する","得意なことを教える"]:["短期の仕事を引き受ける","技能を活かした副業をする","地域の臨時作業に参加する"];
+  let task=rand(options),pay=p.age<13?ri(1,4):p.age<18?ri(3,8):ri(5,16);
+  smallDecision("臨時収入の機会",`${task}ことで、少し収入を得られそうだ。報酬は${pay}G。`,["引き受ける","今回は休む"],[()=>{p.money+=pay;p.skill=clamp(p.skill+(p.age>=13?2:1));p.stress=clamp(p.stress+(p.age<18?1:2));addLog(`${task}をして${pay}Gを受け取った。`,`good`)},()=>{p.health=clamp(p.health+1);p.stress=clamp(p.stress-2);addLog("無理はせず、休息を優先した。","good")}]);return;
+ }
+ if(p.job==="医療従事者"&&Math.random()<.0008&&p.health<20){die("医療事故");return}
+ if(Math.random()<(p.risk>=4?.0025:p.risk>=3?.0012:.0004)){p.health=clamp(p.health-ri(12,38));p.injuryCount=(p.injuryCount||0)+1;p.lastInjuryCause=rand(["厄災","水災被害","戦災被害","病災被害","地災被害","飢災被害","人災・因果改変"]);addLog("厄災に伴う広域災害に巻き込まれた。救助も復旧も間に合わず、被害だけが残った。","bad");if(p.health<=0){die(p.lastInjuryCause);return}}
+ // 季節ごとの生活変化とバロックの潜在リスク
+ p.stress=clamp(p.stress+ri(-2,2));
+ // 精神が限界域に達した場合、前兆を経ずに突発的なバロック発症が起こりうる。
+ if(!p.isPureAngel&&p.baroqueStage===0&&p.mind<10&&Math.random()<.075){
+  p.baroqueStage=2;p.baroqueType=rand(["結晶型","侵食型","感覚変質型","形態変化型","空間異常型"]);p.baroqueAbility=rand(["異常感知","感覚拡張","身体強化","再生能力","空間認識"]);p.baroqueRisk=clamp((p.baroqueRisk||0)+25);p.egoStability=clamp(p.egoStability-ri(18,32));p.stress=clamp(p.stress+ri(12,22));p.baroqueHistory=p.baroqueHistory||[];p.baroqueHistory.push({age:p.age,year:p.year,event:"精神限界による突発発症"});addLog(`精神状態が限界を下回った瞬間、前兆をほとんど見せずバロックが発症した。変異の型は「${p.baroqueType}」。身体と認識に急激な変化が生じている。`,`bad`);
+  if(Math.random()<.35){p.baroqueCauseKnown=false;addLog("検査を行っても原因は特定できなかった。既知の発症例とは異なる点が多い。","event")}
+ }
+ // 季節ごとの生活変化とバロックの潜在リスク
+ if(p.stress>55)p.baroqueRisk=clamp(p.baroqueRisk+ri(1,3),0,100);
+ if(p.mind<30)p.baroqueRisk=clamp(p.baroqueRisk+1,0,100);
+ if(p.baroqueStage===0&&p.baroqueRisk>25&&Math.random()<p.baroqueRisk/1600){p.baroqueStage=1;p.egoStability=clamp(p.egoStability-ri(2,8));p.baroqueHistory.push({age:p.age,year:p.year,event:"前兆"});addLog("原因の分からない違和感が、少しずつ日常に混じり始めた。","event")}
+ if(p.baroqueStage>0&&p.baroqueStage<4&&Math.random()<.06+p.baroqueRisk/1800){p.baroqueStage=Math.min(4,p.baroqueStage+1);p.baroqueHistory.push({age:p.age,year:p.year,event:"進行"});addLog("バロックの症状に変化が見られた。","bad")}
+ if(p.age>=13&&p.age<75&&p.seasonIndex===0&&Math.random()<.07){p.friends++;p.social=clamp(p.social+1);addLog("気の合うクッキーと知り合い、友人になった。","good")}
+ if(p.age>=20&&p.age<60&&!p.married&&p.seasonIndex===0&&Math.random()<.035)smallDecision("縁談","親しいクッキーから、誰かを紹介したいと誘われた。",["会ってみる","今は考えない"],[()=>{p.married=true;p.partner=true;p.happiness=clamp(p.happiness+12);addLog("紹介された相手と親しくなり、やがて伴侶となった。","good")},()=>addLog("今は一人の時間を大切にすることにした。")]);
+ if(p.married&&p.age>=20&&p.age<48&&p.seasonIndex===0&&Math.random()<.07){p.children++;p.happiness=clamp(p.happiness+5);addLog("家族が増えた。新しい命を迎え、暮らしが少し賑やかになった。","good")}
+ if(p.risk>=4&&Math.random()<.025){p.health-=ri(4,12);p.stress+=8;addLog("周辺で異常現象が発生した。生活に影響が及び、心身ともに消耗した。","bad")}
+ if(!decision&&p.age>=13&&!p.isAngel&&Math.random()<.018){terraceEvent();return}
+ if(!decision){if(Math.random()<(p.age<6?.09:p.age<13?.12:.18)){p.yearHadEvent=true;randomEvent()}else{p.quietSeasons=(p.quietSeasons||0)+1;if(p.seasonIndex===0&&!p.yearHadEvent){addLog(rand([`一年が過ぎた。仕事や家事をこなし、穏やかな日常を送った。`,`大きな事件のない一年だった。いつもの暮らしが静かに続いていく。`,`季節は巡り、特筆する出来事のない一年が過ぎた。`]))}if(p.seasonIndex===0){p.yearHadEvent=false;p.quietSeasons=0}}}
+ if(!decision&&!p.afterlife&&p.seasonIndex===0)lifeExpansionTick();
+ if(p.health<=0){die(resolveHealthDeathCause());return}if(!p.isPureAngel&&p.age>50&&Math.random()<.003+(100-p.health)/3000){die(resolveNaturalDeathCause());return}if(!p.isPureAngel&&p.age>105){die(resolveNaturalDeathCause());return}
+}
+
+
+// v7.1: persistent family, society, career, legacy and special-life systems.
+function lifeExpansionTick(){
+ if(!p||p.dead||p.afterlife||p.isAngel)return;
+ p.npcRelations=p.npcRelations||[];p.regionState=p.regionState||{economy:50,security:50,healthcare:50,technology:50,prosperity:50,disaster:0};p.careerFields=p.careerFields||[];
+ // NPCs age independently, move, form families and may disappear from daily life.
+ p.npcRelations.forEach(n=>{if(n.alive){n.years=(n.years||0)+1;if(n.years>35&&Math.random()<.012)n.alive=false;if(Math.random()<.025)n.location=rand([p.place,"ノーマルレイヤー・都市部","辺境の交易路","きな粉砂漠の集落"]);}});
+ if(p.age>=13&&p.npcRelations.length<7&&Math.random()<.18){const names=["レモンパイ味クッキー","ヘーゼルナッツ味クッキー","ローズマカロン味クッキー","カカオニブ味クッキー","ピスタチオタルト味クッキー","洋梨コンポート味クッキー"];let name=rand(names);if(!p.npcRelations.some(n=>n.name===name))p.npcRelations.push({name,role:"知人",bond:ri(2,12),alive:true,location:p.place,years:0});}
+ if(p.npcRelations.length&&Math.random()<.11){let n=rand(p.npcRelations);if(!n.alive){smallDecision("届いた訃報",`${n.name}が亡くなったという知らせが届いた。かつて親しくしていた相手の訃報は、思いがけず心に残る。`,["弔いに行く","手紙を送る","静かに悼む"],[()=>{p.happiness=clamp(p.happiness-5);p.mind=clamp(p.mind-3);p.helped++;addLog(`${n.name}の弔いに赴いた。` ,"event")},()=>{p.money=Math.max(0,p.money-5);p.happiness=clamp(p.happiness-2);addLog(`${n.name}の遺族へ手紙を送った。`,`event`)},()=>{p.mind=clamp(p.mind-1);addLog(`${n.name}との思い出を胸にしまった。`,`event`)}]);return;}
+  smallDecision("人間関係：再会",`${n.name}（${n.role}）と久しぶりに顔を合わせた。以前より少し大人びて見える。`,["ゆっくり話す","近況だけ聞く","忙しいので別れる"],[()=>{n.bond=clamp(n.bond+12);p.social=clamp(p.social+4);p.happiness=clamp(p.happiness+4);p.friendshipYears=(p.friendshipYears||0)+1;p.reunionSeen=true;addLog(`${n.name}と長い時間を過ごし、関係が深まった。`,`good`)},()=>{n.bond=clamp(n.bond+4);addLog(`${n.name}と近況を交換した。`)},()=>{n.bond=clamp(n.bond-3);p.stress=clamp(p.stress+1);addLog(`${n.name}とは挨拶だけで別れた。`)}]);return;
+ }
+ // family and children: choices create lasting records and trade-offs.
+ if(p.age>=18&&p.married&&p.seasonIndex===0&&Math.random()<.08){smallDecision("家族のこれから","家族の将来について話し合う機会があった。",["教育や生活に投資する","一緒に過ごす時間を増やす","家計を優先する"],[()=>{p.money=Math.max(0,p.money-25);p.knowledge=clamp(p.knowledge+4);p.familySupport=(p.familySupport||0)+1;addLog("家族の将来のために蓄えを使った。","good")},()=>{p.happiness=clamp(p.happiness+7);p.familySupport=(p.familySupport||0)+1;addLog("家族と過ごす時間を増やした。","good")},()=>{p.money+=12;p.stress=clamp(p.stress+3);addLog("当面の生活を守るため、支出を抑えた。") }]);return;}
+ if(p.age>=18&&!p.ownBusiness&&p.job!=="無職"&&p.money>=120&&Math.random()<.018){smallDecision("独立の機会","小さな店や工房を引き継がないかという話が舞い込んだ。",["資金を出して独立する","共同経営にする","断る"],[()=>{p.money-=100;p.ownBusiness=true;p.fame+=4;p.job="自営業";p.jobYears=0;addLog("小さな店を開いた。経営は不安定だが、自分の裁量で働ける。","good")},()=>{p.money-=45;p.ownBusiness=true;p.job="共同経営者";p.fame+=2;addLog("共同経営に参加した。責任も利益も分け合うことになった。","good")},()=>addLog("独立は見送り、今の仕事を続けることにした。")]);return;}
+ // regional history changes slowly; local conditions influence survival.
+ if(Math.random()<.07){let r=p.regionState;let event=rand(["景気後退","公共診療所の開設","交易路の整備","治安悪化","技術投資","小規模災害"]);if(event==="景気後退"){r.economy=clamp(r.economy-10);r.prosperity=clamp(r.prosperity-7);p.recessionSurvived=(p.recessionSurvived||0)+1;addLog("地域経済が冷え込み、仕事や商取引が減った。","bad")}else if(event==="公共診療所の開設"){r.healthcare=clamp(r.healthcare+9);p.health=clamp(p.health+2);addLog("地域に公共診療所が開設され、医療へのアクセスが少し改善した。","good")}else if(event==="交易路の整備"){r.economy=clamp(r.economy+7);r.prosperity=clamp(r.prosperity+5);p.money+=ri(3,12);addLog("交易路が整備され、人や物の流れが活発になった。","good")}else if(event==="治安悪化"){r.security=clamp(r.security-9);p.risk=clamp(p.risk+1,1,5);addLog("地域の治安が悪化し、夜間の外出を控える住民が増えた。","bad")}else if(event==="技術投資"){r.technology=clamp(r.technology+8);p.knowledge=clamp(p.knowledge+2);addLog("企業や行政が技術投資を行い、地域の設備が少しずつ更新された。","event")}else{r.disaster=clamp(r.disaster+1);p.health=clamp(p.health-ri(1,4));addLog("小規模な災害が発生した。大きな被害は避けられたが、復旧には時間がかかりそうだ。","bad")}}
+ if(p.age>=18&&p.job!=="無職"&&Math.random()<.035){p.professionRank=clamp((p.professionRank||0)+1,0,5);if(!p.careerFields.includes(p.job))p.careerFields.push(p.job);if(p.professionRank===3)addLog("仕事の腕が認められ、専門家として扱われるようになった。","good")}
+ if(p.place.includes("フェアリー")&&p.age>0)p.fairyYears=(p.fairyYears||0)+1;
+ if(p.baroqueStage>=2){p.baroqueSocialYears=(p.baroqueSocialYears||0)+1; if(Math.random()<.08){smallDecision("変異後の暮らし","変異した身体を見て、周囲の反応が変わってきた。",["事情を説明する","隠して暮らす","同じ境遇の者を探す"],[()=>{p.social=clamp(p.social+3);p.stress=clamp(p.stress-3);addLog("自分の状態を説明し、理解してくれる相手を少しずつ増やした。","good")},()=>{p.stress=clamp(p.stress+4);addLog("変異を隠すため、生活の一部を制限した。","event")},()=>{p.helped++;p.social=clamp(p.social+5);addLog("同じ境遇の者と知り合い、互いの経験を共有した。","good")}]);return;}}
+ if(p.terraceEncountered&&p.terraceEncountered.length>=2&&Math.random()<.025){smallDecision("裏社会の仲介","異なるテラスに属する者たちの間で、取引条件を調整してほしいと頼まれた。",["仲介を引き受ける","一方の側に立つ","断る"],[()=>{p.terraceMediator=true;p.terraceCouncil=(p.terraceCouncil||0)+1;p.money+=25;p.stress=clamp(p.stress+5);addLog("双方の条件を整理し、衝突を一度だけ先送りにした。","event")},()=>{p.terraceRelations=p.terraceRelations||{};p.fame+=2;p.stress=clamp(p.stress+6);addLog("一方の組織に肩入れした。もう一方からの信用は失われた。","event")},()=>addLog("危険な仲介を断り、関係者から距離を取った。")]);return;}
+}
+
+const terraceNames=["キマイラ","ケルベロス","ヒュドラ","ゴルゴン","テュポーン"];
+function terraceEvent(){
+ if(!p||p.dead||p.afterlife||p.isAngel||p.age<13)return;
+ p.terraceRelations=p.terraceRelations||{};p.terraceEncountered=p.terraceEncountered||[];
+ if(p.terraceEncountered.length>=3&&Math.random()<.08){smallDecision("五大テラス：代表会談の余波","五大テラスの代表者たちが不可侵と勢力図の調整を目的に会談を開いたらしい。表向きは平穏だが、会談後には物流や人の流れに小さな変化が現れている。",["変化を観察する","関係者の依頼を受ける","深入りを避ける"],[()=>{p.knowledge=clamp(p.knowledge+7);p.terraceRelations=p.terraceRelations||{};addLog("会談後の勢力変化を観察した。表の発表と裏で起きていることは、必ずしも同じではない。","event")},()=>{p.money+=ri(10,25);p.terraceEvents=(p.terraceEvents||0)+1;addLog("会談に関係する運搬・連絡の仕事を引き受けた。報酬は良かったが、依頼主の名は最後まで伏せられていた。","good")},()=>{p.stress=clamp(p.stress-2);addLog("会談の話題から距離を置いた。知らない方がよいこともある。","good")}]);return}
+ const org=rand(terraceNames);if(!p.terraceEncountered.includes(org))p.terraceEncountered.push(org);p.terraceEvents=(p.terraceEvents||0)+1;
+ const events={
+  "キマイラ":["規則のある路地","この一帯では、夜間の通行や商取引に細かな規則がある。住人は不満を口にしない。規則を破った者がどうなるか、皆が知っているからだ。",["規則に従い、保護を願い出る","関わらずに立ち去る"],[()=>{p.terraceProtection="キマイラ";p.terraceRelations[org]=(p.terraceRelations[org]||0)+12;p.health=clamp(p.health+5);p.stress=clamp(p.stress+4);addLog("キマイラの規則に従うことを条件に、支配区域での保護を認められた。安全と引き換えに、自由は少し狭くなった。","event")},()=>{p.terraceRelations[org]=(p.terraceRelations[org]||0)-2;addLog("規則に関わることを避け、その区域を離れた。","good")}]],
+  "ケルベロス":["路地裏の仲間たち","若いクッキーたちが揉め事を起こしている。通りすがりのあなたにも声がかかる。彼らは仲間を見捨てないことで知られている。",["手を貸す","深入りせず立ち去る"],[()=>{p.terraceRelations[org]=(p.terraceRelations[org]||0)+15;p.social=clamp(p.social+5);p.friends++;p.terraceProtection="ケルベロス";addLog("ケルベロスの者たちと肩を並べた。彼らはあなたを『身内寄り』として扱い始めた。","good")},()=>{p.terraceRelations[org]=(p.terraceRelations[org]||0)-1;addLog("揉め事には関わらず、その場を離れた。","event")}]],
+  "ヒュドラ":["創造の実験場","研究者らしきクッキーが、常識から外れた装置を見せてきた。研究成果は魅力的だが、実験の安全性については説明が曖昧だ。",["研究に協力する","成果だけ見て帰る"],[()=>{p.hydraResearch=true;p.terraceRelations[org]=(p.terraceRelations[org]||0)+14;p.knowledge=clamp(p.knowledge+9);p.skill=clamp(p.skill+5);p.stress=clamp(p.stress+8);addLog("ヒュドラの研究に協力した。知識と技術を得た一方、実験記録にはあなたの名前も残された。","event")},()=>{p.knowledge=clamp(p.knowledge+2);addLog("研究成果だけを見学し、実験への参加は断った。","good")}]],
+  "ゴルゴン":["誰かに見られている","街角で、同じ人物を何度も見かける。振り返るたびに姿は消えている。後日、あなたしか知らないはずの予定が変更されていた。",["何も知らないふりをする","監視の正体を探る"],[()=>{p.gorgonWatched=true;p.terraceRelations[org]=(p.terraceRelations[org]||0)+5;p.stress=clamp(p.stress+2);addLog("あなたは何も気づかなかったことにした。だが、見られているという感覚だけは消えなかった。","event")},()=>{p.terraceRelations[org]=(p.terraceRelations[org]||0)-5;p.knowledge=clamp(p.knowledge+5);p.stress=clamp(p.stress+12);addLog("監視の痕跡を探ったが、手掛かりは残っていなかった。数日後、身辺に関する噂が不自然に途絶えた。","bad")}]],
+  "テュポーン":["崩壊の後の再編","街区の一部が一夜で機能を失った。物流も治安も崩れたが、数日後には見慣れない規則と新しい流通経路が生まれていた。",["復旧作業に加わる","危険区域から避難する"],[()=>{p.typhoonAftermath=true;p.terraceRelations[org]=(p.terraceRelations[org]||0)+3;p.helped++;p.stress=clamp(p.stress+10);addLog("テュポーンの活動後に生じた再編へ、復旧作業を通じて関わった。何が壊され、何が作り直されたのか、最後まで理解できなかった。","event")},()=>{p.typhoonAftermath=true;p.money=Math.max(0,p.money-15);p.health=clamp(p.health-ri(2,7));addLog("危険区域から避難した。街は再編されたが、以前の暮らしは戻らなかった。","bad")}]]
+ };
+ const e=events[org];smallDecision(`テラス：${org}`,e[1],e[2],e[3]);
+}
+
+function angelEvent(){
+ const pool=[
+ ["ルーチェ市の休日","今日は特に予定がない。ベイクドームの街を散策する？",["街を散策する","自室でのんびりする"],[()=>{p.happiness=clamp(p.happiness+7);p.social=clamp(p.social+2);addLog("ルーチェ市で穏やかな休日を過ごした。","good")},()=>{p.happiness=clamp(p.happiness+5);p.stress=clamp(p.stress-5);addLog("自室で好きなことをして過ごした。","good")}]],
+ ["セレスティアルの目に留まる","セレスティアルがあなたの振る舞いに興味を示したようだ。",["気ままに話す","頼まれごとを引き受ける"],[()=>{p.holyFavor=(p.holyFavor||0)+ri(2,5);p.happiness=clamp(p.happiness+3);addLog("気さくな会話が弾み、セレスティアルに気に入られた。","good")},()=>{p.holyFavor=(p.holyFavor||0)+ri(5,10);p.helped++;addLog("小さな頼まれごとを見事にこなし、セレスティアルから覚えられた。","good")}]],
+ ["天使たちの噂話","地上から来た昇天使と、純天使たちの間で価値観の違いが話題になっている。",["双方の話を聞く","面白がって眺める"],[()=>{p.social=clamp(p.social+5);p.knowledge=clamp(p.knowledge+3);addLog("互いの文化を知るきっかけを作った。","good")},()=>{p.happiness=clamp(p.happiness+3);addLog("少し離れたところから、賑やかな様子を眺めていた。")}]],
+ ["クロノス記録塔の閲覧","記録塔で、地上にいた頃の自分の人生記録を閲覧できると知った。",["記録を読む","今は読まない"],[()=>{p.knowledge=clamp(p.knowledge+7);p.mind=clamp(p.mind+3);addLog("自分の人生を記録越しに振り返った。懐かしさと、少しの距離を感じた。","event")},()=>{p.happiness=clamp(p.happiness+2);addLog("過去を振り返るのは、また別の日にすることにした。")}]],
+ ["ルーチェ市の小さな祭り","天使たちが自主的に開いた小さな祭り。地上の祭礼を真似た屋台も並んでいる。",["祭りを手伝う","見物して回る"],[()=>{p.social=clamp(p.social+5);p.helped++;p.happiness=clamp(p.happiness+4);addLog("祭りの準備を手伝い、普段話さない天使とも交流した。","good")},()=>{p.happiness=clamp(p.happiness+7);addLog("屋台を巡り、賑やかな時間を楽しんだ。","good")}]],
+ ["門前で待つ昇天使","グロリアスゲートの近くで、地上から来たばかりの昇天使が立ち尽くしている。",["声をかける","門番に知らせる"],[()=>{p.social=clamp(p.social+5);p.helped++;addLog("新しく迎えられた昇天使に、ここでの暮らしを説明した。","good")},()=>{p.helped++;addLog("門番隊に状況を伝え、案内を任せた。","good")}]],
+ ["記録官の書類整理","記録塔で書類の整理が追いついていないらしい。新人記録官が助けを求めている。",["整理を手伝う","別の用事を優先する"],[()=>{p.knowledge=clamp(p.knowledge+5);p.social=clamp(p.social+2);addLog("記録の照合を手伝った。古い記録の中に、現在のベイク大陸と異なる記述を見つけた。","event")},()=>{addLog("今日は自分の予定を優先することにした。")}]],
+ ["翼の手入れ","翼の羽根が少し乱れている。自分で整えることもできるが、誰かに頼むこともできる。",["知人に手入れを頼む","自分で整える"],[()=>{p.social=clamp(p.social+3);p.happiness=clamp(p.happiness+4);addLog("誰かに翼の手入れを手伝ってもらった。何気ない時間が心地よかった。","good")},()=>{p.skill=clamp(p.skill+2);addLog("鏡を見ながら、自分で翼を整えた。")}]],
+ ["行政区からの呼び出し","アウレア行政区から、生活状況について簡単な聞き取りをしたいと連絡が届いた。",["応じる","断る"],[()=>{p.knowledge=clamp(p.knowledge+3);p.holyFavor=(p.holyFavor||0)+2;addLog("聞き取りに応じ、ベイクドームでの暮らしについて意見を伝えた。","good")},()=>{p.stress=clamp(p.stress-2);addLog("今は静かに過ごしたいと伝え、呼び出しを断った。")}]],
+ ["地上から届いた品","地上の誰かが、あなたの生前の土地に関係する品を届けてきた。",["受け取る","記録だけ残す"],[()=>{p.happiness=clamp(p.happiness+6);p.mind=clamp(p.mind+3);addLog("懐かしい品を受け取った。地上で過ごした時間が、確かに自分の一部だったと思い出した。","event")},()=>{p.knowledge=clamp(p.knowledge+2);addLog("品の由来だけを記録し、受け取りは辞退した。")}]]
+ ];
+ const angelContact=rand(angelRoster);pool.push(["ベイクドームでの短い会話",`${angelContact}と廊下ですれ違い、短い会話を交わした。部署の話題から、最近のベイクドームの様子まで、話は思いのほか弾いた。`,["もう少し話をする","挨拶だけして別れる"],[()=>{p.social=clamp(p.social+4);p.happiness=clamp(p.happiness+3);p.characterBonds=p.characterBonds||[];const key=angelContact.replace(/味クッキー|エンジェルウィングス/g,"").replace("アンジェリカ・","").replace(" セネシオ","").trim();if(!p.characterBonds.includes(key))p.characterBonds.push(key);addLog(`${angelContact}と会話し、ベイクドームでの交流を深めた。`,"good")},()=>{p.happiness=clamp(p.happiness+1);addLog(`${angelContact}に挨拶をして、その場を離れた。`)}]]);
+ if(p.afterlife&&p.angelJobUnlocked!==true&&p.holyFavor>=12&&Math.random()<.28){pool.push(["特別な役目の打診","セレスティアルがあなたを気に入り、ベイクドームの役目を任せてもよいと考えているようだ。",["役目を引き受ける","今まで通り自由に暮らす"],[()=>{p.angelJobUnlocked=true;p.job=rand(angelJobs);p.angelRole=p.job;p.jobYears=0;p.promotionRank=1;p.holyFavor+=5;addLog(`セレスティアルに気に入られ、昇天使でありながら特例として「${p.job}」の役目を得た。`,`good`)},()=>{p.happiness=clamp(p.happiness+5);addLog("役目には就かず、これからも自由な暮らしを続けることにした。","good")} ]])}
+ if((p.afterlife||p.isAngel)&&Math.random()<.22){
+  const d=rand([
+   ["『まだ開いていない扉を、閉じてはならない』","エダムチーズ味クッキーから渡された指令。どの扉を指すのか、説明はない。",["該当する扉を探す","記録だけ残して待つ"],[()=>{p.directiveCount=(p.directiveCount||0)+1;p.knowledge=clamp(p.knowledge+7);p.stress=clamp(p.stress+2);addLog("指令に従って開いていない扉を探した。見つけた扉の向こうには、ただ静かな空間が広がっていた。","event")},()=>{p.directiveCount=(p.directiveCount||0)+1;p.knowledge=clamp(p.knowledge+3);addLog("指令を記録し、続報を待つことにした。","event")} ]],
+   ["『ひとりでいる者に、声をかけよ』","誰を指しているのかは不明。指令書には、場所も名前も書かれていない。",["ひとりでいる天使を探す","自分の周囲を見渡す"],[()=>{p.directiveCount=(p.directiveCount||0)+1;p.helped++;p.social=clamp(p.social+5);p.happiness=clamp(p.happiness+4);addLog("ひとりで過ごしていた天使に声をかけた。短い会話だったが、相手は少し安心したようだった。","good")},()=>{p.directiveCount=(p.directiveCount||0)+1;p.social=clamp(p.social+3);addLog("自分の周囲を見渡し、困っている者がいないか気にかけることにした。","good")} ]]
+  ]);pool.push(["伝令官からの指令",`エダムチーズ味クッキーから、あなた宛ての指令が届いた。\n\n${d[0]}\n${d[1]}`,d[2],d[3]]);
+ }
+ if(p.afterlife&&p.angelJobUnlocked&&(p.promotionRank||1)<4&&p.holyFavor>=20&&Math.random()<.16){pool.push(["セレスティアルからの追加の寵愛","あなたの働きぶりを見ていたセレスティアルが、もう一段階責任ある役目を任せたいと考えている。",["期待に応える","今の役目を大切にする"],[()=>{p.promotionRank=(p.promotionRank||1)+1;p.holyFavor+=8;p.fame+=5;p.knowledge=clamp(p.knowledge+5);addLog(`セレスティアルの推薦で役目が引き上げられた。現在の昇進段階は${p.promotionRank}。`,`good`)},()=>{p.happiness=clamp(p.happiness+5);p.holyFavor+=2;addLog("今の役目を丁寧に続けることを選んだ。セレスティアルはそれも気に入ったようだ。","good")}]]);}
+ if(p.afterlife&&p.angelJobUnlocked&&Math.random()<.10){pool.push(["神の私的な頼まれごと","セレスティアルから、公式な職務とは別の小さな頼まれごとが届いた。",["個人的な頼みを引き受ける","公務を優先する"],[()=>{p.holyFavor+=ri(5,10);p.social=clamp(p.social+3);p.pandoraRequestCount=(p.pandoraRequestCount||0)+1;addLog("セレスティアルの私的な頼まれごとを片付けた。公式記録には残らないが、確かに覚えられたようだ。","good")},()=>{p.knowledge=clamp(p.knowledge+3);p.holyFavor+=1;addLog("公務を優先した。セレスティアルは少し残念そうだったが、判断を尊重した。","event")}]]);}
+ if(p.afterlife&&p.angelJobUnlocked&&(p.promotionRank||1)>=2&&Math.random()<.08){pool.push(["役職推薦の打診","セレスティアルの側近から、あなたを上位役職へ推薦する話が持ち上がった。",["推薦を受ける","推薦を辞退する"],[()=>{p.promotionRank=Math.min(4,(p.promotionRank||1)+1);p.holyFavor+=6;p.fame+=4;addLog("推薦が認められ、昇天使としては異例の上位役職に就いた。","good")},()=>{p.happiness=clamp(p.happiness+3);addLog("肩書きよりも、自分らしい働き方を選んだ。","good")}]]);}
+ if(p.afterlife&&p.angelJobUnlocked&&p.job&&p.job!=="自由人（昇天使）"){
+  const roleEvents={
+   "記録官":["失われた一頁","記録塔の古い台帳から、一頁だけ抜け落ちている。",["欠落を調べる","欠落として記録する"],[()=>{p.knowledge=clamp(p.knowledge+6);addLog("欠落した頁の痕跡を見つけた。記録に残らない出来事があることを知った。","event")},()=>{addLog("欠落そのものを記録し、後任へ引き継いだ。")}]],
+   "異端審問官":["曖昧な告発","ある天使への告発が届いたが、証拠は不十分だ。",["慎重に調査する","今回は保留する"],[()=>{p.knowledge=clamp(p.knowledge+4);p.stress=clamp(p.stress+3);addLog("証言を照合し、拙速な処分を避けた。","good")},()=>{p.happiness=clamp(p.happiness+1);addLog("判断を保留し、追加の証拠を待つことにした。")}]],
+   "技術官":["保守点検の異常","ベイクドームの転送設備に、設計書にない挙動が見つかった。",["原因を調べる","使用を停止する"],[()=>{p.skill=clamp(p.skill+7);p.knowledge=clamp(p.knowledge+4);addLog("設備の異常を調査し、危険な挙動を抑え込んだ。","good")},()=>{p.helped++;addLog("設備を停止し、事故を未然に防いだ。","good")}]],
+   "外交官":["小さな文化摩擦","地上から来た昇天使と純天使の間で、慣習の違いによる行き違いが起きている。",["双方の話を聞く","仲裁役を探す"],[()=>{p.social=clamp(p.social+6);addLog("双方の事情を聞き、互いの慣習を説明した。","good")},()=>{p.helped++;addLog("経験豊富な天使に仲裁を依頼した。","good")}]],
+   "伝令官":["指令の余白","届けるべき指令書に、本文とは別の短い一文が書き足されている。",["余白も伝える","本文だけを伝える"],[()=>{p.directiveCount=(p.directiveCount||0)+1;p.knowledge=clamp(p.knowledge+4);addLog("余白の一文もそのまま伝えた。受け取った天使は、なぜか驚かなかった。","event")},()=>{p.directiveCount=(p.directiveCount||0)+1;addLog("正式な本文だけを伝え、余白の文は記録に留めた。","event")}]],
+   "門番隊":["門の向こうの来訪者","門の外に、入域記録のない来訪者が立っている。敵意は感じられない。",["規則に従って確認する","上役へ判断を仰ぐ"],[()=>{p.knowledge=clamp(p.knowledge+3);addLog("規定の手順で来訪者を確認した。相手は静かに名を告げた。","event")},()=>{p.helped++;addLog("独断を避け、上役へ判断を仰いだ。","good")}]]
+  };
+  if(roleEvents[p.job]&&Math.random()<.42)pool.push(roleEvents[p.job]);
+ }
+ const e=rand(pool);smallDecision(e[0],e[1],e[2],e[3]);
+}
+function startAfterlife(){clearInterval(smallTimer);smallTimer=null;clearTimeout(autoTimer);p.dead=false;p.afterlife=true;p.afterlifeAge=0;p.age=0;p.year++;p.seasonIndex=0;p.place="グロリアスベイクドーム";p.risk=0;p.isAngel=true;p.isPureAngel=false;p.angelType="昇天使";p.job="自由人（昇天使）";p.careerLocked=true;p.money=Math.max(0,p.money);p.health=100;p.mind=100;p.happiness=clamp(p.happiness+15);p.stress=0;p.afterlifeEvents=[];paused=false;decision=false;$("overlay").style.display="none";addLog("地上での人生を終え、昇天使としてグロリアスベイクドームでの新たな暮らしが始まった。ここから200年を基本とする、地上とは異なる時間を過ごす。","good");render();startClock()}
+function finishAfterlife(){p.afterlife=false;p.afterlifeComplete=true;p.dead=true;paused=true;clearInterval(timer);addLog("昇天使としての200年を過ごし、ひとつの長い記録が完成した。","good");let earned=[];for(let [name,desc,cat,fn] of titleDefs){if(fn(p)&&!p.titles.includes(name)){p.titles.push(name);earned.push(name)}}let collection=JSON.parse(storage.get("bakeTitles","[]"));earned.forEach(x=>{if(!collection.includes(x))collection.push(x)});storage.set("bakeTitles",JSON.stringify(collection));let records=JSON.parse(storage.get("bakeAscendedLives","[]"));let idx=records.findIndex(x=>x.name===p.name&&x.cause===p.cause&&x.year===p.year-1);if(idx<0)idx=records.findIndex(x=>x.name===p.name&&x.cause===p.cause);if(idx>=0){records[idx].afterlifeYears=200;records[idx].afterlifeJob=p.job;records[idx].holyFavor=p.holyFavor||0;records[idx].afterlifeSummary=(p.logs||[]).slice(0,80);storage.set("bakeAscendedLives",JSON.stringify(records))}$("overlay").style.display="grid";$("modal").innerHTML=`<div class="dead"><h2>ASCENDED LIFE COMPLETE</h2><p>${escapeHtml(p.name)}は昇天使として200年を過ごした。</p><p>職業：${escapeHtml(p.job)}<br>セレスティアルからの寵愛：${p.holyFavor||0}</p><h3>追加で獲得した称号</h3><div class="titlelist">${earned.map(x=>`<span class="titlebadge">${escapeHtml(x)}</span>`).join("")||"なし"}</div><button class="primary" onclick="newLife()">新しい人生を始める</button><button onclick="$('overlay').style.display='none'">記録を閉じる</button></div>`;render()}
+
+function setJob(j,reason=""){
+ if(!p||p.job===j)return false;
+ const firstCareer=(p.job==="子ども"||p.job==="見習い"||p.job==="無職"&&!p.careerLocked);
+ const allowed=firstCareer||reason==="retire"||reason==="majorChange";
+ if(!allowed){addLog(`「${p.job}」としての仕事を続けることにした。転職するほどの事情はなかった。`);return false}
+ if(reason==="majorChange"&&p.job!=="子ども"&&p.job!=="無職")p.jobChanges++;
+ p.job=j;p.jobYears=0;if(j!=="無職"&&j!=="見習い"&&j!=="子ども")p.careerLocked=true;
+ addLog(j==="無職"?"仕事を離れ、無職となった。":`新しく「${j}」として働き始めた。`,"good");return true;
+}
+function makeHandyContract(){
+ const jobsList=[
+  {name:"迷子のペット捜索",desc:"商店街で飼い主とはぐれたペットを探してほしい。",pay:45,diff:18,stat:"social"},
+  {name:"荷物の護送",desc:"交易路を通る荷物を目的地まで護送する依頼。",pay:85,diff:38,stat:"skill"},
+  {name:"境界点付近の調査",desc:"境界点周辺で消えた調査員の足取りを追ってほしい。",pay:150,diff:62,stat:"knowledge"},
+  {name:"夜間警備",desc:"倉庫街で一晩だけ警備をしてほしい。",pay:65,diff:28,stat:"skill"},
+  {name:"発症者の搬送補助",desc:"バロック発症者を医療施設まで安全に送り届ける依頼。",pay:110,diff:48,stat:"social"},
+  {name:"違法研究の証拠収集",desc:"研究施設の裏側を調べ、証拠を持ち帰ってほしい。",pay:180,diff:72,stat:"knowledge"}
+ ];
+ const c=rand(jobsList);const base=clamp(48+(p.skill-30)*.45+(p.knowledge-25)*.2+(p.social-30)*.18-(p.risk-1)*3-c.diff*.35,5,95);const chance=Math.round(base);
+ return ["便利屋の依頼："+c.name,c.desc+` 報酬：${c.pay}G／難易度：${c.diff}。現在の推定成功率：${chance}%。`,[`依頼を受ける（成功率 ${chance}%）`,`条件を交渉する（成功率 ${Math.max(5,chance-8)}%・報酬増）`,`断る`],[()=>{const roll=Math.random()*100;if(roll<chance){p.money+=c.pay;p.fame+=3;p.skill=clamp(p.skill+3);p.happiness=clamp(p.happiness+3);p.helped++;p.contractsCompleted=(p.contractsCompleted||0)+1;addLog(`依頼「${c.name}」に成功。報酬${c.pay}Gを受け取った。`,`good`)}else{p.health=clamp(p.health-ri(3,12));p.stress=clamp(p.stress+8);p.money=Math.max(0,p.money-ri(5,20));p.contractsFailed=(p.contractsFailed||0)+1;addLog(`依頼「${c.name}」は失敗。損害と疲労が残った。`,`bad`)}},()=>{const negotiated=Math.max(5,chance-8),roll=Math.random()*100;if(roll<negotiated){p.money+=Math.round(c.pay*1.35);p.fame+=4;p.contractsCompleted=(p.contractsCompleted||0)+1;p.contractNegotiations=(p.contractNegotiations||0)+1;addLog(`条件交渉が成立し、依頼「${c.name}」を高報酬で完遂した。`,`good`)}else{p.stress=clamp(p.stress+6);p.social=clamp(p.social-2);p.contractsFailed=(p.contractsFailed||0)+1;addLog(`交渉または依頼に失敗。信用を少し損ねた。`,`bad`)}},()=>{p.social=clamp(p.social+1);addLog(`依頼「${c.name}」を断った。無理をしない判断も大切だ。`)}]];
+}
+function randomEvent(){
+ p.events++;let calamityEvent=null,pool=[
+ ["故郷の縁","生まれ育った土地に関わる出来事が起きた。",["地元の人々と協力する","自分の道を優先する"],[()=>{p.social=clamp(p.social+7);p.fame+=2;p.happiness=clamp(p.happiness+4);addLog("故郷の人々と協力し、地域とのつながりを深めた。","good")},()=>{p.skill=clamp(p.skill+3);addLog("自分の進路を優先し、新しい技術を磨いた。") }]],
+ ["仕事の転機","今の職場で新しい役割を任せたいという話が持ち上がった。",["引き受ける","今の役割を続ける"],[()=>{p.skill=clamp(p.skill+5);p.fame+=3;p.money+=35;p.jobYears+=1;addLog(`「${p.job}」として責任ある仕事を任され、評価と収入が上がった。`,"good")},()=>{p.stress=clamp(p.stress-2);addLog("無理に役割を広げず、今の仕事を丁寧に続けることにした。")}]],
+ ["困っている旅人","道に迷った旅人が助けを求めている。",["道案内をする","急いでいるので通り過ぎる"],[()=>{p.helped++;p.localAid=(p.localAid||0)+1;p.happiness=clamp(p.happiness+7);p.fame+=2;addLog("旅人を目的地まで案内した。感謝の言葉をもらった。","good")},()=>{p.mind=clamp(p.mind-2);addLog("旅人を気にしながらも、その場を離れた。")}]],
+ ["思いがけない出費","住まいの修繕が必要になった。",["修理する","応急処置で済ませる"],[()=>{p.money=Math.max(0,p.money-80);p.health=clamp(p.health+2);addLog("住まいをきちんと修理した。")},()=>{p.money=Math.max(0,p.money-15);p.stress+=5;addLog("最低限の修繕だけを行った。")}]],
+ ["学びの機会","地域で短期講習が開かれるらしい。",["参加する","今回は見送る"],[()=>{p.money=Math.max(0,p.money-25);p.knowledge=clamp(p.knowledge+9);p.skill=clamp(p.skill+5);addLog("講習で新しい知識と技術を得た。","good")},()=>addLog("今回は参加を見送った。")]],
+ ["街の祭り","街で季節の祭りが開かれている。",["友人と参加する","家でゆっくり過ごす"],[()=>{p.happiness=clamp(p.happiness+10);p.social=clamp(p.social+3);p.money=Math.max(0,p.money-10);addLog("祭りを楽しみ、友人との思い出が増えた。","good")},()=>{p.happiness=clamp(p.happiness+2);addLog("家で静かな休日を過ごした。")}]]
+ ];
+ if(false)pool.push(["砂漠の水源","集落の井戸が枯れかけている。水源を探す隊に誘われた。",["探索に参加する","備蓄を守る"],[()=>{if(Math.random()<.65){p.helped++;p.fame+=5;p.social=clamp(p.social+5);addLog("新しい水源を見つけ、集落の危機を救った。","good")}else{p.health=clamp(p.health-12);p.stress=clamp(p.stress+8);addLog("探索は難航し、消耗して帰還した。","bad")}},()=>{p.money+=10;addLog("備蓄管理を手伝い、集落の生活を支えた。")}]]);
+ if(p.place.includes("フェアリー"))pool.push(["妖精の迷い道","普段は見えない小道が開き、妖精たちの領域へ続いている。",["奥へ進む","入口で観察する"],[()=>{p.knowledge=clamp(p.knowledge+12);p.baroqueRisk=clamp(p.baroqueRisk+2);addLog("妖精の領域で不思議な知識を得た。","event")},()=>{p.knowledge=clamp(p.knowledge+5);p.mind=clamp(p.mind+3);addLog("安全な場所から妖精の営みを観察した。","good")}]]);
+ if(p.place.includes("バターマングローブ")){
+  pool.push(["バターマングローブの湿った風","湿度の高い風が森を抜け、根の間を黒い水が流れている。地元の住民は、この地方の森には近づかない方がいいと忠告した。",["住民から話を聞く","森の入口を調べる"],[()=>{p.butterMangroveEvents=(p.butterMangroveEvents||0)+1;p.social=clamp(p.social+4);p.knowledge=clamp(p.knowledge+3);addLog("住民からバターマングローブ地方の古い伝承を聞いた。森の奥には、今も怪王がいるという。","event")},()=>{p.butterMangroveEvents=(p.butterMangroveEvents||0)+1;p.knowledge=clamp(p.knowledge+6);p.stress=clamp(p.stress+2);addLog("森の入口を調べた。根の表面には、通常の腐食とは異なる痕跡が残っていた。","event")} ]]);
+  pool.push(["ロットの群れ","森の奥から、小さな生き物たちが集まってきた。互いに寄り集まり、まるでひとつの意思を持つようにこちらを見ている。",["刺激しないよう観察する","食べ物を置いてみる"],[()=>{p.butterMangroveEvents=(p.butterMangroveEvents||0)+1;p.knowledge=clamp(p.knowledge+5);addLog("ロットたちの動きを静かに観察した。彼らは森の奥へ戻っていった。","event")},()=>{p.butterMangroveEvents=(p.butterMangroveEvents||0)+1;p.money=Math.max(0,p.money-5);p.social=clamp(p.social+2);addLog("食べ物を置くと、ロットたちは警戒しながらも受け取った。","good")} ]]);
+  pool.push(["パラニ・クアウトラの腐食痕","腐食樹林パラニ・クアウトラの外縁で、植物とも鉱物ともつかない物質が地面を覆っている。触れたものの形を少しずつ変えているようだ。",["距離を保って記録する","危険を承知でサンプルを採る"],[()=>{p.butterMangroveEvents=(p.butterMangroveEvents||0)+1;p.butterMangroveResearch=true;p.knowledge=clamp(p.knowledge+8);addLog("安全な距離から腐食痕を記録した。これは単なる植物の繁殖ではない。","good")},()=>{p.butterMangroveEvents=(p.butterMangroveEvents||0)+1;p.butterMangroveResearch=true;p.health=clamp(p.health-8);p.knowledge=clamp(p.knowledge+12);p.stress=clamp(p.stress+5);addLog("サンプルを採取したが、手袋越しにも異様な熱と脈動が伝わった。","bad")} ]]);
+ }
+ if(p.place.includes("都市部"))pool.push(["再開発地区の立ち退き", "再開発計画で、住んでいた地区の住民に立ち退き通知が届いた。", ["補償交渉に参加する","別の住まいを探す"], [()=>{p.social=clamp(p.social+4);p.fame+=2;p.stress=clamp(p.stress+3);addLog("住民たちと補償交渉を行い、最低限の条件を引き出した。","event")},()=>{p.money=Math.max(0,p.money-25);p.stress=clamp(p.stress+2);addLog("新しい住まいを探し、ひとまず生活の場所を確保した。","event")}]]);
+ if(p.place.includes("城塞跡地"))pool.push(["崩れかけた地下通路","城塞跡地の地下から、古い通路が見つかった。奥にはまだ動く装置があるらしい。",["慎重に調査する","入口を封鎖する"],[()=>{p.knowledge=clamp(p.knowledge+8);p.skill=clamp(p.skill+3);if(Math.random()<.25){p.health=clamp(p.health-8);addLog("調査中に天井の一部が崩れ、負傷した。それでも古い装置の記録を持ち帰った。","bad")}else addLog("地下装置の記録を持ち帰った。かつての技術水準は想像以上だった。","good")},()=>{p.helped++;p.fame+=2;addLog("危険な通路を封鎖し、探索者たちに注意を呼びかけた。","good")}]]);
+ if(p.place.includes("マシュマリア"))pool.push(["空中都市の居住資格","天空都市の居住区画に空きが出たが、審査と保証金が必要らしい。",["保証人を探す","地上で暮らし続ける"],[()=>{if(p.money>=80){p.money-=80;p.fame+=2;p.happiness=clamp(p.happiness+7);addLog("審査を通過し、天空都市で暮らす資格を得た。","good")}else{p.stress=clamp(p.stress+3);addLog("保証金を用意できず、申請を見送った。","event")}},()=>{p.social=clamp(p.social+2);addLog("地上での暮らしを続けることにした。","event")}]]);
+ if(p.place.includes("和風文化圏"))pool.push(["誰もいない祭囃子","夜更け、山の方から祭囃子が聞こえる。近隣の住民は、今夜は祭りを行っていないと言う。",["音の出所を確かめる","家に戻って休む"],[()=>{p.knowledge=clamp(p.knowledge+6);p.mind=clamp(p.mind-2);if(Math.random()<.35){p.happiness=clamp(p.happiness+5);addLog("山道の先には古い祭具だけが残されていた。音は、近づくほど遠ざかっていった。","event")}else addLog("音の出所は見つからなかった。翌朝、道には小さな足跡が残っていた。","event")},()=>{p.health=clamp(p.health+2);p.stress=clamp(p.stress-3);addLog("不思議な音を気にしつつも、今夜は休むことにした。","good")}]]);
+ if(p.place.includes("ワンダークリーム"))pool.push(["帰り道が見つからない","観光施設から出ようとしたところ、入ってきたはずの出口が見当たらない。",["案内人についていく","自力で道を探す"],[()=>{p.social=clamp(p.social+4);p.happiness=clamp(p.happiness+2);addLog("不思議な案内人についていくと、いつの間にか見慣れた通りへ戻っていた。","event")},()=>{p.knowledge=clamp(p.knowledge+7);p.stress=clamp(p.stress+5);if(Math.random()<.25)p.health=clamp(p.health-5);addLog("自力で出口を探した。戻るまでに時間がかかり、妙な疲労が残った。","event")}]]);
+ if(p.place.includes("ブルーハワイ"))pool.push(["青い海の底に眠るもの","漁の最中、海底に人工物らしき構造が見えた。潮流が強く、長く潜るのは危険だ。",["記録だけ取る","潜って確かめる"],[()=>{p.knowledge=clamp(p.knowledge+6);p.fame+=2;addLog("船上から構造物の位置を記録し、研究機関へ情報を渡した。","good")},()=>{p.health=clamp(p.health-7);p.knowledge=clamp(p.knowledge+10);p.stress=clamp(p.stress+4);addLog("海底で古い構造物の一部を確認した。内部には現在の技術体系と異なる刻印があった。","event")}]]);
+ if(p.place.includes("セイクレッドシュガー"))pool.push(["聖堂の寄付帳","巡礼者から集めた寄付金の帳簿に、不自然な支出が記されている。",["証拠を集めて報告する","見なかったことにする"],[()=>{p.knowledge=clamp(p.knowledge+5);p.fame+=3;p.stress=clamp(p.stress+4);addLog("帳簿の写しを確保し、信頼できる窓口へ報告した。信仰と組織の問題は別だと考えた。","event")},()=>{p.money+=10;p.mind=clamp(p.mind-2);addLog("関わらないことにした。寄付帳は元の場所へ戻された。","event")}]]);
+ if(p.place.includes("研究施設"))pool.push(["研究区画の見学","施設の研究者から、見学と簡単な補助作業に誘われた。",["手伝う","距離を置く"],[()=>{p.knowledge=clamp(p.knowledge+10);p.skill=clamp(p.skill+5);p.baroqueRisk=clamp(p.baroqueRisk+1);addLog("研究補助を通じて高度な技術に触れた。","event")},()=>{p.stress=clamp(p.stress-2);addLog("施設には近づかず、普段の生活を続けた。")}]]);
+ if(p.place.includes("ベイクドーム"))pool.push(["天使の教導","先輩天使から記録や規律について学ぶ機会を得た。",["教導を受ける","自由時間を過ごす"],[()=>{p.knowledge=clamp(p.knowledge+8);p.social=clamp(p.social+3);addLog("天使の教導を受け、ベイクドームの規範を学んだ。","good")},()=>{p.happiness=clamp(p.happiness+5);addLog("自由時間に街を歩き、住民たちと交流した。")}]]);
+ if((p.isAngel||p.afterlife)&&Math.random()<.18){
+  const directives=[
+   ["『東の境界で、まだ名のない鐘が鳴る。音の出所を確かめよ』","境界の異常を遠くから観測する指令らしい。具体的な対象も、期限も記されていない。",["指令に従って調査する","安全を優先して報告する"],[()=>{p.directiveCount=(p.directiveCount||0)+1;p.directiveHistory=p.directiveHistory||[];p.directiveHistory.push("境界の鐘");p.boundaryResearch=(p.boundaryResearch||0)+1;p.knowledge=clamp(p.knowledge+9);p.stress=clamp(p.stress+3);addLog("伝令官長エダムチーズ味クッキーから受け取った指令に従い、境界の鐘を調査した。現地には鐘など存在しなかった。","event")},()=>{p.directiveCount=(p.directiveCount||0)+1;p.knowledge=clamp(p.knowledge+4);addLog("境界の鐘について、危険を避けたうえで調査可能な範囲を報告した。","good")} ]],
+   ["『ひとつ余分な椅子を用意せよ。来客の名は尋ねなくてよい』","誰を迎えるための指令なのかは分からない。エダムチーズ味クッキーも、由来については知らされていないという。",["指示通りに準備する","関係部署に確認する"],[()=>{p.directiveCount=(p.directiveCount||0)+1;p.directiveHistory=p.directiveHistory||[];p.directiveHistory.push("余分な椅子");p.social=clamp(p.social+5);p.holyFavor=(p.holyFavor||0)+1;addLog("指令通りに椅子をひとつ用意した。誰も来なかったが、翌朝には椅子だけが消えていた。","event")},()=>{p.directiveCount=(p.directiveCount||0)+1;p.knowledge=clamp(p.knowledge+5);p.stress=clamp(p.stress+2);addLog("関係部署に確認したが、該当する来客予定は存在しなかった。","event")} ]],
+   ["『記録にない名前を、今日だけは記録せよ』","対象の名前は指令書に書かれていない。空欄のまま渡された記録用紙だけが、妙に重い。",["空欄のまま保管する","記録塔で照合を試みる"],[()=>{p.directiveCount=(p.directiveCount||0)+1;p.directiveHistory=p.directiveHistory||[];p.directiveHistory.push("空欄の記録");p.knowledge=clamp(p.knowledge+4);addLog("名前の欄を空白のまま保管した。翌日、紙には見覚えのない筆跡が浮かんでいた。","event")},()=>{p.directiveCount=(p.directiveCount||0)+1;p.knowledge=clamp(p.knowledge+9);p.stress=clamp(p.stress+4);addLog("記録塔で照合したが、該当する名前はどの記録にも存在しなかった。","event")} ]],
+   ["『今日、誰かひとりの願いを叶えること』","個人宛ての指令だった。大げさな使命ではなく、身近な誰かの願いをひとつ叶えるように、とだけ記されている。",["身近な相手を手助けする","指令の意図を考える"],[()=>{p.directiveCount=(p.directiveCount||0)+1;p.helped++;p.happiness=clamp(p.happiness+6);p.social=clamp(p.social+3);addLog("身近な相手の願いをひとつ叶えた。指令の差出人が誰であれ、悪い気分ではなかった。","good")},()=>{p.directiveCount=(p.directiveCount||0)+1;p.knowledge=clamp(p.knowledge+5);addLog("指令の意図を考えたが、答えは出なかった。ひとまず記録だけを残した。","event")} ]]
+  ];
+  const d=rand(directives);pool.push(["伝令官からの指令",`伝令官長エダムチーズ味クッキーから、あなた個人宛ての指令が届いた。\n\n${d[0]}\n\n${d[1]}`,d[2],d[3]]);
+ }
+
+ if(p.family==="研究者の家庭")pool.push(["家族の研究資料","家族が扱う研究資料に、興味深い記述を見つけた。",["一緒に調べる","触れずにおく"],[()=>{p.knowledge=clamp(p.knowledge+9);p.baroqueRisk=clamp(p.baroqueRisk+1);addLog("家族の研究を手伝い、知識を深めた。","event")},()=>{p.happiness=clamp(p.happiness+2);addLog("研究から離れ、家族との時間を過ごした。")}]]);
+ if(p.family==="孤児として育つ")pool.push(["支援施設との縁","支援施設の職員から、学費や生活の援助を提案された。",["援助を受ける","自力でやってみる"],[()=>{p.money+=35;p.happiness=clamp(p.happiness+5);p.social=clamp(p.social+3);addLog("支援を受け、安心して暮らせる環境を得た。","good")},()=>{p.skill=clamp(p.skill+4);addLog("自分でできることを増やそうと決めた。","event")}]]);
+ if(p.job==="便利屋")pool.push(makeHandyContract());
+ if(p.jobYears>=8&&p.job!=="子ども"&&p.job!=="無職"&&p.job!=="見習い"&&Math.random()<.06)pool.push(["職場の閉鎖",`長年勤めてきた職場が、経営難や事故の影響で閉鎖されることになった。これまでの職業経験をどう活かすか、決断を迫られている。`,["同じ職業で働ける場所を探す","やむを得ず別の職業へ移る"],[()=>{p.money=Math.max(0,p.money-35);p.social=clamp(p.social+3);addLog(`職場は失ったが、これまでの経験を活かして「${p.job}」を続ける道を選んだ。`,`good`)},()=>{const old=p.job;const next=rand(jobs.filter(j=>j!==old&&j!=="無職"&&j!=="見習い"));setJob(next,"majorChange");addLog(`職場を失ったことをきっかけに、長年続けた「${old}」を離れて「${next}」へ転職した。`,`event`)}]]);
+ if(p.job!=="子ども"&&p.job!=="無職"&&p.job!=="見習い"&&Math.random()<.32)pool.push(["職場での評価",`「${p.job}」として積み重ねてきた経験が認められ、仕事の幅を広げる機会が訪れた。`,["新しい役目に挑戦する","慣れた仕事を大切にする"],[()=>{p.skill=clamp(p.skill+5);p.fame+=2;p.money+=25;addLog(`同じ職業のまま経験を積み、周囲から頼られるようになった。`,"good")},()=>{p.happiness=clamp(p.happiness+3);p.stress=clamp(p.stress-2);addLog("今の仕事の質を高めることを選んだ。","good")}]]);
+ if(p.job==="パン職人")pool.push(["新作パンの試作","店主から新作商品の開発を任された。",["試作に没頭する","常連の意見を聞く"],[()=>{p.skill=clamp(p.skill+9);p.stress=clamp(p.stress+4);p.fame+=2;addLog("試作品が評判になり、職人としての腕を認められた。","good")},()=>{p.social=clamp(p.social+5);p.knowledge=clamp(p.knowledge+3);addLog("常連の声を取り入れ、店の人気商品を生み出した。","good")}]]);
+ if(p.job==="研究者"||p.job==="バロック研究員")pool.push(["研究成果の発表","研究成果を学会で発表する機会が巡ってきた。",["発表する","追加検証を優先する"],[()=>{p.fame+=7;p.knowledge=clamp(p.knowledge+5);p.stress=clamp(p.stress+5);addLog("研究成果を発表し、専門家から注目を集めた。","event")},()=>{p.knowledge=clamp(p.knowledge+8);p.skill=clamp(p.skill+3);addLog("発表を急がず、データの精度を高めた。","good")}]]);
+ if(p.job==="商店員"||p.job==="商人")pool.push(["仕入れ先のトラブル","仕入れ先から納品の遅れを知らされた。店の信用を守る必要がある。",["別ルートで仕入れる","常連に事情を説明する"],[()=>{p.money=Math.max(0,p.money-30);p.skill=clamp(p.skill+4);addLog("別ルートを確保し、営業への影響を抑えた。","good")},()=>{p.social=clamp(p.social+5);p.fame+=2;addLog("事情を説明したことで常連の理解を得た。","good")}]]);
+ if(p.job==="料理人")pool.push(["厨房の新メニュー","料理長から新しい季節メニューを考えるよう頼まれた。",["独創的な料理に挑戦","定番を改良する"],[()=>{p.skill=clamp(p.skill+7);p.fame+=4;p.stress=clamp(p.stress+3);addLog("独創的な料理が話題になり、評判が広がった。","good")},()=>{p.skill=clamp(p.skill+4);p.happiness=clamp(p.happiness+3);addLog("定番料理を改良し、安定した人気を得た。","good")}]]);
+ if(p.job==="職人")pool.push(["特注品の制作","難しい注文が舞い込んだ。納期は短いが報酬は高い。",["挑戦する","納期を延ばしてもらう"],[()=>{if(p.skill>55){p.money+=90;p.fame+=5;addLog("見事に特注品を完成させ、評判を高めた。","good")}else{p.stress=clamp(p.stress+8);p.skill=clamp(p.skill+3);addLog("苦戦しながらも技術を磨く経験になった。","event")}},()=>{p.social=clamp(p.social+2);p.skill=clamp(p.skill+5);addLog("納期を調整し、品質を優先して制作することにした。","good")}]]);
+ if(p.job==="芸術家")pool.push(["作品の展示会","小さなギャラリーから作品展示の誘いが来た。",["展示する","新作を作り込む"],[()=>{p.fame+=6;p.social=clamp(p.social+4);p.money+=20;addLog("展示会で作品が注目され、新しい知人もできた。","good")},()=>{p.skill=clamp(p.skill+7);p.knowledge=clamp(p.knowledge+3);addLog("展示を見送り、制作に集中した。","event")}]]);
+ if(p.job==="役人")pool.push(["住民からの陳情","住民たちが生活環境の改善を求めている。",["現場を調査する","上層部に予算を申請する"],[()=>{p.social=clamp(p.social+5);p.knowledge=clamp(p.knowledge+3);p.helped++;addLog("現場の声を聞き、具体的な改善案をまとめた。","good")},()=>{p.fame+=2;p.stress=clamp(p.stress+4);addLog("予算申請を行い、行政内部で調整を始めた。","event")}]]);
+ if(p.job==="農業従事者")pool.push(["不作の兆し","天候不順で作物の生育が悪い。対策を迫られている。",["設備に投資する","近隣と共同対策する"],[()=>{p.money=Math.max(0,p.money-45);p.skill=clamp(p.skill+5);addLog("設備を整え、次の収穫に備えた。")},()=>{p.social=clamp(p.social+6);p.happiness=clamp(p.happiness+3);addLog("近隣農家と協力し、被害を抑えた。","good")}]]);
+ if(p.job==="教師")pool.push(["生徒の進路相談","悩みを抱えた生徒が、放課後に相談に来た。",["時間をかけて話を聞く","専門家につなぐ"],[()=>{p.helped++;p.social=clamp(p.social+5);p.happiness=clamp(p.happiness+4);addLog("生徒は少しずつ前向きになり、感謝を伝えてくれた。","good")},()=>{p.knowledge=clamp(p.knowledge+3);p.stress=clamp(p.stress-2);addLog("適切な相談窓口を紹介し、支援につなげた。","good")}]]);
+ if(p.job==="医療従事者"||p.job==="バロック専門医")pool.push(["緊急の患者","診療所に急患が運び込まれた。人手が足りない。",["対応に加わる","応援を呼ぶ"],[()=>{if(p.skill+ p.knowledge>90){p.fame+=6;p.helped++;p.happiness=clamp(p.happiness+4);addLog("迅速な処置で患者の容態を安定させた。","good")}else{p.stress=clamp(p.stress+10);p.health=clamp(p.health-4);addLog("懸命に対応したが、心身に負担が残った。","bad")}},()=>{p.social=clamp(p.social+3);p.helped++;addLog("応援を呼び、チームで患者を支えた。","good")}]]);
+ if(p.job==="警備員"||p.job==="冒険者")pool.push(["夜間の警戒任務","危険な区域の巡回を頼まれた。",["引き受ける","交代要員を求める"],[()=>{if(Math.random()<.7){p.money+=35;p.skill=clamp(p.skill+4);p.fame+=2;addLog("異常なく任務を終え、報酬を受け取った。","good")}else{p.health=clamp(p.health-14);p.stress=clamp(p.stress+8);addLog("不意の襲撃で負傷した。","bad")}},()=>{p.social=clamp(p.social+2);addLog("仲間と交代で警戒にあたり、安全を確保した。")}]]);
+ if(p.risk>=4)pool.push(["境界点の揺らぎ","近隣で空間が歪み、見慣れない景色が一瞬だけ現れた。",["様子を見に行く","近づかず避難する"],[()=>{if(Math.random()<.48){p.boundarySurvived=true;p.boundaryEscapes=(p.boundaryEscapes||0)+1;p.boundaryResearch=(p.boundaryResearch||0)+1;p.knowledge=clamp(p.knowledge+18);p.fame+=5;addLog("異常地帯から生還した。見たものを言葉にするのは難しい。","event")}else{p.health-=ri(25,55);p.stress+=25;addLog("異常現象に巻き込まれ、深い傷を負った。","bad");if(p.health<=0)die("境界点災害")}},()=>{p.health=clamp(p.health+3);addLog("危険を察知して、その場を離れた。")}]]);
+ if(Math.random()<.025)pool.push(["厄災の報せ","遠方で厄災に関わる大規模な事件が起きたという。",["救援活動に参加する","自分の生活を守る"],[()=>{p.disaster=true;p.helped++;p.health-=ri(5,18);p.fame+=12;addLog("危険を承知で救援に参加した。多くの人々の記憶に残る経験となった。","event")},()=>{p.disaster=true;addLog("遠方の惨事をニュースで知った。自分にできることは少なかった。")}]]);
+ if(p.baroqueStage===0&&p.baroqueRisk>12)pool.push(["鏡の中の違和感","鏡に映る自分の姿が、一瞬だけ違って見えた。",["医療機関で検査する","気のせいとして過ごす"],[()=>{p.money=Math.max(0,p.money-20);p.knowledge=clamp(p.knowledge+2);addLog("検査では明確な異常は見つからなかった。","event")},()=>{p.stress=clamp(p.stress+4);p.baroqueRisk=clamp(p.baroqueRisk+3)}]]);
+ if(p.baroqueStage>=1)pool.push(["眠れない夜","眠りが浅く、身体の奥に説明しづらい違和感が残る。",["休養を取る","仕事を続ける"],[()=>{p.stress=clamp(p.stress-8);p.mind=clamp(p.mind+4);p.baroqueRisk=clamp(p.baroqueRisk-2)},()=>{p.money+=15;p.stress=clamp(p.stress+8);p.baroqueRisk=clamp(p.baroqueRisk+3)}]]);
+ if(p.baroqueStage>=1)pool.push(["診断の提案","医療従事者から、バロックの可能性について詳しい検査を勧められた。",["詳しい検査を受ける","今は受けない"],[()=>{p.money=Math.max(0,p.money-35);p.knowledge=clamp(p.knowledge+8);p.baroqueDiagnosed=true;addLog("検査でバロックの兆候が確認された。原因は依然として不明だ。","event")},()=>{p.stress=clamp(p.stress+3);addLog("検査を先送りにした。","event")} ]]);
+ if(p.baroqueStage>=2&&!p.baroqueType)pool.push(["最初の変異","身体の一部に、これまでになかった変化が現れた。",["専門家に相談する","自分で様子を見る"],[()=>{p.baroqueType=rand(["結晶・鉱物型","異形器官型","影・流動型","感覚変異型","内部変質型","複合型"]);p.baroqueAbility=rand(["自己再生","感情知覚","空間歪曲","身体拡張","記憶感応","物質変質"]);p.baroqueControl=ri(20,45);p.egoStability=clamp(p.egoStability-ri(4,12));p.baroqueHistory.push({age:p.age,year:p.year,event:"変異発現",type:p.baroqueType,ability:p.baroqueAbility});addLog(`変異が確認された。分類は「${p.baroqueType}」。固有能力「${p.baroqueAbility}」が発現した。`,`event`)},()=>{p.baroqueType=rand(["結晶・鉱物型","異形器官型","影・流動型","感覚変異型","内部変質型"]);p.baroqueAbility=rand(["自己再生","感情知覚","空間歪曲","身体拡張","記憶感応","物質変質"]);p.baroqueControl=ri(5,30);p.egoStability=clamp(p.egoStability-12);addLog("変異が進み、本人にも説明できない能力が現れた。","bad")} ]]);
+ if(p.baroqueStage>=2)pool.push(["制御訓練","発現した能力を安全に扱うための訓練を提案された。",["訓練に参加する","今は避ける"],[()=>{p.money=Math.max(0,p.money-25);p.baroqueControl=clamp(p.baroqueControl+15);p.knowledge=clamp(p.knowledge+3);addLog("訓練を通じて、能力の扱い方を少し学んだ。","good")},()=>{p.baroqueControl=clamp(p.baroqueControl-3);p.stress=clamp(p.stress+4)}] ]);
+ if(p.baroqueStage>=2)pool.push(["家族への告白","自分の身体に起きていることを、家族に伝える時が来た。",["正直に話す","まだ隠しておく"],[()=>{p.social=clamp(p.social+4);p.happiness=clamp(p.happiness+5);p.egoStability=clamp(p.egoStability+5);addLog("家族は戸惑いながらも、話を聞いてくれた。","good")},()=>{p.stress=clamp(p.stress+7);addLog("今は話さないことにした。秘密を抱える負担が残る。")}]]);
+ if(p.baroqueStage>=2&&p.friends>0)pool.push(["友人の反応","変異について知った友人が、今まで通り接してよいのか尋ねてきた。",["いつも通りでいてほしい","距離を置いてほしい"],[()=>{p.happiness=clamp(p.happiness+6);p.egoStability=clamp(p.egoStability+6);p.social=clamp(p.social+3);addLog("友人は、あなたをあなたとして受け止めようとした。","good")},()=>{p.stress=clamp(p.stress-3);p.social=clamp(p.social-5);p.lostFriend=true;addLog("しばらく距離を置くことにした。","event")}]]);
+ if(p.baroqueStage>=2)pool.push(["研究協力の依頼","研究施設から、症例記録への協力を求められた。報酬は悪くない。",["協力する","断る"],[()=>{p.money+=70;p.knowledge=clamp(p.knowledge+10);p.researchRecognition=clamp((p.researchRecognition||0)+15);addLog("研究に協力し、報酬と引き換えに検査記録を提供した。","event")},()=>{p.social=clamp(p.social+1);addLog("研究協力を断り、自分の生活を優先した。")}]]);
+ if(p.baroqueStage===0&&p.friends>0)pool.push(["友人の異変","親しい友人が、原因不明の体調不良と身体の違和感を訴えている。",["一緒に医療機関へ行く","本人の判断に任せる"],[()=>{p.money=Math.max(0,p.money-15);p.helped++;p.supportedAffected=true;p.social=clamp(p.social+4);addLog("友人に付き添って検査を受けた。結果が分かるまで支えることにした。","good")},()=>{p.social=clamp(p.social-1);addLog("友人の意思を尊重し、見守ることにした。")} ]]);
+ if(p.baroqueStage>=2)pool.push(["治療法の提案","専門医から、症状を抑えるための治療を提案された。",["治療を受ける","今回は見送る"],[()=>{p.money=Math.max(0,p.money-45);p.stress=clamp(p.stress-8);p.egoStability=clamp(p.egoStability+8);p.baroqueRecovered=true;addLog("治療によって症状の一部が落ち着いた。変異そのものは残っている。","good")},()=>{p.stress=clamp(p.stress+2);addLog("今は治療を受けず、様子を見ることにした。")} ]]);
+ if(p.baroqueStage>=2)pool.push(["非公開の実験","研究施設で、本人の同意が曖昧なまま進められている実験の噂を聞いた。",["告発する","関わらない"],[()=>{p.ethicalResearchRefused=true;p.fame=clamp(p.fame+5);p.social=clamp(p.social+3);addLog("問題のある実験について告発した。研究施設との関係は悪化したが、支援者も現れた。","event")},()=>{p.stress=clamp(p.stress+2);addLog("危険を避けるため、関わらないことにした。")} ]]);
+ if(p.baroqueStage>=2&&p.friends>0)pool.push(["発症者の護衛依頼","発症したクッキーを医療施設まで護衛してほしいと頼まれた。",["引き受ける","断る"],[()=>{p.helped++;p.baroqueRescued=true;p.happiness=clamp(p.happiness+5);p.fame=clamp(p.fame+3);addLog("発症者を無事に医療施設まで送り届けた。","good")},()=>addLog("今回は依頼を断った。")]]);
+ if(p.baroqueStage>=3)pool.push(["能力の暴走","感情が大きく揺れた瞬間、能力が制御を離れた。",["助けを求める","自力で抑え込む"],[()=>{p.baroqueControl=clamp(p.baroqueControl+5);p.egoStability=clamp(p.egoStability+3);p.stress=clamp(p.stress-5);addLog("周囲の助けを借りて、どうにか能力を鎮めた。","good")},()=>{p.health=clamp(p.health-12);p.stress=clamp(p.stress+12);p.baroqueControl=clamp(p.baroqueControl-8);addLog("無理に抑え込んだ結果、身体に負担が残った。","bad")}]]);
+ // 純天使の配属先ごとの専用エピソード
+ if(p.isAngel&&!p.afterlife){
+  if(p.job==="記録官")pool.push(["記録の食い違い","クロノス記録塔の古い記録に、現在の歴史と一致しない記述が見つかった。",["原本を調べる","上役に報告する"],[()=>{p.knowledge=clamp(p.knowledge+7);p.holyFavor=(p.holyFavor||0)+1;addLog("原本の照合を進め、記録の矛盾を特定した。","good")},()=>{p.fame+=2;p.stress=clamp(p.stress+2);addLog("上役に報告し、正式な調査案件として扱われることになった。","event")} ]]);
+  if(p.job==="異端審問官")pool.push(["審問対象の訴え","異端の疑いをかけられたクッキーが、審問の不当さを訴えている。",["証言を丁寧に聞く","規定に従って審理を進める"],[()=>{p.knowledge=clamp(p.knowledge+4);p.social=clamp(p.social+3);p.holyFavor=(p.holyFavor||0)+1;addLog("証言を丁寧に聞き、疑いの根拠を再検討した。","good")},()=>{p.fame+=2;p.stress=clamp(p.stress+4);addLog("規定に沿って審理を進めた。判断の重さが心に残った。","event")} ]]);
+  if(p.job==="技術官")pool.push(["設備の異常","ベイクドームの転送設備に不具合が発生し、利用者が足止めされている。",["自分で修理する","安全を優先して停止する"],[()=>{p.skill=clamp(p.skill+7);p.knowledge=clamp(p.knowledge+3);addLog("設備を修復し、転送機能を復旧させた。","good")},()=>{p.holyFavor=(p.holyFavor||0)+1;p.stress=clamp(p.stress-2);addLog("設備を停止して事故を防ぎ、点検班に引き継いだ。","good")} ]]);
+  if(p.job==="外交官")pool.push(["天使間の意見対立","他部署の天使たちが、地上への対応方針を巡って対立している。",["双方の妥協点を探す","自分の見解を明確に伝える"],[()=>{p.social=clamp(p.social+6);p.holyFavor=(p.holyFavor||0)+2;addLog("双方が受け入れられる妥協点を見つけた。","good")},()=>{p.fame+=3;p.stress=clamp(p.stress+3);addLog("自分の見解を明確に示し、議論の方向性を変えた。","event")} ]]);
+  if(p.job==="伝令官")pool.push(["曖昧な神託","伝令として受け取った指令は、断片的で解釈が難しいものだった。",["慎重に言葉を補う","原文のまま伝える"],[()=>{p.knowledge=clamp(p.knowledge+5);p.social=clamp(p.social+2);addLog("意図を損なわないよう慎重に翻訳し、指令を伝えた。","good")},()=>{p.holyFavor=(p.holyFavor||0)+2;p.stress=clamp(p.stress+3);addLog("解釈を加えず、受け取った言葉をそのまま伝えた。","event")} ]]);
+  if(p.job==="門番隊")pool.push(["門前の来訪者","グロリアスゲートに、身元の分からない旅人が現れた。",["話を聞いて案内する","規則に従い入門を保留する"],[()=>{p.social=clamp(p.social+4);p.holyFavor=(p.holyFavor||0)+1;addLog("来訪者の事情を聞き、適切な部署へ案内した。","good")},()=>{p.skill=clamp(p.skill+2);addLog("規則に従って入門を保留し、確認を依頼した。","event")} ]]);
+ }
+ // ベイクドームの天使文化・異端・堕天に関する固有イベント
+ if(p.isAngel&&!p.afterlife){
+  if(p.job!=="見習い天使")pool.push(["規範への疑問","教導の中で、地上のクッキーや創造に関する古い規範に疑問を抱いた。",["疑問を記録しておく","上役に率直に尋ねる"],[()=>{p.knowledge=clamp(p.knowledge+5);p.holyFavor=(p.holyFavor||0)-1;addLog("疑問を自分の中で整理し、記録に残した。","event")},()=>{p.knowledge=clamp(p.knowledge+7);p.holyFavor=(p.holyFavor||0)-2;addLog("上役との議論になったが、考えを深める機会になった。","event")} ]]);
+  if(p.age>=20)pool.push(["異端の疑い","あなたの言動が、ベイクドームの一部の天使から異端的だと疑われている。",["審問に応じる","自分の考えを曲げない"],[()=>{p.holyFavor=(p.holyFavor||0)+1;p.stress=clamp(p.stress+3);addLog("審問に応じ、誤解を解くため説明を続けた。","event")},()=>{p.fame+=3;p.holyFavor=(p.holyFavor||0)-5;p.stress=clamp(p.stress+8);p.heresyFlag=true;addLog("自分の考えを撤回せず、異端視される立場になった。","bad")} ]]);
+  if(p.heresyFlag&&Math.random()<.12)pool.push(["堕天の危機","異端の疑いが強まり、天使としての資格を問われている。",["謝罪して秩序に戻る","追放を覚悟して拒む"],[()=>{p.heresyFlag=false;p.holyFavor=(p.holyFavor||0)+4;p.stress=clamp(p.stress-8);addLog("謝罪と説明を経て、ひとまず処分を免れた。","good")},()=>{p.fallen=true;p.isAngel=false;p.angelType="堕天使";p.job="無職";p.place="ベイクドーム外縁";p.risk=2;addLog("天使としての資格を剥奪され、堕天した。地上と天界の狭間で新たな生活が始まる。","bad")} ]]);
+ } else if(!p.afterlife&&p.age>=18&&Math.random()<.02){pool.push(["異端の告発","あなたの思想や行動が、地域の宗教組織から異端視されている。",["公の場で反論する","波風を立てずに身を引く"],[()=>{p.fame+=4;p.stress=clamp(p.stress+7);p.heresyFlag=true;addLog("信仰や慣習への疑問を公にし、異端者として告発された。","event")},()=>{p.social=clamp(p.social-2);p.happiness=clamp(p.happiness-2);addLog("争いを避け、しばらく距離を置くことにした。","good")} ]]);}
+
+ // ベイクドームで遭遇する天使は、指定された11名に限定する。
+ const bond=(name)=>{p.characterBonds=p.characterBonds||[];if(!p.characterBonds.includes(name))p.characterBonds.push(name)};
+ const flag=(key)=>{p.characterFlags=p.characterFlags||[];if(!p.characterFlags.includes(key))p.characterFlags.push(key)};
+ if(p.place.includes("ベイクドーム")){
+  pool.push(["記録官長カダイフタトゥルスの照合","記録官長カダイフタトゥルス味クッキーが、記録の照合作業に人手を求めている。古い記録ほど、単純な誤記では済まない矛盾が多い。",["原本と写本を照合する","記録の保管手順を確認する"],[()=>{bond("カダイフタトゥルス");flag("record_tower");p.knowledge=clamp(p.knowledge+9);p.skill=clamp(p.skill+3);addLog("カダイフタトゥルス味クッキーの指揮のもと、記録の照合を手伝った。","good")},()=>{bond("カダイフタトゥルス");p.knowledge=clamp(p.knowledge+5);p.stress=clamp(p.stress-2);addLog("記録塔の保管手順を学んだ。記録官長は厳格だが、説明は丁寧だった。","good")} ]]);
+  pool.push(["新人記録官マルメロの手伝い","記録官の新人（？）を名乗るマルメロ味クッキーが、資料整理を手伝ってほしいと声をかけてきた。本人の説明は妙に芝居がかっている。",["資料整理を手伝う","話に付き合う"],[()=>{bond("マルメロ");flag("record_tower");p.knowledge=clamp(p.knowledge+8);p.skill=clamp(p.skill+2);addLog("マルメロ味クッキーと記録を照合し、古い資料の欠落を見つけた。","good")},()=>{bond("マルメロ");p.happiness=clamp(p.happiness+4);p.social=clamp(p.social+2);addLog("マルメロ味クッキーの大げさな語りに付き合った。本人は満足げだった。") }]]);
+  if(!p.marmeloTruthSeen&&Math.random()<.045)pool.push(["記録官の新人、その正体","資料の端に、マルメロ味クッキーの古い記録が挟まっていた。そこには現職の記録官とは異なる、堕天使としての登録履歴が残されている。本人はそれを隠す様子もなく、ただ『今は記録官をしている』と告げた。",["本人に詳しく尋ねる","記録を元の場所へ戻す"],[()=>{p.marmeloTruthSeen=true;bond("マルメロ");flag("marmelo_fallen_revealed");p.knowledge=clamp(p.knowledge+10);p.stress=clamp(p.stress+2);addLog("マルメロ味クッキーが堕天使であることを知った。彼は今も記録官として働いている。","event")},()=>{p.marmeloTruthSeen=true;p.knowledge=clamp(p.knowledge+3);addLog("記録を元の場所へ戻した。知らないふりをすることも、ひとつの配慮なのかもしれない。","event")} ]]);
+  pool.push(["異端審問官長アンジェリカ・デクルシヴァ","アンジェリカ・デクルシヴァ味クッキー――通称デクルシヴァ味クッキーが、任務帰りにあなたへ声をかけた。口調は荒いが、仕事の相談には妙に具体的だ。",["調査を手伝う","雑談に付き合う","距離を置く"],[()=>{bond("デクルシヴァ");flag("inquisitor_help");p.knowledge=clamp(p.knowledge+6);p.skill=clamp(p.skill+4);p.holyFavor=(p.holyFavor||0)+1;addLog("デクルシヴァ味クッキーの調査を手伝い、現場での判断を学んだ。","good")},()=>{bond("デクルシヴァ");p.happiness=clamp(p.happiness+4);p.social=clamp(p.social+3);addLog("デクルシヴァ味クッキーと他愛ない話をした。彼は最後まで素直に笑わなかった。")},()=>addLog("今は関わらず、道を譲った。")] ]);
+  pool.push(["副官セネシオの差し入れ","異端審問官の副官、セネシオ エンジェルウィングス味クッキー（通称セネシオ味クッキー）が、忙しい天使たちへ食事の差し入れを配っている。",["配るのを手伝う","ありがたく受け取る"],[()=>{bond("セネシオ");flag("inquisitor_help");p.helped++;p.social=clamp(p.social+5);p.happiness=clamp(p.happiness+4);addLog("セネシオ味クッキーと一緒に差し入れを配り、部署の天使たちと交流した。","good")},()=>{bond("セネシオ");p.health=clamp(p.health+3);p.happiness=clamp(p.happiness+5);addLog("セネシオ味クッキーの手料理を受け取った。疲れが少し和らいだ。","good")} ]]);
+  pool.push(["技術官長ニトロセルロースの点検","技術官長ニトロセルロース味クッキーが、転送設備の定期点検を行っている。設備の一部に、通常の故障とは異なる反応が出ているらしい。",["点検を補助する","安全区域から記録を取る"],[()=>{bond("ニトロセルロース");p.skill=clamp(p.skill+8);p.knowledge=clamp(p.knowledge+5);addLog("ニトロセルロース味クッキーの点検を補助し、設備の異常箇所を特定した。","good")},()=>{bond("ニトロセルロース");p.knowledge=clamp(p.knowledge+7);p.stress=clamp(p.stress-1);addLog("安全区域から設備の反応を記録した。技術官長は慎重な判断を評価した。","good")} ]]);
+  if(p.age>=18)pool.push(["外交局長アカマツリの調整","外交局長アカマツリ味クッキーが、部署間の意見対立を収めようとしている。普段は穏やかに見えるが、議論が白熱すると一歩も引かない。",["双方の話を整理する","アカマツリの判断を補佐する"],[()=>{bond("アカマツリ");p.social=clamp(p.social+7);p.knowledge=clamp(p.knowledge+4);addLog("アカマツリ味クッキーの調整を手伝い、衝突しかけた部署同士を引き離した。","good")},()=>{bond("アカマツリ");p.fame+=2;p.skill=clamp(p.skill+3);addLog("外交局長の補佐を務め、難しい交渉の進め方を学んだ。","event")} ]]);
+  if(p.age>=18)pool.push(["外交官プルンバーゴの仲裁","外交官プルンバーゴ味クッキーが、地上との連絡に関する小さな行き違いを解決しようとしている。",["仲裁を手伝う","状況を観察する"],[()=>{bond("プルンバーゴ");p.social=clamp(p.social+6);p.knowledge=clamp(p.knowledge+4);p.holyFavor=(p.holyFavor||0)+1;addLog("プルンバーゴ味クッキーの仲裁を手伝い、双方が受け入れられる伝達方法を見つけた。","good")},()=>{p.knowledge=clamp(p.knowledge+3);addLog("プルンバーゴ味クッキーの交渉を見学し、外交の難しさを知った。")} ]]);
+  pool.push(["伝令官長エダムチーズの伝令","伝令官長エダムチーズ味クッキーが、各部署へ届ける指令の確認をしている。文面には、誰の意思によるものか分からない一文が混じっていた。",["指令の伝達を手伝う","文面の不自然さを指摘する"],[()=>{bond("エダムチーズ");p.knowledge=clamp(p.knowledge+7);p.holyFavor=(p.holyFavor||0)+1;addLog("エダムチーズ味クッキーの指示に従い、指令を各部署へ伝えた。内容の由来について、彼は多くを語らなかった。","event")},()=>{bond("エダムチーズ");p.knowledge=clamp(p.knowledge+9);p.stress=clamp(p.stress+2);addLog("文面の矛盾を指摘すると、エダムチーズ味クッキーは少し考え込んでから書き直した。","good")} ]]);
+  pool.push(["門番隊長コープスリバイバー","門番隊長コープスリバイバー味クッキーが、門前の警備を手伝う者を募っている。どうやら勤務の様子をSNSに投稿するつもりらしい。",["警備に参加する","記念写真を撮る"],[()=>{bond("コープスリバイバー");p.skill=clamp(p.skill+6);p.fame+=2;addLog("門前警備を手伝い、来訪者の誘導を担当した。","good")},()=>{bond("コープスリバイバー");p.happiness=clamp(p.happiness+4);p.social=clamp(p.social+2);addLog("コープスリバイバー味クッキーと記念写真を撮った。本人は投稿文に悩んでいた。")} ]]);
+  pool.push(["門番隊員トロピカルブリーズ","門番隊員トロピカルブリーズ味クッキーが、門の周辺で起きた小さなトラブルの対応を手伝ってほしいと頼んできた。",["来訪者の案内を手伝う","門の外の様子を確認する"],[()=>{bond("トロピカルブリーズ");p.social=clamp(p.social+4);p.helped++;p.holyFavor=(p.holyFavor||0)+1;addLog("来訪者を案内し、門前の混乱を収めた。トロピカルブリーズ味クッキーは穏やかに礼を言った。","good")},()=>{bond("トロピカルブリーズ");p.knowledge=clamp(p.knowledge+5);addLog("門の外に広がる景色を観察し、境界の変化について話を聞いた。","event")} ]]);
+  pool.push(["どこにも所属しないビャクシ","部署の案内板の前で、ビャクシ味クッキーが所在なさげに立っている。どこの所属でもないらしいが、ベイクドームのことは誰よりもよく知っているようにも見える。",["話しかけてみる","そっとしておく"],[()=>{bond("ビャクシ");p.knowledge=clamp(p.knowledge+8);p.happiness=clamp(p.happiness+2);addLog("ビャクシ味クッキーと話をした。所属も役目も曖昧なまま、彼は不思議な助言だけを残して去った。","event")},()=>{p.stress=clamp(p.stress-2);addLog("ビャクシ味クッキーには声をかけず、その場を離れた。")} ]]);
+ }
+ if(p.place.includes("研究施設")||p.place.includes("都市")||p.job==="便利屋"){
+ }
+ // バターマングローブ地方でのみ、低確率で怪王テオナナカトルと遭遇する。
+ if(!p.afterlife&&p.place.includes("バターマングローブ")&&!p.teonanacatlEncounter&&Math.random()<.035){
+  calamityEvent=["怪王テオナナカトルとの遭遇","ロットたちが一斉に森の奥へ引いていく。湿った根の向こうから、赤黒い異形のクッキーが姿を現した。テオナナカトル味クッキー――この地方に君臨する怪王だ。彼はあなたを値踏みするように眺め、芝居がかった口調で問いかけた。『さて、迷い子よ。わが森に何を求めて来た？』",["礼を尽くして目的を話す","怪王の姿を観察する","刺激しないよう退く"],[()=>{p.teonanacatlEncounter=true;p.butterMangroveEvents=(p.butterMangroveEvents||0)+1;p.characterBonds=p.characterBonds||[];p.characterBonds.push("テオナナカトル");p.knowledge=clamp(p.knowledge+10);p.social=clamp(p.social+3);p.holyFavor=(p.holyFavor||0);addLog("テオナナカトル味クッキーに目的を告げた。怪王は興味深そうに耳を傾け、森の一部を通ることを許した。","event")},()=>{p.teonanacatlEncounter=true;p.butterMangroveEvents=(p.butterMangroveEvents||0)+1;p.butterMangroveResearch=true;p.knowledge=clamp(p.knowledge+14);p.stress=clamp(p.stress+4);addLog("怪王の姿を観察した。彼の身体から伸びるものは、植物にも獣にも似ていた。視線に気づかれた瞬間、森の空気が変わった。","event")},()=>{p.teonanacatlEncounter=true;p.butterMangroveEvents=(p.butterMangroveEvents||0)+1;p.stress=clamp(p.stress+2);addLog("怪王を刺激しないよう、ゆっくりと森を離れた。背後から、笑っているような声が聞こえた。","event")} ]];
+ }
+ // 六厄災：前兆・遭遇・選択・生還記録をひとつの大きな事件として扱う。
+ if(!p.afterlife){
+  const calamities=[
+   {n:"バハルクッキー",title:"水災：バハルクッキー",desc:"【降臨予兆】雨の降っていない街で、排水溝から海鳴りが聞こえる。水面には空にない月が映り、川の流れが一斉に上流へ向き始めた。やがて雲の下から巨大な角と幾重もの水輪が現れる。水災バハルクッキーが、この地へ降臨した。",opts:["住民の避難を助ける","水路の中心へ向かう","身を隠してやり過ごす"],fn:[()=>{p.calamityRescues++;p.helped+=2;p.health=clamp(p.health-8);p.fame+=5;p.calamitySurvived.push("バハルクッキー");addLog("避難誘導の最中、巨大な水の輪郭が街を覆った。あなたは濁流から人々を逃がし、辛うじて生還した。","good")},()=>{p.calamityTalks++;p.knowledge=clamp(p.knowledge+12);p.health=clamp(p.health-22);p.calamitySurvived.push("バハルクッキー");addLog("水の中心で、母なる厄災の声を聞いた。理解できた言葉は少ない。それでも、あなたは帰ってきた。","event")},()=>{p.stress=clamp(p.stress+12);p.calamitySurvived.push("バハルクッキー");addLog("街の一角は水没した。あなたは生き延びたが、戻らない日常もあった。","bad")} ]},
+   {n:"オダマキ味クッキー",title:"戦災：オダマキ味クッキー",desc:"【降臨予兆】国境線の警報が同時に鳴り、休戦協定の文面から署名者の名前が消えた。遠方の空に無数の旗と武器の影が浮かび、戦災オダマキ味クッキー――ジェーチクッキーが戦場へ降臨する。",opts:["負傷者の救護に回る","防衛線に加わる","中立地帯へ避難する"],fn:[()=>{p.calamityRescues++;p.helped+=2;p.health=clamp(p.health-10);p.calamitySurvived.push("オダマキ味クッキー");addLog("負傷者を運び続けるうち、戦場の向こうに厄災の姿が見えた。あなたは最後の搬送を終えて撤退した。","good")},()=>{p.skill=clamp(p.skill+8);p.health=clamp(p.health-18);p.fame+=6;p.calamitySurvived.push("オダマキ味クッキー");addLog("防衛線は何度も崩れかけた。あなたは仲間と踏みとどまり、夜明けまで持ちこたえた。","event")},()=>{p.stress=clamp(p.stress+8);p.calamitySurvived.push("オダマキ味クッキー");addLog("戦火から距離を取り、避難先で長い夜を過ごした。","bad")} ]},
+   {n:"ヴェネーヌムクッキー",title:"病災：ヴェネーヌムクッキー",desc:"【降臨予兆】診療記録の患者名が一晩で空欄になり、閉鎖病棟のガラスに見知らぬ胞子の影が映る。街の鐘が鳴っても誰も外へ出ない。病災ヴェネーヌムクッキーが、静かな病の気配をまとって降臨した。",opts:["隔離と支援に協力する","記録を集めて原因を探る","感染を避けて離れる"],fn:[()=>{p.calamityRescues++;p.helped++;p.health=clamp(p.health-7);p.knowledge=clamp(p.knowledge+5);p.calamitySurvived.push("ヴェネーヌムクッキー");addLog("隔離区画で患者の世話を続けた。病の正体は分からないままだが、救えた命はあった。","good")},()=>{p.knowledge=clamp(p.knowledge+13);p.baroqueRisk=clamp(p.baroqueRisk+6);p.calamitySurvived.push("ヴェネーヌムクッキー");addLog("記録の断片から、症状の共通点を見つけた。しかし原因の核心は霧の中にある。","event")},()=>{p.stress=clamp(p.stress+6);p.calamitySurvived.push("ヴェネーヌムクッキー");addLog("感染区域を離れた。後に街へ戻ると、見慣れた景色は変わっていた。","bad")} ]},
+   {n:"テラクッキー",title:"地災：テラクッキー",desc:"【降臨予兆】地図に存在しない巨大な蜘蛛形の地上絵が地表へ浮かび上がる。地殻が軋み、道路も建物も宝石のような結晶へ置き換わっていく。多脚の影を従え、地災テラクッキーが大地へ降臨した。",opts:["結晶化した区域から人を救出する","現象の中心を観測する","地下施設へ逃げ込む"],fn:[()=>{p.calamityRescues++;p.helped++;p.health=clamp(p.health-12);p.calamitySurvived.push("テラクッキー");addLog("結晶の脚が地面を走る中、あなたは取り残された住民を救い出した。大地はまだ脈打っている。","good")},()=>{p.boundaryResearch=(p.boundaryResearch||0)+1;p.knowledge=clamp(p.knowledge+15);p.health=clamp(p.health-14);p.calamitySurvived.push("テラクッキー");addLog("結晶の中心で、世界そのものが資源として再構成される光景を見た。視界の奥に、蜘蛛のような厄災がいた。","event")},()=>{p.stress=clamp(p.stress+10);p.calamitySurvived.push("テラクッキー");addLog("地上の変化が収まるまで地下で耐えた。地表には見知らぬ結晶の地形が残った。","bad")} ]},
+   {n:"アバドンクッキー",title:"飢災：アバドンクッキー",desc:"【降臨予兆】市場の秤が何も載せていないのに傾き、満杯だった穀物庫が空になっている。食べ物の匂いだけが街を漂い、誰も満腹にならない。飢災アバドンクッキーが、尽きない飢えとともに降臨した。",opts:["食料を分け合う","物流の原因を追う","備蓄を確保する"],fn:[()=>{p.calamityRescues++;p.helped+=2;p.money=Math.max(0,p.money-25);p.happiness=clamp(p.happiness+4);p.calamitySurvived.push("アバドンクッキー");addLog("自分の備蓄を分け、近隣の家族を支えた。空腹は続いたが、誰も一人ではなかった。","good")},()=>{p.knowledge=clamp(p.knowledge+8);p.fame+=3;p.calamitySurvived.push("アバドンクッキー");addLog("物流の異常を追ううち、飢餓を利用する何者かの影を見つけた。","event")},()=>{p.money+=10;p.social=clamp(p.social-3);p.calamitySurvived.push("アバドンクッキー");addLog("備蓄を確保して生き延びた。だが、周囲との関係には溝ができた。","bad")} ]},
+   {n:"魔女・パンドラ",title:"人災：魔女・パンドラ",desc:"【降臨予兆】差出人のない封書が届く。封を切る前から、あなたがまだ選んでいない選択肢の内容が紙の裏に透けて見えた。空間の継ぎ目が開き、世界の創造に関わる人災――魔女・パンドラが、まるで招待客のように降臨する。",opts:["招待に応じる","手紙を解析する","破棄して忘れる"],fn:[()=>{p.calamityTalks++;p.knowledge=clamp(p.knowledge+15);p.happiness=clamp(p.happiness+2);p.calamitySurvived.push("魔女・パンドラ");addLog("招待の先で、パンドラの気まぐれな問いに答えた。彼女は満足したのか、何も言わずに姿を消した。","event")},()=>{p.knowledge=clamp(p.knowledge+10);p.stress=clamp(p.stress+5);p.calamitySurvived.push("魔女・パンドラ");addLog("手紙には未来の出来事を思わせる記述があった。警告なのか、悪戯なのかは分からない。","event")},()=>{p.stress=clamp(p.stress-2);p.calamitySurvived.push("魔女・パンドラ");addLog("手紙を破棄した。翌朝、封書の存在を覚えている者はあなた以外にいなかった。","good")} ]}
+  ];
+  const eligible=calamities.filter(c=>!(p.calamityRecords||[]).includes(c.n));
+  const ageFactor=p.age<12?.35:p.age<18?.65:p.age>=65?1.15:1;const chance=(p.risk>=4?.085:p.risk>=3?.045:.012)*ageFactor;
+  if(eligible.length&&Math.random()<chance){const c=rand(eligible);calamityEvent=[c.title,c.desc,c.opts,c.fn.map((fn,i)=>()=>{p.calamityRecords=p.calamityRecords||[];p.calamityRecords.push(c.n);p.calamityArrivalCount=(p.calamityArrivalCount||0)+1;p.disaster=true;fn();p.calamityAftermath={name:c.n,severity:i===2?3:i===1?2:1};if(p.calamitySurvived.length>=6)p.fame+=10;})];}
+ }
+
+ // パンドラは一度の遭遇で終わらない。二度目の接触は本人の気まぐれで、人生の節目に届く。
+ if((p.calamityRecords||[]).includes("魔女・パンドラ")&&!p.calamitySecondContact)pool.push(["二通目の封書","何年も前に届いたものと同じ筆跡の封書が、今度は枕元に置かれていた。『前の選択、なかなか面白かったわ』。差出人はパンドラ。",["返事を書く","封書を解析する","何も見なかったことにする"],[()=>{p.calamitySecondContact=true;p.calamityTalks=(p.calamityTalks||0)+1;p.knowledge=clamp(p.knowledge+12);p.stress=clamp(p.stress+3);addLog("返事を書き終えた瞬間、紙面から文字が消えた。遠くで誰かが笑った気がした。","event")},()=>{p.calamitySecondContact=true;p.knowledge=clamp(p.knowledge+8);p.stress=clamp(p.stress+7);addLog("封書には、まだ起きていない出来事の断片が記されていた。警告か、悪戯か、判別できない。","bad")},()=>{p.calamitySecondContact=true;p.happiness=clamp(p.happiness-2);addLog("封書を捨てた。翌朝、捨てた場所には黒い砂糖の粒だけが残っていた。","event")} ]]);
+
+ // 年齢段階ごとのイベント。子どもに成人の責任を負わせず、老年期には健康・孤立・生活基盤の変化を反映。
+ p.ageMilestones=p.ageMilestones||[];
+ const ageOnce=(key,title,desc,opts,fns)=>{if(!p.ageMilestones.includes(key))pool.push([title,desc,opts,fns.map(fn=>()=>{p.ageMilestones.push(key);fn()})])};
+ if(p.age<=5)ageOnce("early_childhood","幼い日の居場所","家の中が落ち着かず、あなたは安心して過ごせる場所を探している。",["近所の大人に頼る","一人で遊んで過ごす"],[()=>{p.mind=clamp(p.mind+4);p.social=clamp(p.social+2);addLog("近所の大人が気にかけてくれた。小さな安心が、幼いあなたを支えた。","good")},()=>{p.mind=clamp(p.mind-4);p.stress=clamp(p.stress+4);addLog("一人で過ごす時間が増えた。誰にも気づかれない寂しさを覚えた。","bad")}]);
+ if(p.age>=6&&p.age<=12)ageOnce("school_age","学び舎の格差","同じ教室に通っていても、持ち物や食事、帰る家の事情はそれぞれ違う。",["勉強を続ける","家の手伝いを優先する","友人と助け合う"],[()=>{p.knowledge=clamp(p.knowledge+7);p.stress=clamp(p.stress+2);addLog("勉強を続けた。環境の差は埋まらないが、知識は少しずつ身についた。","event")},()=>{p.money+=12;p.health=clamp(p.health-3);p.childLabor=true;addLog("家の手伝いを優先した。学ぶ時間は減ったが、家計は少し助かった。","bad")},()=>{p.friends++;p.helped++;p.social=clamp(p.social+5);addLog("友人と持ち物や食べ物を分け合った。子ども同士でできることは限られていた。","good")}]);
+ if(p.age>=13&&p.age<=17)ageOnce("adolescence","進路と家計","進学を勧める声がある一方、家計を支えるために働いてほしいという声もある。",["進学を目指す","働き始める","家族と交渉する"],[()=>{p.knowledge=clamp(p.knowledge+9);p.money=Math.max(0,p.money-25);addLog("進学を目指した。費用の工面は難しく、奨学制度や支援を探すことになった。","event")},()=>{p.money+=45;p.health=clamp(p.health-5);p.stress=clamp(p.stress+5);p.childLabor=true;addLog("働き始めた。収入は得たが、同年代が学ぶ時間を仕事に費やすことになった。","bad")},()=>{p.social=clamp(p.social+3);p.stress=clamp(p.stress+2);addLog("家族と話し合い、働きながら学ぶ道を探すことにした。","event")}]);
+ if(p.age>=18&&p.age<=29)ageOnce("young_adult","最初の住まい","独立する時が来た。保証人、敷金、職歴。住む場所を得るだけでも条件がある。",["安い住居を選ぶ","知人と共同生活する","実家に残る"],[()=>{p.money=Math.max(0,p.money-45);p.stress=clamp(p.stress+4);addLog("安い住居を借りた。設備は古く、冬の寒さや防犯に不安が残る。","event")},()=>{p.money=Math.max(0,p.money-20);p.social=clamp(p.social+4);addLog("知人と住居を共有した。費用は抑えられたが、プライバシーは少ない。","good")},()=>{p.money+=5;p.stress=clamp(p.stress+3);addLog("実家に残った。出費は抑えられたが、家族との関係に気を遣う。","event")}]);
+ if(p.age>=30&&p.age<=49)ageOnce("midlife","背負うもの","仕事、家族、借金、介護。誰かの生活を支えるため、自分の望みを後回しにしている。",["自分の健康を優先する","家族や同僚を支える","収入を増やすため無理をする"],[()=>{p.money=Math.max(0,p.money-20);p.health=clamp(p.health+4);p.stress=clamp(p.stress-5);addLog("休息を取った。失った時間や収入は戻らないが、倒れる前に立ち止まった。","good")},()=>{p.helped++;p.happiness=clamp(p.happiness+3);p.stress=clamp(p.stress+5);addLog("誰かを支えた。感謝はされたが、自分の疲れが消えるわけではない。","event")},()=>{p.money+=55;p.health=clamp(p.health-8);p.stress=clamp(p.stress+10);addLog("無理を重ねて収入を得た。身体が悲鳴を上げるまで、休む余裕はなかった。","bad")}]);
+ if(p.age>=50&&p.age<=64)ageOnce("late_middle_age","親の老い、自分の老い","身近な誰かの介護や、自身の検査結果が生活の予定を変え始めた。",["介護を引き受ける","公的支援を探す","距離を置く"],[()=>{p.helped++;p.stress=clamp(p.stress+9);p.money=Math.max(0,p.money-25);addLog("介護を引き受けた。大切な相手のためだが、生活と健康への負担は重い。","bad")},()=>{p.knowledge=clamp(p.knowledge+5);p.money=Math.max(0,p.money-10);addLog("支援制度を調べ、利用できるサービスを探した。手続きは複雑で、すぐには解決しない。","event")},()=>{p.social=clamp(p.social-3);p.stress=clamp(p.stress-2);addLog("自分の生活を守るため、距離を置いた。罪悪感は残った。","event")}]);
+ if(p.age>=65)ageOnce("elderly","老後の暮らし","年金や貯蓄だけでは生活費を賄えない。身体も以前のようには動かない。",["働ける範囲で働く","支援を申請する","生活を切り詰める"],[()=>{p.money+=30;p.health=clamp(p.health-5);addLog("短時間の仕事を続けた。収入はわずかだが、休めば暮らしが成り立たない。","event")},()=>{p.money+=20;p.stress=clamp(p.stress+3);addLog("支援を申請した。審査と手続きに時間がかかり、結果を待つ日々が続く。","event")},()=>{p.money=Math.max(0,p.money-5);p.health=clamp(p.health-5);p.happiness=clamp(p.happiness-4);addLog("食費や暖房費を削った。節約はできても、健康まで削ることになった。","bad")}]);
+ if(p.calamityAftermath){const a=p.calamityAftermath;p.calamityAftermath=null;pool.push(["厄災の後に残ったもの",`${a.name}の災害は収束した。しかし、壊れた住居、失われた仕事、行方の分からない知人。生き延びた後にも生活は続く。`,["復興作業に参加する","補償や責任を求める","土地を離れる","被災者の記録を残す"],[()=>{p.calamityRebuilds=(p.calamityRebuilds||0)+1;p.calamityRebuildsBy=p.calamityRebuildsBy||[];p.calamityRebuildsBy.push(a.name);p.calamityEcho=a.name;p.helped++;p.health=clamp(p.health-5);p.happiness=clamp(p.happiness+3);addLog(`${a.name}の災害後、復興作業に参加した。瓦礫の下に戻らないものも多いが、残った者たちで生活を立て直す。`,`good`)},()=>{p.fame+=3;p.stress=clamp(p.stress+5);p.calamityTraumaBy=p.calamityTraumaBy||[];p.calamityTraumaBy.push(a.name);p.calamityTrauma=(p.calamityTrauma||0)+1;p.calamityEcho=a.name;addLog(`${a.name}の被害について補償を求めた。記録を残し責任を問うことはできても、失ったものは戻らない。`,`event`)},()=>{p.money=Math.max(0,p.money-30);p.risk=Math.max(1,p.risk-1);p.place="避難先の仮設居住区";p.calamityTrauma=(p.calamityTrauma||0)+1;p.calamityTraumaBy=p.calamityTraumaBy||[];p.calamityTraumaBy.push(a.name);p.calamityEcho=a.name;addLog(`${a.name}の被害を受けた土地を離れた。仮設の住まいで、新しい生活を始めることになった。`,`bad`)},()=>{p.calamityTalks=(p.calamityTalks||0)+1;p.fame+=5;p.knowledge=clamp(p.knowledge+5);p.calamityArchive=p.calamityArchive||[];p.calamityArchive.push(a.name);p.calamityEcho=a.name;addLog(`${a.name}の被災者たちから証言を集め、失われた生活の記録を残した。記録は後世に伝えられることになった。`,`good`)}]])}
+
+ // 厄災ごとの長期的な余波。直後の復興だけで終わらず、後年の生活にも痕跡を残す。
+ if(p.calamityEcho&&!p.afterlife){const n=p.calamityEcho;p.calamityEcho="";const echoes={
+ "バハルクッキー":["潮の残響","水が引いた後も、井戸水にかすかな塩気が残っている。住民の中には、夜になると水辺から呼ばれる夢を見る者もいる。",["井戸の水質調査に協力する","水辺の慰霊碑を訪ねる"],[()=>{p.knowledge=clamp(p.knowledge+5);p.health=clamp(p.health+2);addLog("井戸の調査に協力し、安全な水源を見つけた。","good")},()=>{p.stress=clamp(p.stress-3);p.happiness=clamp(p.happiness+2);addLog("水辺の慰霊碑に花を供えた。失われた日々を忘れない者たちがいた。","event")}]],
+ "オダマキ味クッキー":["戦後に残る境界線","戦闘が終わっても、旧前線の検問や地雷除去は続いている。かつて敵味方だった住民は、同じ市場で顔を合わせるようになった。",["地雷除去の作業に参加する","元敵側の住民との交流会に出る"],[()=>{p.health=clamp(p.health-3);p.helped++;p.fame+=2;addLog("危険区域の除去作業を手伝った。通れる道が少しずつ戻ってきた。","good")},()=>{p.social=clamp(p.social+5);p.stress=clamp(p.stress-2);addLog("元敵側の住民と話をした。和解は簡単ではないが、対話の席は残された。","event")}]],
+ "ヴェネーヌムクッキー":["隔離解除の日","隔離措置が解除された地域で、感染者だった者とその家族が戻ってきた。しかし、住居や仕事を失った人々への補償は進んでいない。",["元患者の生活再建を支援する","差別的な規則の撤廃を求める"],[()=>{p.helped++;p.social=clamp(p.social+3);p.money=Math.max(0,p.money-8);addLog("元患者の生活再建を手伝った。病が去っても、暮らしを取り戻すには時間がかかる。","good")},()=>{p.fame+=4;p.stress=clamp(p.stress+3);addLog("差別的な規則の撤廃を求めた。反発もあったが、議論は公の場へ広がった。","event")}]],
+ "テラクッキー":["結晶化区域の権利","結晶化した土地の一部が資源区域として登録され、元の住民に立ち退き通知が届き始めた。",["住民の土地権利を守る","採掘企業と補償交渉をする"],[()=>{p.helped++;p.fame+=3;p.stress=clamp(p.stress+3);addLog("住民の権利を守る活動に加わった。土地を失わずに済む者も現れた。","good")},()=>{p.money+=20;p.knowledge=clamp(p.knowledge+4);addLog("採掘企業との補償交渉に関わった。全員が納得したわけではないが、補償金は確保された。","event")}]],
+ "アバドンクッキー":["配給制度のその後","食料供給は回復しつつあるが、配給の優先順位を巡る不満が残っている。倉庫には食料が戻っても、買う余裕のない住民は多い。",["共同備蓄庫の運営を手伝う","食料価格の監視を求める"],[()=>{p.helped++;p.happiness=clamp(p.happiness+3);addLog("共同備蓄庫の運営を手伝った。困窮した世帯へ食料を届ける仕組みが整った。","good")},()=>{p.knowledge=clamp(p.knowledge+4);p.fame+=3;addLog("食料価格の監視を求めた。買い占めを防ぐための制度が議論され始めた。","event")}]],
+ "魔女・パンドラ":["記録にない一日","人生の記録を見返すと、日付だけが残り、その日に何をしたのか誰も思い出せない箇所がある。あなたの手帳には、見覚えのない筆跡で短い感想が書かれていた。",["記録を保存する","記憶を追わず日常へ戻る"],[()=>{p.knowledge=clamp(p.knowledge+8);p.calamityTalks=(p.calamityTalks||0)+1;addLog("記録を複製して保管した。空白の一日は埋まらないが、消されずに残るものができた。","event")},()=>{p.stress=clamp(p.stress-3);addLog("記録を閉じ、日常へ戻った。思い出せない一日を、無理に取り戻す必要はない。","good")}]]};const e=echoes[n];if(e)pool.push([e[0],e[1],e[2],e[3]]);}
+ // 直近7件のイベントを避け、同じイベントや同じ選択の連続を抑える
+ // 成人向けの職務・恋愛・政治イベントは年齢条件を満たす場合のみ抽選対象にする。
+ pool=pool.filter(e=>{const n=e[0];if(["仕事の転機","職場の閉鎖","職場での評価","便利屋の依頼"].some(k=>n.includes(k)))return p.age>=18;if(["縁談","家族が増えた"].some(k=>n.includes(k)))return p.age>=20&&p.age<60;if(["異端の告発"].some(k=>n.includes(k)))return p.age>=18;return true});
+ const recent=Array.isArray(p.recentEvents)?p.recentEvents:[];
+ let fresh=pool.filter(e=>!recent.includes(e[0]));
+ if(!fresh.length)fresh=pool.filter(e=>!recent.slice(-3).includes(e[0]));
+ if(!fresh.length)fresh=pool;
+ // 年齢と生活段階に合わないイベントを抽選候補から除外する。
+ fresh=fresh.filter(e=>{const n=e[0];if(p.age<6&&/仕事の転機|学びの機会|街の祭り|便利屋の依頼|独立の機会|家族のこれから/.test(n))return false;if(p.age<13&&/縁談|独立の機会|家族のこれから|仕事の転機/.test(n))return false;if(p.age<18&&/独立の機会|引退|家族のこれから/.test(n))return false;if(p.age<18&&/結婚|出産|子育て|配偶者/.test(n))return false;if(p.age>=65&&/進路を選ぶ|学び舎/.test(n))return false;return true});
+ if(!fresh.length)fresh=pool.filter(e=>p.age>=18||!/仕事の転機|独立の機会|家族のこれから/.test(e[0]));
+ let e=calamityEvent||rand(fresh);p.recentEvents=[...recent,e[0]].slice(-7);
+ if(/水災|戦災|病災|地災|飢災|人災/.test(e[0]))bigDecision(e[0],e[1],e[2],e[3]);else smallDecision(e[0],e[1],e[2],e[3]);
+}
+function bigDecision(title,desc,labels,fns){paused=true;decision=true;showModal(title,desc,labels,fns,false)}
+function smallDecision(title,desc,labels,fns){paused=true;decision=true;showModal(title,desc,labels,fns,!(p&&p.afterlife))}
+function showMinor(title,desc,labels){showModal(title,desc,labels.map(x=>x.label),labels.map(x=>x.fn),false)}
+function choiceCost(title,label){
+ const t=String(title),l=String(label);
+ const rules=[
+  [/進路を選ぶ/.test(t)&&/学問を続ける/.test(l),30],
+  [/家族のこれから/.test(t)&&/教育や生活に投資/.test(l),25],
+  [/独立の機会/.test(t)&&/資金を出して独立/.test(l),100],
+  [/独立の機会/.test(t)&&/共同経営/.test(l),45],
+  [/思いがけない出費/.test(t)&&/修理する/.test(l),80],
+  [/思いがけない出費/.test(t)&&/応急処置/.test(l),15],
+  [/学びの機会/.test(t)&&/参加する/.test(l),25],
+  [/街の祭り/.test(t)&&/参加する/.test(l),10],
+  [/届いた訃報/.test(t)&&/手紙を送る/.test(l),5],
+  [/ロットの群れ/.test(t)&&/食べ物を置く/.test(l),5],
+  [/テュポーン/.test(t)&&/避難する/.test(l),15]
+ ];
+ for(const [match,cost] of rules)if(match)return cost;
+ return 0;
+}
+function previewChoiceEffect(fn){
+ if(!p||typeof fn!=="function")return {text:"—",uncertain:false};
+ const originalP=p, originalRandom=Math.random, originalSet=storage.set, originalDecision=decision, originalPaused=paused, originalSpeed=speed;
+ const stubs={addLog,addDeltaLog,render,die,showModal,bigDecision,smallDecision,showMinor,showCollection,showDeathCollection,showAscendedCollection,showPeopleInfo,showRegionInfo,showWorkInfo,showHealthInfo,showSettings,showSaveSlots,exportSave,importSaveDialog};
+ const names=Object.keys(stubs),results=[];let fatal=false;
+ try{
+  for(let sample=0;sample<5;sample++){
+   p=JSON.parse(JSON.stringify(originalP));
+   let seed=sample+1;Math.random=()=>{seed=(seed*9301+49297)%233280;return seed/233280};
+   storage.set=()=>true;
+   addLog=()=>{};addDeltaLog=()=>{};render=()=>{};die=()=>{fatal=true};showModal=()=>{};bigDecision=()=>{};smallDecision=()=>{};showMinor=()=>{};
+   showCollection=()=>{};showDeathCollection=()=>{};showAscendedCollection=()=>{};showPeopleInfo=()=>{};showRegionInfo=()=>{};showWorkInfo=()=>{};showHealthInfo=()=>{};showSettings=()=>{};showSaveSlots=()=>{};exportSave=()=>{};importSaveDialog=()=>{};
+   const before={};Object.keys(deltaKeys).forEach(k=>before[k]=Number(p[k]||0));
+   try{fn()}catch(e){}
+   const diff={};Object.keys(deltaKeys).forEach(k=>{const d=Math.round((Number(p[k]||0)-before[k])*10)/10;if(d)diff[k]=d});results.push(diff);
+  }
+ }catch(e){}
+ finally{p=originalP;Math.random=originalRandom;storage.set=originalSet;decision=originalDecision;paused=originalPaused;speed=originalSpeed;for(const n of names)globalThis[n]=stubs[n]}
+ const keys=[...new Set(results.flatMap(x=>Object.keys(x)))];
+ const labels=keys.map(k=>{const vals=results.map(x=>x[k]||0),min=Math.min(...vals),max=Math.max(...vals);if(min===0&&max===0)return null;const fmt=v=>{const sign=v>0?"+":"";return `${sign}${v}${k==="money"?"G":""}`};const name=deltaKeys[k]||k;return min===max?`${name} ${fmt(min)}`:`${name} ${fmt(min)}〜${fmt(max)}`}).filter(Boolean);
+ const text=labels.length?labels.join(" / "):"数値変動なし（関係・記録などに影響する場合があります）";return {text:text+(fatal?" / 死亡する可能性あり":""),uncertain:keys.some(k=>new Set(results.map(x=>x[k]||0)).size>1)||fatal};
+}
+function showModal(title,desc,labels,fns,timed){
+ clearTimeout(autoTimer);clearInterval(smallTimer);smallTimer=null;
+ // 昇天使生活では選択肢を急いで選ばせない。地上の小さな選択も含め、制限時間を設けない。
+ if(p&&p.afterlife)timed=false;
+ if(autoChoice&&autoIsMajor(title))timed=false;
+ decision=true;
+ $("overlay").style.display="grid";let m=$("modal");m.classList.toggle("calamity-modal",/水災|戦災|病災|地災|飢災|人災/.test(title));m.style.maxWidth=/水災|戦災|病災|地災|飢災|人災/.test(title)?"620px":"520px";m.innerHTML=`${/水災|戦災|病災|地災|飢災|人災/.test(title)?`<div class="calamity-stamp">⚠ CALAMITY / CONTINENTAL THREAT</div><div class="calamity-scene"><span class="scene-mark">${title.includes("水災")?"〰":title.includes("戦災")?"⚔":title.includes("病災")?"☣":title.includes("地災")?"◇":title.includes("飢災")?"∅":"✧"}</span><b>厄災降臨記録</b><small>${title.includes("水災")?"潮汐異常・広域浸水警報":title.includes("戦災")?"広域交戦・停戦協定崩壊":title.includes("病災")?"未知病原・隔離警報":title.includes("地災")?"地殻再構成・地形改変":title.includes("飢災")?"食料供給断絶・飢餓警報":"因果記録異常・現実干渉"}</small></div>`:""}<div class="sub">${timed?"QUICK DECISION / 小さな選択":"IMPORTANT DECISION / 人生の選択"}</div><h2>${escapeHtml(title)}</h2><p>${escapeHtml(desc)}</p>${timed?'<div class="timer"><i id="timebar"></i></div><div class="sub" id="countdown">15秒以内に選択してください</div>':""}<div class="choices" id="choices"></div>`;
+ labels.forEach((label,i)=>{let wrap=document.createElement("div");wrap.className="choice-wrap";let b=document.createElement("button");b.type="button";const cost=choiceCost(title,label);const affordable=!cost||p.money>=cost;b.textContent=affordable?label:`${label}（${cost}G必要・所持金不足）`;b.disabled=!affordable;b.title=cost?`必要金額：${cost}G / 所持金：${p.money}G`:"";b.setAttribute("data-choice-index",String(i));if(affordable)b.addEventListener("click",ev=>{ev.preventDefault();ev.stopPropagation();choose(i)},{once:true});wrap.append(b);const forecast=previewChoiceEffect(fns[i]);const info=document.createElement("div");info.className="choice-forecast";const tag=document.createElement("span");tag.className="forecast-label";tag.textContent=forecast.uncertain?"選択時のステータス変動予測（ランダム幅あり）":"選択時のステータス変動予測";info.append(tag);const val=document.createElement("span");val.textContent=forecast.text;if(forecast.uncertain)val.className="uncertain";info.append(val);wrap.append(info);$("choices").append(wrap)});
+ const allUnavailable=[...$("choices").querySelectorAll('button[data-choice-index]')].every(b=>b.disabled);
+ if(allUnavailable){const wrap=document.createElement("div");wrap.className="choice-wrap";const b=document.createElement("button");b.type="button";b.className="primary";b.textContent="何もしない（所持金不足のため見送る）";b.addEventListener("click",ev=>{ev.preventDefault();ev.stopPropagation();choose(labels.length)},{once:true});wrap.append(b);const info=document.createElement("div");info.className="choice-forecast";info.textContent="費用は発生しません。今回の機会を見送ります。";wrap.append(info);$("choices").append(wrap);labels.push("何もしない");fns.push(()=>{addLog("所持金が足りず、選べる行動がなかったため何もしないことにした。","event")})}
+ function choose(i){if(!decision||!p||!fns[i])return;clearTimeout(autoTimer);const chosenLabel=labels[i];p.recentChoices=[...(p.recentChoices||[]),chosenLabel].slice(-8);clearInterval(smallTimer);smallTimer=null;const before={};Object.keys(deltaKeys).forEach(k=>before[k]=Number(p[k]||0));decision=false;$("overlay").style.display="none";try{fns[i]()}catch(e){console.error("選択処理でエラー:",e);addLog("選択処理中にエラーが発生したため、時間を再開しました。","bad")}if(p.observationEndPending){p.observationEndPending=false;die("観察終了");return}const changes=[];Object.keys(deltaKeys).forEach(k=>{let d=Math.round((Number(p[k]||0)-before[k])*10)/10;if(d)changes.push(`${deltaKeys[k]} ${d>0?"+":""}${d}`)});addDeltaLog(changes,chosenLabel);paused=false;syncPauseButtons();lastTick=Date.now();clockCarry=0;render()}
+ if(autoChoice&&!autoIsMajor(title))autoHandleDecision();else if(autoChoice&&autoIsMajor(title)){const note=m.querySelector(".sub");if(note)note.textContent="AUTO PAUSED / 重要な選択のため確認してください";}
+ if(timed){let start=Date.now();smallTimer=setInterval(()=>{let left=15-(Date.now()-start)/1000;let bar=$("timebar");if(bar)bar.style.width=Math.max(0,left/15*100)+"%";let c=$("countdown");if(c)c.textContent=`残り ${Math.max(0,left).toFixed(1)} 秒`;if(left<=0){clearInterval(smallTimer);const available=[...$("choices").querySelectorAll('button[data-choice-index]:not(:disabled)')].map(b=>Number(b.dataset.choiceIndex));choose(available.length?available[ri(0,available.length-1)]:ri(0,labels.length-1))}},100)}
+}
+function die(cause){if(p.dead)return;clearInterval(smallTimer);smallTimer=null;clearTimeout(autoTimer);p.dead=true;p.cause=cause;let dc=JSON.parse(storage.get("bakeDeathCauses","[]"));if(!dc.includes(cause)){dc.push(cause);storage.set("bakeDeathCauses",JSON.stringify(dc))}paused=true;clearInterval(timer);addLog(`この年、${cause}により生涯を終えた。`,"bad");let earned=[];for(let [name,desc,cat,fn] of titleDefs){if(fn(p)&&!p.titles.includes(name)){p.titles.push(name);earned.push(name)}}let collection=JSON.parse(storage.get("bakeTitles","[]"));earned.forEach(x=>{if(!collection.includes(x))collection.push(x)});storage.set("bakeTitles",JSON.stringify(collection));// 生前の善行・人とのつながり・名声などから昇天確率を算出。最低4%、最大45%。
+ const virtue=Math.min(25,(p.helped||0)*1.6)+Math.min(8,(p.friends||0)*.5)+Math.min(7,(p.fame||0)*.12)+(p.happiness>=70?3:0)+(p.children>0?2:0);
+ const ascensionChance=Math.round(Math.max(4,Math.min(45,7+virtue)));
+ p.ascended=!p.isPureAngel&&p.angelType!=="純天使"&&Math.random()*100<ascensionChance;p.ascensionChance=p.isPureAngel||p.angelType==="純天使"?0:ascensionChance;
+ if(p.isPureAngel||p.angelType==="純天使"){p.afterlifeStatus="純天使として生涯を終えた";addLog("純天使は昇天使へ転じることなく、その生を終えた。","event")}else if(p.ascended){p.afterlifeStatus="昇天使";addLog(`死後の審査の結果、昇天使としてグロリアスベイクドームへ迎えられた。（判定時の確率 ${ascensionChance}%）`,"good");let aa=JSON.parse(storage.get("bakeAscendedLives","[]"));aa.unshift({name:p.name,age:p.age,place:p.place,cause,job:p.job,year:p.year,ascensionChance,afterlifeYears:0,holyFavor:p.holyFavor||0});storage.set("bakeAscendedLives",JSON.stringify(aa.slice(0,100)));}
+ else p.afterlifeStatus="通常の死後";
+ let life={name:p.name,age:p.age,place:p.place,cause,titles:p.titles,year:p.year,ascended:p.ascended,ascensionChance,job:p.job,baroque:{stage:p.baroqueStage,type:p.baroqueType,ability:p.baroqueAbility,history:p.baroqueHistory}};let lives=JSON.parse(storage.get("bakeLives","[]"));lives.unshift(life);storage.set("bakeLives",JSON.stringify(lives.slice(0,100)));
+ $("overlay").style.display="grid";$("modal").innerHTML=`<div class="dead"><div class="sub">LIFE COMPLETE / 人生の終わり</div><h2>${escapeHtml(p.name)}</h2><div style="font-size:2rem;color:var(--gold)">${p.age}歳</div><p>${escapeHtml(cause)}により、その一生を終えた。</p><p>生まれた場所：${escapeHtml(p.place)}<br>職業：${escapeHtml(p.job)} / 友人：${p.friends}人 / 家族：${p.children}人の子ども</p>${p.ascended?`<div class="titlebadge" style="margin:12px auto;padding:12px;border:1px solid var(--gold)">✧ 昇天使として迎えられた ✧</div><p>死後の審査を経て、グロリアスベイクドームへ。地上での人生は終わったが、天使としての新たな生が始まる。</p>`:`<p class="sub">${p.isPureAngel||p.angelType==="純天使"?"純天使としての生を終えた。昇天使として迎えられることはない。":"死後の審査では昇天使に選ばれなかった。魂は通常の行き先へと旅立った。"}</p>`}<p class="sub">昇天判定時の確率：${ascensionChance}%</p><h3 style="color:var(--gold)">獲得称号</h3><div class="titlelist" style="justify-content:center">${p.titles.map(x=>`<span class="titlebadge">${escapeHtml(x)}</span>`).join("")||"称号なし"}</div><p style="font-size:.85rem">「どんな人生にも、その者だけの記録がある。」</p>${p.ascended?`<button class="primary" onclick="startAfterlife()">昇天使としての人生を続ける</button><button onclick="newLife()">ここで終えて新しい人生を始める</button>`:`<button class="primary" onclick="closeDeath()">人生の総括を見る</button><button onclick="newLife()">新しい人生を始める</button>`}</div>`;
+ render();
+}
+function closeDeath(){$("overlay").style.display="none";let sum=`${p.name}は${p.age}歳で${p.cause}により亡くなった。${p.place}に生まれ、${p.job}として生きた。生涯の称号は${(p.titles||[]).length}個、友人${p.friends||0}人、子ども${p.children||0}人。`;addLog("人生の総括："+sum,"event");showLifeSummary()}
+function showLifeSummary(){const rows=[["生涯年齢",`${p.age}歳`],["最終職業",p.job],["生まれた地域",p.place],["最終所持金",`${(p.money||0).toLocaleString()} G`],["友人",`${p.friends||0}人`],["子ども",`${p.children||0}人`],["称号",`${(p.titles||[]).length}個`],["重要イベント",`${p.events||0}件`],["バロック",p.baroqueStage?`段階${p.baroqueStage}・${p.baroqueType||"型不明"}`:"発症記録なし"],["厄災記録",`${(p.calamityRecords||[]).length}件`]];$("overlay").style.display="grid";$("modal").innerHTML=`<button class="modal-close" onclick="closeV8Modal()">×</button><div class="sub">LIFE SUMMARY / 人生総括</div><h2>${escapeHtml(p.name)}の一生</h2><div style="text-align:center;font-size:2rem;color:var(--gold);font-weight:800">${p.age}歳</div><p style="text-align:center">死因：${escapeHtml(p.cause)} / ${p.ascended?"昇天使として迎えられた":"昇天せず"}</p><div class="info-grid">${rows.map(([n,v])=>`<div class="info-card"><small>${n}</small><b>${escapeHtml(v)}</b></div>`).join("")}</div><h3>人生の主な記録</h3>${(p.logs||[]).slice(-8).reverse().map(x=>`<div class="entry"><small>${x.year||p.year}年・${x.age??p.age}歳</small>${escapeHtml(x.text||"")}</div>`).join("")}<div class="choices"><button class="primary" onclick="closeV8Modal()">記録を閉じる</button><button onclick="newLife()">新しい人生を始める</button></div>`}
+function render(){if(!p)return;try{storage.set("bakeCurrent",JSON.stringify(p))}catch(e){}$("name").textContent=p.name;$("avatar").textContent=p.isAngel?"😇":"🍪";$("identity").textContent=`${p.afterlife?`昇天使 ${p.afterlifeAge||0}/200年`:p.isPureAngel?`純天使・観察${p.observationEnded?"終了":"継続中"}`:p.angelType||"地上のクッキー"} / ${p.place} / ${p.family||""}`;$("age").textContent=p.afterlife?`${p.afterlifeAge||0}/200年`:(p.age+"歳");$("seasonInfo").textContent=p.afterlife?`昇天使生活 ${p.afterlifeAge||0}/200年`:p.isPureAngel?`純天使の観察 ${p.age}年 / 次の節目 ${Math.max(100,Math.ceil((p.age+1)/50)*50)}年`:`${seasons[p.seasonIndex]} / ${p.age}歳・${p.year}年`;$("money").textContent=p.money.toLocaleString()+" G";$("job").textContent=p.job;$("traits").innerHTML=`<span class="chip">${p.trait}</span><span class="chip">${p.risk>=4?"高危険地域":p.risk>=3?"不安定な地域":"比較的安全"}</span>${p.terraceProtection?`<span class="chip">${p.terraceProtection}の保護下</span>`:""}${p.ownBusiness?`<span class="chip">自営業</span>`:""}`;
+ let items=[["健康",p.health],["精神",p.mind],["幸福",p.happiness],["ストレス",p.stress],["所持金",p.money]];
+ $("stats").innerHTML=items.map(([n,v])=>{const isMoney=n==="所持金",bad=n==="ストレス";const pct=isMoney?Math.min(100,Math.max(0,v/10)):bad?100-clamp(v):clamp(v);return `<div class="stat"><div class="statline"><span>${n}</span><b>${isMoney?Math.round(v).toLocaleString()+" G":Math.round(v)}</b></div><div class="bar"><i style="width:${pct}%"></i></div></div>`}).join("");
+ $("baroqueInfo").innerHTML=p.baroqueStage===0?`発症確認なし。現在の状態：通常。<br>※発症リスクは非公開で、前兆や検査から推測できます。`:`段階：${["正常","前兆","初期変異","進行","特殊状態"][p.baroqueStage]}<br>変異：${escapeHtml(p.baroqueType||"未確定")}<br>能力：${escapeHtml(p.baroqueAbility||"未発現")}<br>自我安定度：${Math.round(p.egoStability)} / 100　能力制御：${Math.round(p.baroqueControl)} / 100`;$("titles").innerHTML=p.titles.length?p.titles.map(x=>`<span class="titlebadge">${escapeHtml(x)}</span>`).join(""):'<span class="sub">人生の中で称号を獲得します。</span>';const tc=$("titleCount");if(tc)tc.textContent=`${p.titles.length}個獲得`;
+ syncPauseButtons();
+}
+function showCollection(){let all=JSON.parse(storage.get("bakeTitles","[]"));$("overlay").style.display="grid";$("modal").innerHTML=`<button class="modal-close" aria-label="閉じる" onclick="$('overlay').style.display='none'">×</button><h2>称号図鑑</h2><p>これまでの人生で獲得した称号：${all.length} / ${titleDefs.length}</p><div class="sub">◆ 獲得済み　◇ 未獲得</div>${titleDefs.map(([n,d,cat])=>{const got=all.includes(n);const hint=cat==="life"?"人生の長さや最期の迎え方に注目してみよう。":cat==="work"?"仕事の継続や転職、職務上の実績が鍵になる。":cat==="social"?"他者との関係や、誰かを助けた回数が関係する。":cat==="baroque"?"バロックの発症・進行・治療・周囲との関係が鍵になる。":cat==="calamity"?"厄災との遭遇後、どのような行動を取ったかが重要。":cat==="angel"?"ベイクドームでの生活や、天使としての立場に関係する。":cat==="terrace"?"裏社会の支配者たちと、どのような距離を取ったかが鍵になる。":"特定の場所・人物・出来事を経験すると記録される。";const clue=d.replace(/\d+歳以上まで生きる/g,"長寿を目指す").replace(/\d+歳以上/g,"長寿を迎える").replace(/\d+歳未満/g,"若いうち").replace(/\d+年以上/g,"長期間").replace(/\d+回以上/g,"何度も").replace(/\d+人以上/g,"複数の").replace(/\d+以上/g,"一定以上");return `<div class="entry" style="margin:7px 0"><b>${got?"◆":"◇"} ${escapeHtml(n)}</b><div class="sub" style="margin-top:4px">${got?`獲得条件：${escapeHtml(d)}`:`ヒント：${escapeHtml(clue)}<br>${escapeHtml(hint)}`}</div></div>`}).join("")}<button onclick="$('overlay').style.display='none'">閉じる</button>`}
+function showDeathCollection(){let found=JSON.parse(storage.get("bakeDeathCauses","[]"));const groups=Object.entries(deathCauseGroups);const total=deathCauses.length;const discovered=deathCauses.filter(c=>found.includes(c)).length;$ ("overlay").style.display="grid";$ ("modal").innerHTML=`<button class="modal-close" aria-label="閉じる" onclick="closeV8Modal()">×</button><h2>死因図鑑</h2><p class="sub">確認した死因：${discovered} / ${total}</p><div class="death-grid">${groups.map(([group,items])=>`<div class="death-category">${escapeHtml(group)}</div>${items.map(c=>`<div class="death-item ${found.includes(c)?"found":""}">${found.includes(c)?"◆":"◇"} ${escapeHtml(c)}</div>`).join("")}`).join("")}${found.filter(c=>!deathCauses.includes(c)).map(c=>`<div class="death-item found">◆ ${escapeHtml(c)}（旧記録）</div>`).join("")}</div><p class="sub">◆ 記録済み　◇ 未確認。死因は年齢・健康状態・職業・地域・経験した出来事によって変化します。</p>`}
+function showAscendedCollection(){let all=JSON.parse(storage.get("bakeAscendedLives","[]"));$("overlay").style.display="grid";$("modal").innerHTML=`<button class="modal-close" aria-label="閉じる" onclick="$('overlay').style.display='none'">×</button><h2>昇天使記録</h2><p>昇天使として迎えられた人生：${all.length}件</p>${all.length?all.map(x=>`<div class="entry"><b>${escapeHtml(x.name)}</b> / ${x.age}歳<br><span class="sub">${escapeHtml(x.place)}出身・${escapeHtml(x.job)}・死因：${escapeHtml(x.cause)}<br>昇天判定時の確率 ${x.ascensionChance}%<br>昇天後：${x.afterlifeYears||0}年 / 役目：${escapeHtml(x.afterlifeJob||"自由人（昇天使）")} / 寵愛：${x.holyFavor||0}</span></div>`).join(""):'<p class="sub">まだ昇天使として迎えられた記録はありません。</p>'}<button onclick="$('overlay').style.display='none'">閉じる</button>`}
+
+// v8.0 navigation, records, region/health/work panels and portable save management
+// v8.2 adds compact status, foldable controls and no-cost fallback choices
+// v8.3 removes hunger mechanics, records chosen actions and improves mobile navigation
+function filterLogs(kind){activeLogFilter=kind;const entries=[...$("log").children];entries.forEach(e=>{e.style.display=kind==="all"||e.classList.contains(kind)?"":"none"})}
+function scrollToPanel(i){const panels=document.querySelectorAll("main>.panel");panels[i]?.scrollIntoView({behavior:"smooth",block:"start"})}
+function scrollToLog(){scrollToPanel(1)}
+function safeRead(key,fallback){try{return JSON.parse(storage.get(key,JSON.stringify(fallback)))}catch(e){return fallback}}
+function migrateV8State(state){const d={logs:[],titles:[],npcRelations:[],baroqueHistory:[],calamityRecords:[],calamitySurvived:[],calamityRebuildsBy:[],calamityTraumaBy:[],terraceEncountered:[],terraceRelations:{},characterBonds:[],characterFlags:[],ageMilestones:[],careerFields:[],regionState:{economy:50,security:50,healthcare:50,technology:50,prosperity:50,disaster:0},seasonIndex:0,quietSeasons:0,yearHadEvent:false,contractsCompleted:0,contractsFailed:0,contractNegotiations:0,localAid:0,boundaryResearch:0,boundaryEscapes:0,holyFavor:0,afterlife:false,afterlifeAge:0,baroqueRisk:0,baroqueStage:0,baroqueType:"",baroqueAbility:"",baroqueControl:0,egoStability:100,calamityRescues:0,calamityTalks:0,calamityTrauma:0,calamityRebuilds:0,hardshipCount:0,injuryCount:0,friends:0,children:0,events:0,helped:0,stress:0,money:0,jobYears:0,jobChanges:0,careerLocked:false};for(const [k,v] of Object.entries(d))if(state[k]===undefined||state[k]===null)state[k]=Array.isArray(v)?[]:(v&&typeof v==="object"?{...v}:v);state.regionState={...d.regionState,...(state.regionState||{})};state.isPureAngel=state.isPureAngel===true||(state.isAngel&&state.angelType==="純天使");return state}
+function showMoreMenu(){showModal("その他のメニュー","確認したい情報を選んでください。",["仕事・収入","健康・状態","人物記録","地域情報","設定","死亡記録","昇天使記録"],[()=>showWorkInfo(),()=>showHealthInfo(),()=>showPeopleInfo(),()=>showRegionInfo(),()=>showSettings(),()=>showDeathCollection(),()=>showAscendedCollection()],false)}
+function showRegionInfo(){const place=p?.place||"未開始";const data=places.filter(x=>!x.n.includes("ベイクドーム"));const current=places.find(x=>x.n===place);const state=p?.regionState||{};const html=`<button class="modal-close" onclick="closeV8Modal()" aria-label="閉じる">×</button><h2>地域情報</h2><p>現在地：<b>${escapeHtml(place)}</b></p>${current?`<p>${escapeHtml(current.desc)}</p><div class="info-grid"><div class="info-card"><small>危険度</small><b>${current.risk}/5</b></div><div class="info-card"><small>経済状況</small><b>${state.economy??"—"}</b></div><div class="info-card"><small>治安</small><b>${state.security??"—"}</b></div><div class="info-card"><small>医療水準</small><b>${state.healthcare??"—"}</b></div><div class="info-card"><small>技術水準</small><b>${state.technology??"—"}</b></div></div>`:"<p>人生を開始すると現在地の情報が表示されます。</p>"}<h3>地上の地域</h3>${data.map(x=>`<div class="entry"><b>${escapeHtml(x.n)}</b><div class="sub">危険度 ${x.risk}/5 · ${escapeHtml(x.desc)}</div></div>`).join("")}<p class="sub">城塞跡地と天空都市マシュマリアは、出生地の選択肢では別々に表示されますが、地域体系上は「城塞跡地 ＆ 天空都市マシュマリア」の一組です。</p>`;$ ("overlay").style.display="grid";$ ("modal").innerHTML=html}
+function showWorkInfo(){const j=p?.job||"未開始";$ ("overlay").style.display="grid";$ ("modal").innerHTML=`<button class="modal-close" onclick="closeV8Modal()">×</button><h2>仕事・収入</h2><div class="info-grid"><div class="info-card"><small>現在の職業</small><b>${escapeHtml(j)}</b></div><div class="info-card"><small>所持金</small><b>${(p?.money||0).toLocaleString()} G</b></div><div class="info-card"><small>勤続年数</small><b>${p?.jobYears||0}年</b></div><div class="info-card"><small>転職回数</small><b>${p?.jobChanges||0}回</b></div><div class="info-card"><small>依頼完了</small><b>${p?.contractsCompleted||0}件</b></div><div class="info-card"><small>依頼失敗</small><b>${p?.contractsFailed||0}件</b></div></div><p class="sub">仕事や収入の機会は、人生イベント内で発生します。年齢・能力・地域・健康状態などによって選択肢が変化します。</p>`}
+function showHealthInfo(){if(!p){showModal("健康・状態","人生を開始すると健康状態が表示されます。",["閉じる"],[()=>{}],false);return;}const rows=[["健康",p.health],["精神",p.mind],["幸福",p.happiness],["ストレス",p.stress],["バロック段階",p.baroqueStage||0],["自我安定度",p.egoStability??100],["能力制御",p.baroqueControl||0]];$ ("overlay").style.display="grid";$ ("modal").innerHTML=`<button class="modal-close" onclick="closeV8Modal()">×</button><h2>健康・状態</h2><div class="info-grid">${rows.map(([n,v])=>`<div class="info-card"><small>${n}</small><b>${Math.round(v)}</b></div>`).join("")}</div><div class="baroquePanel"><h3>BAROQUE / バロック</h3>${p.baroqueStage?`段階：${escapeHtml(p.baroqueType||"未確定")} / ${escapeHtml(p.baroqueAbility||"能力未発現")}<p>自我安定度と能力制御は独立して変動します。</p>`:"現在、発症は確認されていません。発症リスクや前兆は確実な予告ではありません。"}</div>`}
+function showPeopleInfo(){const ns=p?.npcRelations||[];$ ("overlay").style.display="grid";$ ("modal").innerHTML=`<button class="modal-close" onclick="closeV8Modal()">×</button><h2>人物記録 <span class="sub">${ns.length}人</span></h2><div class="person-list">${ns.length?ns.map((n,i)=>`<details class="person-row"><summary><span class="person-name">${escapeHtml(n.name)}</span><span class="person-meta">${escapeHtml(n.role||"知人")} · ${n.bond??"—"}</span><span class="person-meta">${n.alive===false?"故人":"存命"}</span></summary><div class="person-detail">関係値：${n.bond??"—"} / 状態：${n.alive===false?"故人":"存命"} / 居場所：${escapeHtml(n.location||"不明")} ${n.note?`<br>${escapeHtml(n.note)}`:""}</div></details>`).join(""):"<p class=\"sub\">まだ人物との出会いはありません。</p>"}</div>`}
+function showSettings(){const current=storage.get("bakeSettings","");let cfg={font:"standard",motion:"normal",confirm:"important"};try{cfg={...cfg,...JSON.parse(current||"{}")}}catch(e){};$ ("overlay").style.display="grid";$ ("modal").innerHTML=`<button class="modal-close" onclick="closeV8Modal()">×</button><h2>設定</h2><label>文字サイズ<select id="v8Font"><option value="small">小</option><option value="standard">標準</option><option value="large">大</option></select></label><br><label>演出速度<select id="v8Motion"><option value="normal">通常</option><option value="fast">高速</option><option value="simple">簡略</option></select></label><br><label>重大イベント<select id="v8Confirm"><option value="important">重要イベントは確認</option><option value="all">すべて確認</option></select></label><div class="choices" style="margin-top:12px"><button class="primary" onclick="saveV8Settings()">設定を保存</button><button onclick="showSaveSlots()">セーブスロット</button><button onclick="exportSave()">セーブを書き出す</button><button onclick="importSaveDialog()">セーブを読み込む</button></div>`;$ ("v8Font").value=cfg.font;$ ("v8Motion").value=cfg.motion;$ ("v8Confirm").value=cfg.confirm;}
+function saveV8Settings(){const cfg={font:$ ("v8Font").value,motion:$ ("v8Motion").value,confirm:$ ("v8Confirm").value};storage.set("bakeSettings",JSON.stringify(cfg));document.documentElement.style.fontSize=cfg.font==="large"?"18px":cfg.font==="small"?"14px":"16px";document.body.classList.toggle("reduced-motion",cfg.motion==="simple");document.body.classList.toggle("fast-motion",cfg.motion==="fast");closeV8Modal();addLog("表示設定を保存した。","good")}
+function closeV8Modal(){$ ("overlay").style.display="none"}
+function showSaveSlots(){const slots=safeRead("bakeSaveSlots",{});$("overlay").style.display="grid";$("modal").innerHTML=`<button class="modal-close" onclick="closeV8Modal()">×</button><h2>セーブスロット</h2><p class="sub">現在の人生を3つの枠に個別保存できます。保存した枠を読み込むと現在の人生が置き換わります。</p>${[1,2,3].map(i=>{const x=slots[i];return `<div class="entry"><b>スロット ${i}</b><div class="sub">${x?`${escapeHtml(x.current?.name||"名無し")} / ${x.current?.age||0}歳 / ${escapeHtml(x.current?.place||"")} / ${escapeHtml(x.savedAt||"")}`:"空きスロット"}</div><div class="controls"><button ${!p?"disabled":""} onclick="saveSlot(${i})">ここに保存</button><button ${!x?"disabled":""} onclick="loadSlot(${i})">読み込む</button><button ${!x?"disabled":""} onclick="deleteSlot(${i})">削除</button></div></div>`}).join("")}`}
+function saveSlot(i){if(!p){alert("保存する人生がありません。");return}const slots=safeRead("bakeSaveSlots",{});slots[i]={current:JSON.parse(JSON.stringify(p)),savedAt:new Date().toLocaleString("ja-JP")};storage.set("bakeSaveSlots",JSON.stringify(slots));showSaveSlots()}
+function loadSlot(i){const slots=safeRead("bakeSaveSlots",{});if(!slots[i])return;if(p&&!confirm("現在の人生をスロットの内容で置き換えますか？"))return;clearInterval(timer);clearInterval(smallTimer);clearTimeout(autoTimer);p=migrateV8State(slots[i].current);decision=null;paused=true;$("overlay").style.display="none";$("log").innerHTML="";(p.logs||[]).slice().reverse().forEach(x=>{const e=document.createElement("div");e.className="entry "+(x.type||"");e.innerHTML=`<small>${x.year||p.year}年 / ${x.age??p.age}歳</small>${escapeHtml(x.text||"")}`;$("log").append(e)});render();startClock();addLog(`セーブスロット ${i} を読み込んだ。`,"good")}
+function deleteSlot(i){const slots=safeRead("bakeSaveSlots",{});if(!slots[i]||!confirm(`スロット ${i} を削除しますか？`))return;delete slots[i];storage.set("bakeSaveSlots",JSON.stringify(slots));showSaveSlots()}
+function importSaveDialog(){$ ("importSaveFile").click()}
+$("importSaveFile").addEventListener("change",async ev=>{const file=ev.target.files?.[0];if(!file)return;try{const data=JSON.parse(await file.text());if(!data||typeof data!=="object"||!data.current)throw new Error("セーブデータの形式が違います");if(!confirm(`v${data.version||"?"}のセーブを読み込みます。現在の人生データを置き換えますか？`))return;clearInterval(timer);clearInterval(smallTimer);clearTimeout(autoTimer);p=migrateV8State(data.current);for(const [k,v] of Object.entries({bakeDeathCauses:data.deathCauses||[],bakeTitles:data.titles||[],bakeLives:data.lives||[],bakeAscendedLives:data.ascendedLives||[]}))storage.set(k,JSON.stringify(v));storage.set("bakeCurrent",JSON.stringify(p));decision=null;paused=true;$("overlay").style.display="none";$("log").innerHTML="";(p.logs||[]).slice().reverse().forEach(x=>{const e=document.createElement("div");e.className="entry "+(x.type||"");e.innerHTML=`<small>${x.year||p.year}年 / ${x.age??p.age}歳</small>${escapeHtml(x.text||"")}`;$ ("log").append(e)});render();startClock();addLog(`v${data.version||"?"}のセーブデータを読み込んだ。`,"good");}catch(err){alert("読み込みに失敗しました："+err.message)}finally{ev.target.value=""}});
+
+function exportSave(){let data={version:8.3,current:p,deathCauses:JSON.parse(storage.get("bakeDeathCauses","[]")),titles:JSON.parse(storage.get("bakeTitles","[]")),lives:JSON.parse(storage.get("bakeLives","[]")),ascendedLives:JSON.parse(storage.get("bakeAscendedLives","[]"))};let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="bake-continent-life-record.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}
+window.addEventListener("beforeunload",()=>{if(p)storage.set("bakeCurrent",JSON.stringify(p))});
+try{const cfg=JSON.parse(storage.get("bakeSettings","{}"));if(cfg.font==="large")document.documentElement.style.fontSize="18px";if(cfg.font==="small")document.documentElement.style.fontSize="14px";if(cfg.motion==="simple")document.body.classList.add("reduced-motion");if(cfg.motion==="fast")document.body.classList.add("fast-motion");}catch(e){}
+(function init(){let old=storage.get("bakeCurrent", "");if(old){try{let q=JSON.parse(old);if(q&&!q.dead){p=q;Object.assign(p,{seasonIndex:0,quietSeasons:0,yearHadEvent:false,contractsCompleted:0,contractsFailed:0,careerLocked:false,recentEvents:[],recentChoices:[],holyFavor:0,angelType:"",afterlife:false,afterlifeAge:0,angelJobUnlocked:false,fallen:false,heresyFlag:false,baroqueRisk:0,baroqueStage:0,baroqueType:"",baroqueAbility:"",baroqueControl:0,egoStability:100,baroqueHistory:[],baroqueRescued:false,baroqueRecovered:false,ethicalResearchRefused:false,supportedAffected:false,lostFriend:false,baroqueCauseKnown:false,contractNegotiations:0,localAid:0,boundaryResearch:0,boundaryEscapes:0,characterBonds:[],characterFlags:[],calamityRecords:[],calamitySurvived:[],calamityRescues:0,calamityTalks:0,calamityAftermath:null,calamityTrauma:0,calamityRebuilds:0,calamityRebuildsBy:[],calamityTraumaBy:[],hardshipCount:0,injuryCount:0,ageMilestones:[],childLabor:false,retiredAfter65:false,abandonedDuringHardship:false,calamitySecondContact:false,terraceRelations:{},terraceEncountered:[],terraceProtection:"",terraceEvents:0,hydraResearch:false,gorgonWatched:false,typhoonAftermath:false,isPureAngel:false,observationEnded:false,lastObservationPromptAge:0},Object.fromEntries(Object.entries({seasonIndex:0,quietSeasons:0,yearHadEvent:false,contractsCompleted:0,contractsFailed:0,careerLocked:false,recentEvents:[],recentChoices:[],holyFavor:0,angelType:"",afterlife:false,afterlifeAge:0,angelJobUnlocked:false,fallen:false,heresyFlag:false,baroqueRisk:0,baroqueStage:0,baroqueType:"",baroqueAbility:"",baroqueControl:0,egoStability:100,baroqueHistory:[],baroqueRescued:false,baroqueRecovered:false,ethicalResearchRefused:false,supportedAffected:false,lostFriend:false,baroqueCauseKnown:false,contractNegotiations:0,localAid:0,boundaryResearch:0,boundaryEscapes:0,characterBonds:[],characterFlags:[],calamityRecords:[],calamitySurvived:[],calamityRescues:0,calamityTalks:0,calamityAftermath:null,calamityTrauma:0,calamityRebuilds:0,calamityRebuildsBy:[],calamityTraumaBy:[],hardshipCount:0,injuryCount:0,ageMilestones:[],childLabor:false,retiredAfter65:false,abandonedDuringHardship:false,calamitySecondContact:false,terraceRelations:{},terraceEncountered:[],terraceProtection:"",terraceEvents:0,hydraResearch:false,gorgonWatched:false,typhoonAftermath:false,isPureAngel:false,observationEnded:false,lastObservationPromptAge:0}).filter(([k])=>q[k]===undefined)),q);delete p.hunger;delete p.hungerCrises;p.titles=(p.titles||[]).map(x=>x==="飢えを知る者"?"困窮を乗り越えた者":x);p.ageMilestones=p.ageMilestones||[];p.butterMangroveEvents=p.butterMangroveEvents||0;p.butterMangroveResearch=p.butterMangroveResearch||false;p.teonanacatlEncounter=p.teonanacatlEncounter||false;p.marmeloTruthSeen=p.marmeloTruthSeen||false;p.directiveCount=p.directiveCount||0;p.directiveHistory=p.directiveHistory||[];p.terraceRelations=p.terraceRelations||{};p.terraceEncountered=p.terraceEncountered||[];p.terraceProtection=p.terraceProtection||"";p.terraceEvents=p.terraceEvents||0;p.isPureAngel=p.isPureAngel===true||(p.isAngel&&p.angelType==="純天使");p.observationEnded=p.observationEnded||false;p.lastObservationPromptAge=p.lastObservationPromptAge||0;p.calamityRecords=p.calamityRecords||[];p.calamitySurvived=p.calamitySurvived||[];p.calamityArchive=p.calamityArchive||[];p.calamityArrivalCount=p.calamityArrivalCount||0;p.calamityArchive=p.calamityArchive||[];p.calamityArrivalCount=p.calamityArrivalCount||0;p.npcRelations=p.npcRelations||[];p.familySupport=p.familySupport||0;p.friendshipYears=p.friendshipYears||0;p.careerFields=p.careerFields||[];p.regionState=p.regionState||{economy:50,security:50,healthcare:50,technology:50,prosperity:50,disaster:0};p.professionRank=p.professionRank||0;p.rebuildProjects=p.rebuildProjects||0;p.cyberneticLevel=p.cyberneticLevel||0;p.fairyYears=p.fairyYears||0;p.baroqueSocialYears=p.baroqueSocialYears||0;p.terraceCouncil=p.terraceCouncil||0;delete p.hunger;delete p.hungerCrises;
+ const calamityLegacyMap={"バハル":"バハルクッキー","ジェチ":"オダマキ味クッキー","ヴェネヌム":"ヴェネーヌムクッキー","ヒメウズ味クッキー":"ヴェネーヌムクッキー","ヴェネーヌムクッキー":"ヴェネーヌムクッキー","テラ":"テラクッキー","アバドン":"アバドンクッキー","キュベルドン味クッキー":"アバドンクッキー","アバドンクッキー":"アバドンクッキー","パンドラ":"魔女・パンドラ"};
+ p.calamityRecords=p.calamityRecords.map(x=>calamityLegacyMap[x]||x);p.calamitySurvived=p.calamitySurvived.map(x=>calamityLegacyMap[x]||x);p.calamityRebuildsBy=(p.calamityRebuildsBy||[]).map(x=>calamityLegacyMap[x]||x);p.calamityTraumaBy=(p.calamityTraumaBy||[]).map(x=>calamityLegacyMap[x]||x);if(p.calamityAftermath&&p.calamityAftermath.name)p.calamityAftermath.name=calamityLegacyMap[p.calamityAftermath.name]||p.calamityAftermath.name;p.calamityRebuildsBy=p.calamityRebuildsBy||[];p.calamityTraumaBy=p.calamityTraumaBy||[];addLog("前回の人生記録を復元した。","good");render();paused=false;startClock();return}}catch(e){}}})();
+</script>
+</body>
+</html>

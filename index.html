@@ -222,7 +222,7 @@ main{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 24px)}
 .pause-quick{position:fixed;right:12px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:30;background:#806b3c!important;border:1px solid #d0b36e!important;box-shadow:0 4px 18px #0008;font-weight:750;padding:9px 13px!important;min-height:42px!important;border-radius:999px!important}
 @media(max-width:600px){.stats{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:3px!important}.stat{display:block;min-width:0;padding:5px 2px!important;text-align:center}.statline{display:flex;flex-direction:column;align-items:center;gap:1px;font-size:.56rem!important;line-height:1.2;white-space:nowrap}.statline b{font-size:.62rem;white-space:nowrap}.bar{display:block;width:100%;height:3px!important;margin:3px 0 0!important}.pause-quick{right:10px;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 10px);font-size:.78rem!important}}
 </style>
-</head>
+<style>@keyframes slFade{from{opacity:0}to{opacity:1}}#specialLifeStartBanner button{min-width:180px}</style>\n</head>
 <body>
 <header><div class="eyebrow">A LIFE SIMULATION IN BAKE CONTINENT</div><h1>PANIS ET CALAMITAS</h1><p>ひとつの生地に、ひとつの人生。——あなたは、その一生を見届ける。</p></header>
 <main>
@@ -501,10 +501,43 @@ Object.assign(specialLifeProfiles,{
 });
 function normalizeSpecialName(v){return String(v||"").toLowerCase().replace(/[\s　・･._-]/g,"").replace(/味クッキー|クッキー$/g,"").replace(/cookie$/i,"")}
 function findSpecialLifeProfile(value){const n=normalizeSpecialName(value);for(const [id,profile] of Object.entries(specialLifeProfiles)){if([profile.name,...(profile.aliases||[])].some(x=>normalizeSpecialName(x)===n))return {id,profile}}return null}
-function beginLifeFromInput(){const value=($("customCookieName")?.value||"").trim();if(!value){alert("名前を入力するか、ランダム命名を選んでください。");return}const match=findSpecialLifeProfile(value);if(match&&match.profile.requiresSecret){let earned=[];try{earned=JSON.parse(storage.get("bakeTitles","[]"))}catch(e){}if(!earned.includes("ヴォイドの囁きを退けた者")){addLog("記録塔の照合結果：該当個体なし。入力された名前は記録されていません。","event");alert("該当個体なし");return}}if(match){if(!confirm(`既存個体の記録と一致しました。
-
-${match.profile.name}の専用人生を開始しますか？
-通常のランダム人生とは異なる初期設定・固有イベントが適用されます。`))return;beginLife(match.profile.name,match)}else beginLife(value)}
+function beginLifeFromInput(){
+ const value=($("customCookieName")?.value||"").trim();
+ if(!value){alert("名前を入力するか、ランダム命名を選んでください。");return}
+ const match=findSpecialLifeProfile(value);
+ if(match&&match.profile.requiresSecret){
+  let earned=[];try{earned=JSON.parse(storage.get("bakeTitles","[]"))}catch(e){}
+  if(!earned.includes("ヴォイドの囁きを退けた者")){
+   $("modal").innerHTML=`<div class="sub" style="letter-spacing:.18em;color:#c6a96a">CHRONOS RECORD TOWER / ACCESS DENIED</div><h2>個体記録を確認できません</h2><p>入力された名称は、現在の観測権限では照合できません。</p><p style="color:#c6a96a">……記録の外側にいるもの。</p><div class="choices"><button class="primary" onclick="newLife()">戻る</button></div>`;
+   return;
+  }
+ }
+ if(match){
+  const sp=match.profile;
+  $("modal").innerHTML=`<div style="text-align:center;padding:8px 0 14px">
+   <div style="font-size:12px;letter-spacing:.22em;color:#c6a96a">CHRONOS RECORD TOWER</div>
+   <div style="font-size:30px;margin:16px 0 8px">◈</div>
+   <h2 style="margin:0 0 8px">既存個体を検出</h2>
+   <div style="font-size:22px;font-weight:800;color:#f1dfb5">${escapeHtml(sp.name)}</div>
+   <div style="display:inline-block;margin:12px 0;padding:6px 12px;border:1px solid #b99b5b;border-radius:20px;color:#e8d39e;font-size:12px">PERSONAL HISTORY FOUND</div>
+  </div>
+  <p>記録照合に成功しました。通常のランダム人生ではなく、この個体に紐づく初期設定と固有イベントを読み込みます。</p>
+  <p style="color:var(--muted);font-size:13px">開始地点：${escapeHtml(sp.place)} ／ 立場：${escapeHtml(sp.job)}</p>
+  <div class="choices"><button class="primary" onclick="confirmSpecialLife('${match.id}')">この個体の人生を開始する</button><button onclick="newLife()">戻る</button></div>`;
+  return;
+ }
+ beginLife(value);
+}
+function confirmSpecialLife(id){
+ const sp=specialLifeProfiles[id];if(!sp)return;
+ beginLife(sp.name,{id,profile:sp});
+ // A clear, persistent marker distinguishes this route from a random life.
+ const marker=document.createElement("div");
+ marker.id="specialLifeStartBanner";
+ marker.style.cssText="position:fixed;inset:0;z-index:10020;display:flex;align-items:center;justify-content:center;background:rgba(8,11,20,.94);color:#f4e7bd;text-align:center;padding:24px;animation:slFade .35s ease";
+ marker.innerHTML=`<div style="max-width:520px"><div style="font-size:12px;letter-spacing:.25em;color:#c6a96a">CHRONOS RECORD TOWER</div><div style="font-size:48px;margin:18px">◈</div><div style="font-size:13px;letter-spacing:.2em">PERSONAL HISTORY CONNECTED</div><h1 style="font-size:26px;margin:14px 0">${escapeHtml(sp.name)}</h1><p>既存個体の人生記録に接続しました。</p><p style="font-size:13px;color:#c6a96a">過去の記録を読み込み中……未来は未確定です。</p><button class="primary" onclick="this.parentNode.parentNode.remove()" style="margin-top:14px">人生を始める</button></div>`;
+ document.body.appendChild(marker);
+}
 function beginLifeRandom(){beginLife(rand(first)+rand(last))}
 function beginLife(chosenName,specialMatch=null){
  let place=rand(places),isAngel=place.n.includes("ベイクドーム");

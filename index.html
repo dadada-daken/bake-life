@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>PANIS ET CALAMITAS — ベイク大陸ライフ v8.27</title>
+<title>PANIS ET CALAMITAS — ベイク大陸ライフ v8.28</title>
 <style>
 :root{--bg:#171923;--panel:#222635;--panel2:#2b3042;--ink:#f4f0e8;--muted:#aeb4c5;--gold:#e6c477;--green:#76c9a2;--red:#e58b8b;--line:#3b4257}
 *{box-sizing:border-box}body{margin:0;padding-bottom:env(safe-area-inset-bottom);background:radial-gradient(circle at top,#30364b,#171923 60%);color:var(--ink);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;line-height:1.55}
@@ -246,7 +246,7 @@ main{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 24px)}
  <div class="sub" style="margin-top:9px">※ゲームはこのブラウザ内で動作します。人生の記録と称号は自動保存されます。</div>
 </section>
 </main>
-<footer>BAKE LIFE v8.27 — STABILITY & RECORD FIXES</footer>
+<footer>BAKE LIFE v8.28 — BONDS & GENERATIONS</footer>
 <button id="pauseQuickBtn" class="pause-quick" onclick="togglePause()" aria-label="一時停止または再開">Ⅱ 一時停止</button>
 <nav id="v8Nav" aria-label="メインメニュー"><button onclick="scrollToPanel(0)"><span>🍪</span><span>人生</span></button><button onclick="scrollToLog()"><span>📖</span><span>記録</span></button><button onclick="showCollection()"><span>🏅</span><span>称号</span></button><button onclick="showRegionInfo()"><span>🗺️</span><span>地域</span></button><button onclick="showMoreMenu()"><span>☰</span><span>その他</span></button></nav>
 <div class="overlay" id="overlay"><div class="modal" id="modal"></div></div><input id="importSaveFile" type="file" accept="application/json,.json" hidden>
@@ -827,8 +827,7 @@ function seasonTick(){
  // 精神状態・自我安定度が臨界に達すると、通常の進行を飛び越えて精神崩壊イベントへ。
  if(!p.isPureAngel&&!p.baroqueRampage&&!p.mentalCollapseEventSeen&&((p.baroqueStage>=2&&(p.egoStability||100)<=18&&p.stress>=58)||(p.mind<=5&&p.stress>=75&&(p.baroqueRisk||0)>=18))){mentalCollapseEvent();return}
  if(!p.specialLife&&p.age>=13&&p.age<75&&p.seasonIndex===0&&Math.random()<(.04+(p.personality?.sociability??50)*.00055)){p.friends++;p.social=clamp(p.social+1);addLog("気の合うクッキーと知り合い、友人になった。","good")}
- if(!p.specialLife&&p.age>=20&&p.age<60&&!p.married&&p.seasonIndex===0&&Math.random()<(.018+(p.personality?.attachment??50)*.00034))smallDecision("縁談","親しいクッキーから、誰かを紹介したいと誘われた。",["会ってみる","今は考えない"],[()=>{p.married=true;p.partner=true;p.happiness=clamp(p.happiness+12);addLog("紹介された相手と親しくなり、やがて伴侶となった。","good")},()=>addLog("今は一人の時間を大切にすることにした。")]);
- if(!p.specialLife&&p.married&&p.age>=20&&p.age<48&&p.seasonIndex===0&&Math.random()<.07){p.children++;p.happiness=clamp(p.happiness+5);addLog("家族が増えた。新しい命を迎え、暮らしが少し賑やかになった。","good")}
+ // v8.28 replaces identity-less marriage and automatic child increments with persistent relationship records.
  if(p.risk>=4&&Math.random()<.025){p.health-=ri(4,12);p.stress+=8;addLog("周辺で異常現象が発生した。生活に影響が及び、心身ともに消耗した。","bad")}
  if(!decision&&p.age>=13&&!p.isAngel&&Math.random()<.018){terraceEvent();return}
  if(!decision){const eventRate=p.specialLife?(p.age<13?.075:.115):(p.age<6?.075:p.age<13?.10:.145);if(Math.random()<eventRate){p.yearHadEvent=true;randomEvent()}else{p.quietSeasons=(p.quietSeasons||0)+1;if(p.seasonIndex===0&&!p.yearHadEvent){addLog(rand([`一年が過ぎた。仕事や家事をこなし、穏やかな日常を送った。`,`大きな事件のない一年だった。いつもの暮らしが静かに続いていく。`,`季節は巡り、特筆する出来事のない一年が過ぎた。`]))}if(p.seasonIndex===0){p.yearHadEvent=false;p.quietSeasons=0}}}
@@ -1550,7 +1549,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  function recordRegion(event,delta={}){if(!p)return;let rs=ensure(p,'regionState',{economy:50,security:50,healthcare:50,technology:50,prosperity:50,disaster:0});Object.keys(delta).forEach(k=>rs[k]=Math.max(0,Math.min(100,(rs[k]||0)+delta[k])));p.regionHistory=ensure(p,'regionHistory',[]);p.regionHistory.push({age:p.age,year:p.year,place:p.place,event});p.regionHistory=p.regionHistory.slice(-40);let all=read(REGION_KEY,{});let key=p.place||'不明';all[key]=all[key]||{events:[],state:{}};all[key].events.unshift({name:event,age:p.age,year:p.year,life:p.name});all[key].events=all[key].events.slice(0,30);all[key].state={...rs};write(REGION_KEY,all)}
  function persistRegionState(){if(!p)return;const all=read(REGION_KEY,{}),key=p.place||'不明';all[key]=all[key]||{events:[],state:{}};all[key].state={...(p.regionState||{})};write(REGION_KEY,all)}
  function relation(n){ensure(n,'trust',Math.max(0,Math.min(100,(n.bond||0)*5)));ensure(n,'closeness',Math.max(0,Math.min(100,(n.bond||0)*5)));ensure(n,'conflict',0);ensure(n,'lastContactAge',p?.age||0);ensure(n,'history',[]);return n}
- function addRelation(name,role='知人',trust=35){if(!p)return null;p.npcRelations=ensure(p,'npcRelations',[]);let n=p.npcRelations.find(x=>x.name===name);if(!n){n={name,role,bond:Math.round(trust/5),trust,closeness:trust,conflict:0,alive:true,location:p.place,years:0,age:ri(18,Math.max(18,(p.age||18)+8)),job:rand(['職人','商店員','研究助手','運送業','便利屋','医療従事者']),status:'交流が続いている',history:[]};p.npcRelations.push(n);if(p.npcRelations.length>12)p.npcRelations.shift()}relation(n);return n}
+ function addRelation(name,role='知人',trust=35){if(!p)return null;p.npcRelations=ensure(p,'npcRelations',[]);let n=p.npcRelations.find(x=>x.name===name&&x.role===role);if(!n){n={name,role,bond:Math.round(trust/5),trust,closeness:trust,conflict:0,alive:true,location:p.place,years:0,age:ri(18,Math.max(18,(p.age||18)+8)),job:rand(['職人','商店員','研究助手','運送業','便利屋','医療従事者']),status:'交流が続いている',history:[]};p.npcRelations.push(n);if(p.npcRelations.length>40){const drop=p.npcRelations.findIndex(x=>!x.isSpouse&&!x.isChild&&!['dating','engaged','married','widowed'].includes(x.relationshipStatus));if(drop>=0)p.npcRelations.splice(drop,1)}}relation(n);return n}
  function npcHistory(n,text){relation(n);n.history.push({age:p.age,year:p.year,event:text});n.history=n.history.slice(-20);n.lastContactAge=p.age;n.years=(n.years||0)+1}
  function finishEvent(id,detail){register(id,detail);p.events=(p.events||0)+1;p.chronicleHistory=ensure(p,'chronicleHistory',[]);p.chronicleHistory.unshift({id,age:p.age,year:p.year,name:defsById[id]?.name||id,detail:detail||''});p.chronicleHistory=p.chronicleHistory.slice(0,80)}
  function choose(title,desc,opts,actions,id,detail,major=false){const fn=actions.map((a,i)=>()=>{p.recentEvents=ensure(p,'recentEvents',[]);p.recentEvents.push(title);p.recentEvents=p.recentEvents.slice(-9);a();finishEvent(id,detail);addLog(`【記録図鑑】${defsById[id]?.name||title}を経験した。`,'event')});(major?bigDecision:smallDecision)(title,desc,opts,fn)}
@@ -1627,7 +1626,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  const oldRandomEvent=randomEvent;
  randomEvent=function(){if(p&&!p.dead&&!p.afterlife){const eligible=true;if(eligible&&Math.random()<(p.specialLife?.28:.20)&&chronicleEvent())return;}return oldRandomEvent()};
  const oldSeasonTick=seasonTick;
- seasonTick=function(){if(p&&!p.dead){migrate();const oldYear=p.year;const oldPlace=p.place;oldSeasonTick();if(p&&!p.dead&&p.year!==oldYear&&!p.afterlife){(p.npcRelations||[]).forEach(n=>{relation(n);if(n.alive!==false){n.age=(n.age||0)+1;n.years=(n.years||0)+1;if(n.age>=ri(75,96)&&Math.random()<.08){n.alive=false;n.status='故人';n.history.push({age:n.age,event:'死亡'});}}});const rs=p.regionState||{};if(Math.random()<.045){const delta={economy:ri(-2,2),security:ri(-2,2),healthcare:ri(-1,2),technology:ri(-1,2),prosperity:ri(-2,2)};Object.keys(delta).forEach(k=>rs[k]=Math.max(0,Math.min(100,(rs[k]||50)+delta[k])));p.regionState=rs;if(Math.max(...Object.values(delta).map(Math.abs))>=2){const event=rs.economy<25?'景気後退':rs.security<25?'治安悪化':rs.healthcare>70?'医療体制の改善':rs.technology>75?'技術発展':'地域情勢の変化';p.regionHistory=ensure(p,'regionHistory',[]);p.regionHistory.push({age:p.age,place:p.place,event});p.regionHistory=p.regionHistory.slice(-40)}}if(oldPlace!==p.place)recordRegion('地域を移動した');persistRegionState();}}
+ seasonTick=function(){if(p&&!p.dead){migrate();const oldYear=p.year;const oldPlace=p.place;oldSeasonTick();if(p&&!p.dead&&p.year!==oldYear&&!p.afterlife){(p.npcRelations||[]).forEach(n=>{relation(n);});const rs=p.regionState||{};if(Math.random()<.045){const delta={economy:ri(-2,2),security:ri(-2,2),healthcare:ri(-1,2),technology:ri(-1,2),prosperity:ri(-2,2)};Object.keys(delta).forEach(k=>rs[k]=Math.max(0,Math.min(100,(rs[k]||50)+delta[k])));p.regionState=rs;if(Math.max(...Object.values(delta).map(Math.abs))>=2){const event=rs.economy<25?'景気後退':rs.security<25?'治安悪化':rs.healthcare>70?'医療体制の改善':rs.technology>75?'技術発展':'地域情勢の変化';p.regionHistory=ensure(p,'regionHistory',[]);p.regionHistory.push({age:p.age,place:p.place,event});p.regionHistory=p.regionHistory.slice(-40)}}if(oldPlace!==p.place)recordRegion('地域を移動した');persistRegionState();}}
  };
  // NPC関係性表示を拡張。旧データのbondも残しつつ信頼・親密度を表示。
  const oldPeople=showPeopleInfo;showPeopleInfo=function(){if(!p)return oldPeople();migrate();const ns=p.npcRelations||[];$('overlay').style.display='grid';$('modal').innerHTML=`<button class="modal-close" onclick="closeV8Modal()">×</button><h2>人物記録 <span class="sub">${ns.length}人</span></h2><p class="sub">主人公との関係だけでなく、NPCの年齢・職業・生死・交流履歴も記録します。</p><div class="person-list">${ns.length?ns.map(n=>`<details class="person-row"><summary><span class="person-name">${esc(n.name)}</span><span class="person-meta">${esc(n.role||'知人')} · 信頼 ${n.trust??n.bond*5??'—'}</span><span class="person-meta">${n.alive===false?'故人':'存命'}</span></summary><div class="person-detail">年齢：${n.age??'不明'}歳 / 職業：${esc(n.job||'不明')}<br>親密さ：${n.closeness??n.bond*5??'—'} / 対立：${n.conflict??0}<br>状態：${esc(n.status||'交流中')} / 居場所：${esc(n.location||'不明')}<br>${(n.history||[]).slice(-5).reverse().map(x=>`${x.age??'?'}歳：${esc(x.event)}`).join('<br>')}</div></details>`).join(''):'<p class="sub">まだ人物との出会いはありません。</p>'}</div>`};
@@ -1738,6 +1737,146 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  // Existing saves gain only missing tracking fields; historical progress is preserved.
  try{if(p){p.lifeId=p.lifeId||('legacy-live-'+Date.now());p.highRiskYears=p.highRiskYears||0;p.travelAfter70=!!p.travelAfter70;if(p.baroqueStage>0&&!Number.isFinite(p.baroqueOnsetAge)){const onset=(p.baroqueHistory||[]).find(h=>h&&['前兆','精神限界による突発発症'].includes(h.event));p.baroqueOnsetAge=onset?onset.age:null}}}catch(e){}
  try{if(typeof syncSecretTitleLedger==='function')syncSecretTitleLedger()}catch(e){}
+})();
+</script>
+
+
+
+<!-- BAKE LIFE v8.28 : BONDS & GENERATIONS -->
+<script>
+(function installBondsAndGenerationsV828(){
+ 'use strict';
+ const VERSION=1;
+ const clamp100=v=>Math.max(0,Math.min(100,Number(v)||0));
+ const arr=(o,k)=>{if(!Array.isArray(o[k]))o[k]=[];return o[k]};
+ const escV=v=>typeof escapeHtml==='function'?escapeHtml(String(v??'')):String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const id=(prefix)=>`${prefix}-${p?.lifeId||'life'}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`;
+ const log=(t,type='event')=>{try{addLog(t,type)}catch(e){}}
+ function migrateBonds(){
+  if(!p)return;
+  p.relationshipsVersion=VERSION;
+  p.npcRelations=Array.isArray(p.npcRelations)?p.npcRelations:[];
+  p.childrenRecords=Array.isArray(p.childrenRecords)?p.childrenRecords:[];
+  p.relationshipHistory=Array.isArray(p.relationshipHistory)?p.relationshipHistory:[];
+  p.familyHistory=Array.isArray(p.familyHistory)?p.familyHistory:[];
+  p.familySupportHistory=Array.isArray(p.familySupportHistory)?p.familySupportHistory:[];
+  p.relationshipStatus=p.relationshipStatus|| (p.married?'married_legacy':'single');
+  p.childrenLegacyCount=Number.isFinite(p.childrenLegacyCount)?p.childrenLegacyCount:Math.max(0,(p.children||0)-p.childrenRecords.length);
+  p.married=!!p.married;p.partner=!!p.partner;
+  let used=new Set();
+  p.npcRelations.forEach((n,i)=>{
+   if(!n||typeof n!=='object')return;
+   n.npcId=n.npcId||id('npc');
+   while(used.has(n.npcId))n.npcId=id('npc');used.add(n.npcId);
+   n.affection=clamp100(n.affection??Math.max(0,(n.closeness??n.trust??(n.bond||0)*5)-15));
+   n.trust=clamp100(n.trust??(n.bond||0)*5);n.closeness=clamp100(n.closeness??n.trust);
+   n.conflict=clamp100(n.conflict??0);n.romanceEligible=n.romanceEligible!==false;n.compatibility=clamp100(n.compatibility??Math.round((n.trust+n.closeness)/2));n.romanceKind=n.romanceKind||'ordinary';
+   n.relationshipStatus=n.relationshipStatus||'acquaintance';
+   n.relationshipHistory=Array.isArray(n.relationshipHistory)?n.relationshipHistory:[];
+   n.history=Array.isArray(n.history)?n.history:[];
+   n.lastRomanceEventAge=Number.isFinite(n.lastRomanceEventAge)?n.lastRomanceEventAge:-99;
+  });
+  p.childrenRecords.forEach(c=>{c.childId=c.childId||id('child');c.history=Array.isArray(c.history)?c.history:[];c.alive=c.alive!==false;c.age=Math.max(0,Number(c.age)||0);c.growthStage=c.growthStage||growthStage(c.age)});
+  if(p.partnerId){const spouse=p.npcRelations.find(n=>n.npcId===p.partnerId);if(spouse){spouse.isSpouse=true;spouse.relationshipStatus=p.married?'married':(spouse.relationshipStatus||'dating')}}
+ }
+ function growthStage(age){return age<=5?'幼児期':age<=12?'学童期':age<=17?'思春期':age<=24?'青年期':'自立期'}
+ function history(n,event){n.relationshipHistory=n.relationshipHistory||[];n.relationshipHistory.push({age:p.age,year:p.year,event});n.relationshipHistory=n.relationshipHistory.slice(-40);n.history=n.history||[];n.history.push({age:p.age,year:p.year,event});n.history=n.history.slice(-30);n.lastContactAge=p.age}
+ function familyLog(event){p.familyHistory.unshift({age:p.age,year:p.year,event});p.familyHistory=p.familyHistory.slice(0,100);log(event,'good')}
+ function addBondNpc(name,role,opts={}){
+  const n={npcId:id('npc'),name,role,bond:Math.round((opts.trust||40)/5),trust:opts.trust||40,closeness:opts.closeness||40,affection:opts.affection||20,conflict:0,alive:true,location:p.place,years:0,age:Math.max(18,p.age+Math.floor(Math.random()*7)-3),job:opts.job||'職人',status:'交流が続いている',history:[{age:p.age,event:'知り合った'}],relationshipHistory:[],romanceEligible:true,relationshipStatus:'acquaintance',compatibility:opts.compatibility||Math.floor(Math.random()*51)+35,romanceKind:opts.romanceKind||'ordinary',lastRomanceEventAge:-99};
+  p.npcRelations.push(n);return n;
+ }
+ function candidate(){const current=p.romancePartnerId?(p.npcRelations||[]).find(n=>n.npcId===p.romancePartnerId&&n.alive!==false):null;if(current&&['dating','engaged'].includes(current.relationshipStatus))return current;return (p.npcRelations||[]).filter(n=>n&&n.alive!==false&&n.romanceEligible!==false&&!n.isSpouse&&!n.isChild&&!['married','widowed','dating','engaged','separated'].includes(n.relationshipStatus)&&n.age>=18&&Math.abs((n.age||p.age)-p.age)<25).sort((a,b)=>(b.trust+b.closeness+b.affection-b.conflict)-(a.trust+a.closeness+a.affection-a.conflict))[0]||null}
+ function relationshipTitle(name){p.relationshipAchievements=arr(p,'relationshipAchievements');if(!p.relationshipAchievements.includes(name))p.relationshipAchievements.push(name)}
+ function checkRelationshipTitles(){
+  const checks=[['心を通わせた者',!!p.relationshipHistory?.some(x=>x.stage==='dating')],['生涯の伴侶',!!p.relationshipHistory?.some(x=>x.stage==='married')],['小さな命の守り手',p.childrenRecords.some(c=>c.age>=18)],['賑やかな食卓',(p.children||0)>=3],['親とは違う道',p.childrenRecords.some(c=>c.age>=18&&c.job&&c.parentJob&&c.job!==c.parentJob)],['世代を越えて',!!p.grandchildCount],['最後の手紙',!!p.receivedChildLetter],['再び歩き出す者',!!p.relationshipHistory?.some(x=>x.stage==='remarried')],['変わらぬ想い',!!p.honoredDeceasedPartner]];
+  for(const [name,ok] of checks){if(ok&&!p.titles.includes(name)){p.titles.push(name);const all=JSON.parse(storage.get('bakeTitles','[]'));if(!all.includes(name)){all.push(name);storage.set('bakeTitles',JSON.stringify(all))}}}
+ }
+ function addChild(origin='birth'){
+  const c={childId:id('child'),name:typeof randomCookieName==='function'?randomCookieName():'新しいクッキー',age:0,birthYear:p.year,parentIds:[p.lifeId||null,p.partnerId||null],origin,personality:typeof rand==='function'?rand(['好奇心旺盛','慎重','社交的','おとなしい','負けず嫌い','自由奔放']):'好奇心旺盛',health:75,relationship:55,growthStage:'幼児期',job:'子ども',parentJob:p.job,location:p.place,alive:true,history:[{age:0,year:p.year,event:origin==='adoption'?'家族として迎えられた':'誕生'}]};
+  p.childrenRecords.push(c);p.children=(p.children||0)+1;p.happiness=clamp(p.happiness+6);p.familySupport=(p.familySupport||0)+1;familyLog(origin==='adoption'?`${c.name}を家族として迎えた。`:`${c.name}が生まれた。`);return c;
+ }
+ function yearlyChildTick(){
+  for(const c of p.childrenRecords){if(!c.alive)continue;const before=c.age;c.age++;c.growthStage=growthStage(c.age);if(c.age!==before&&[1,6,13,18,25].includes(c.age)){const event=c.age===6?'学び舎に通い始めた':c.age===13?'思春期を迎えた':c.age===18?'成人し、自分の進路を考え始めた':c.age===25?'自分の暮らしを築き始めた':'少しずつ言葉や個性が育っている';c.history.push({age:c.age,year:p.year,event});familyLog(`${c.name}は${c.age}歳になった。${event}。`);if(c.age===18){c.job=typeof rand==='function'?rand(['職人','研究者','商店員','便利屋','医療従事者','運送業','芸術家','無職']):'職人';c.location=p.place;c.relationship=55;}}
+   if(c.age>=18&&c.age%5===0&&Math.random()<.15){c.relationship=clamp100(c.relationship+(Math.random()<.6?4:-3));c.history.push({age:c.age,year:p.year,event:'近況を手紙で知らせた'})}
+  }
+  // Adult children maintain independent lives and may share major family news.
+  for(const c of p.childrenRecords){if(!c.alive||c.age<25||c.lastFamilyNewsYear===p.year||Math.random()>.045)continue;c.lastFamilyNewsYear=p.year;
+   if(!c.married&&Math.random()<.38){c.married=true;c.history.push({age:c.age,year:p.year,event:'結婚した'});familyLog(`${c.name}が結婚したという知らせが届いた。`);}
+   else if(c.married&&Math.random()<.35){c.children=(c.children||0)+1;p.grandchildCount=(p.grandchildCount||0)+1;c.history.push({age:c.age,year:p.year,event:'子どもが生まれた'});familyLog(`${c.name}に子どもが生まれ、あなたに孫ができた。`);}
+   else {c.history.push({age:c.age,year:p.year,event:'近況を手紙で知らせた'});if(p.age>=55){p.receivedChildLetter=true;familyLog(`${c.name}から近況を知らせる手紙が届いた。`);}}
+  }
+ }
+ function specialRomance(n){
+  if(!n||!['dating','engaged','married'].includes(n.relationshipStatus)||Math.random()>.025)return false;
+  const kind=n.romanceKind||'ordinary';if(kind==='ordinary')return false;let title='二人だけの少し変わった事情',desc='二人の関係には、他の誰とも違う事情がある。';let opts=['相手の事情を尊重する','一緒に解決策を探す','今は結論を急がない'];
+  if(kind==='angel'){title='天上と地上の距離';desc='相手の役目はベイクドームにあり、あなたの暮らしは地上にある。会えない時間をどう受け止めるか。';}
+  else if(kind==='fairy'){title='異なる位相で暮らす';desc='相手が暮らすフェアリーレイヤーと、あなたのいる場所では時間や記録の感覚が異なる。';}
+  else if(kind==='baroque'){title='変わっていく身体と、変わらない関係';desc='相手のバロック症状が進んでいる。支えることはできるが、あなた一人で治せるものではない。';}
+  else if(kind==='artificial'){title='記憶の複製と本人';desc='相手の記憶バックアップが見つかった。複製された記憶を本人と同じ存在として扱えるのか、二人で考えることになった。';}
+  else if(kind==='longlife'){title='異なる寿命を数える';desc='二人の寿命には大きな差がある。先のことを考えるほど、今をどう過ごすかが難しくなる。';}
+  smallDecision(title,desc,opts,[()=>{n.trust=clamp100(n.trust+4);n.affection=clamp100(n.affection+3);p.stress=clamp(p.stress-2);history(n,'事情を尊重し、支え合うことにした');familyLog(`${n.name}と、二人にしか分からない事情について話し合った。`)},()=>{n.closeness=clamp100(n.closeness+6);n.affection=clamp100(n.affection+5);p.knowledge=clamp(p.knowledge+2);history(n,'二人で解決策を探した');familyLog(`${n.name}と協力して問題に向き合った。`)},()=>{n.conflict=clamp100(n.conflict+1);p.stress=clamp(p.stress-1);history(n,'結論を急がず時間を置いた');log('すぐに答えを出さず、互いの気持ちを整理する時間を取った。')}]);return true;
+ }
+ function relationshipTick(){
+  if(!p||p.dead||p.afterlife||p.specialLife||p.age<18)return;
+  migrateBonds();
+  const spouse=p.partnerId?p.npcRelations.find(n=>n.npcId===p.partnerId):null;
+  if(p.married&&spouse&&spouse.alive===false){p.married=false;p.partner=false;p.relationshipStatus='widowed';p.partnerId=null;p.romancePartnerId=null;p.lastRelationshipEnded='widowed';p.honoredDeceasedPartner=false;familyLog(`${spouse.name}が亡くなった。共に過ごした時間は、これからもあなたの人生に残り続ける。`);p.relationshipHistory.unshift({age:p.age,year:p.year,stage:'widowed',partner:spouse.name});}
+  if(p.married&&spouse&&spouse.alive!==false){
+   if(specialRomance(spouse))return;
+   if(Math.random()<.035){smallDecision('夫婦のすれ違い',`${spouse.name}との生活に、小さな不満が積み重なっている。`,['時間を作って話し合う','自分から謝る','しばらく距離を置く','別居・離婚を選ぶ'],[()=>{spouse.conflict=clamp100(spouse.conflict-10);spouse.trust=clamp100(spouse.trust+5);p.familySupport=(p.familySupport||0)+1;history(spouse,'話し合いで関係を修復した');familyLog(`${spouse.name}と話し合い、すれ違いを解消した。`)},()=>{spouse.affection=clamp100(spouse.affection+5);spouse.conflict=clamp100(spouse.conflict-5);p.happiness=clamp(p.happiness+3);history(spouse,'自分から歩み寄った')},()=>{spouse.conflict=clamp100(spouse.conflict+7);p.stress=clamp(p.stress+3);history(spouse,'距離を置いた')},()=>{p.married=false;p.partner=false;p.partnerId=null;p.relationshipStatus='single';p.lastRelationshipEnded='divorced';spouse.isSpouse=false;spouse.relationshipStatus='separated';spouse.status='別居・離婚';history(spouse,'別居・離婚した');p.relationshipHistory.unshift({age:p.age,year:p.year,stage:'divorced',partner:spouse.name});familyLog(`${spouse.name}と別居・離婚することになった。`)}]);return;}
+   if(p.age<48&&p.childrenRecords.length<5&&Math.random()<.055){smallDecision('家族を増やすか',`${spouse.name}と、これからの家族について話す機会があった。`,['子どもを迎えたい','養子を迎えたい','今の暮らしを大切にする'],[()=>{addChild('birth')},()=>{if(p.money<15){log('養子を迎えるための準備費用が足りなかった。','bad');return}p.money-=15;addChild('adoption')},()=>{p.happiness=clamp(p.happiness+3);p.familySupport=(p.familySupport||0)+1;familyLog('今の家族との時間を大切にすることにした。')}]);return;}
+   if(Math.random()<.04){smallDecision('家族の時間',`${spouse.name}と一緒に過ごせる時間ができた。`,['二人で出かける','家でゆっくり過ごす','家計や将来について相談する'],[()=>{p.happiness=clamp(p.happiness+5);spouse.affection=clamp100(spouse.affection+4);p.money=Math.max(0,p.money-5);familyLog(`${spouse.name}と二人で出かけた。`)},()=>{p.stress=clamp(p.stress-5);spouse.trust=clamp100(spouse.trust+3);familyLog(`${spouse.name}と家でゆっくり過ごした。`)},()=>{p.familySupport=(p.familySupport||0)+1;p.knowledge=clamp(p.knowledge+2);familyLog(`${spouse.name}と家計や将来について相談した。`)}]);return;}
+  }
+  if(!p.married){
+   let n=candidate();
+   if(!n&&p.age>=20&&p.npcRelations.length<40&&Math.random()<.12){n=addBondNpc(typeof randomCookieName==='function'?randomCookieName():'旅先で出会ったクッキー','新しい知人',{trust:ri(35,65),closeness:ri(30,60),affection:ri(15,35),romanceKind:randKind()});}
+   if(n&&specialRomance(n))return;
+   if(n&&n.lastRomanceEventAge!==p.age&&Math.random()<.18){n.lastRomanceEventAge=p.age;
+    const readiness=n.trust>=45&&n.closeness>=45&&n.affection>=25&&n.conflict<45&&n.compatibility>=30;
+    if(n.relationshipStatus==='dating'&&readiness&&p.age>=20&&Math.random()<.23){smallDecision('将来についての話',`${n.name}と、これからの関係について話す機会が訪れた。`,['結婚を前提に交際を続けたい','もう少し時間をかけたい','今は結婚を考えられない'],[()=>{n.relationshipStatus='engaged';p.relationshipStatus='engaged';history(n,'婚約した');p.relationshipHistory.unshift({age:p.age,year:p.year,stage:'engaged',partner:n.name});familyLog(`${n.name}と婚約した。`)},()=>{n.affection=clamp100(n.affection+4);n.closeness=clamp100(n.closeness+4);history(n,'将来について話し合った')},()=>{n.conflict=clamp100(n.conflict+5);n.affection=clamp100(n.affection-3);history(n,'結婚観の違いが明らかになった')}]);return;}
+    if(n.relationshipStatus==='engaged'){smallDecision('結婚の申し込み',`${n.name}との婚約を経て、二人で結婚する日を決めることになった。`,['結婚する','婚約を続ける','婚約を解消する'],[()=>{p.married=true;p.partner=true;p.partnerId=n.npcId;p.romancePartnerId=null;p.relationshipStatus='married';n.isSpouse=true;n.relationshipStatus='married';history(n,'結婚した');p.relationshipHistory.unshift({age:p.age,year:p.year,stage:'married',partner:n.name});familyLog(`${n.name}と結婚した。`);p.happiness=clamp(p.happiness+10)},()=>{n.affection=clamp100(n.affection+2);history(n,'婚約を続けることにした')},()=>{n.relationshipStatus='separated';p.relationshipStatus='single';p.romancePartnerId=null;n.conflict=clamp100(n.conflict+10);history(n,'婚約を解消した');p.relationshipHistory.unshift({age:p.age,year:p.year,stage:'separated',partner:n.name});familyLog(`${n.name}との婚約を解消した。`)}]);return;}
+    if(readiness&&n.relationshipStatus!=='dating'&&n.relationshipStatus!=='engaged'){
+     smallDecision('二人の距離',`${n.name}と過ごす時間が増え、互いに特別な感情を抱いていることに気づいた。`,['気持ちを伝える','もう少し親しくなる','友人のままでいたい'],[()=>{if(Math.random()<.72+(n.compatibility-50)/250){const restarting=!!p.lastRelationshipEnded||p.relationshipStatus==='widowed';n.relationshipStatus='dating';p.romancePartnerId=n.npcId;n.affection=clamp100(n.affection+15);n.closeness=clamp100(n.closeness+8);p.relationshipStatus='dating';p.relationshipHistory.unshift({age:p.age,year:p.year,stage:restarting?'remarried':'dating',partner:n.name});p.lastRelationshipEnded=null;history(n,'交際を始めた');relationshipTitle('心を通わせた者');familyLog(`${n.name}と交際を始めた。`) }else{n.affection=clamp100(n.affection-6);n.conflict=clamp100(n.conflict+4);history(n,'告白は受け入れられなかった');log(`${n.name}はすぐに答えを出せなかった。関係を続けるかどうかは、これからの二人次第だ。`)}},()=>{n.closeness=clamp100(n.closeness+8);n.affection=clamp100(n.affection+6);n.trust=clamp100(n.trust+4);history(n,'一緒に過ごす時間を増やした')},()=>{n.relationshipStatus='friend';n.affection=clamp100(n.affection-5);history(n,'友人として付き合うことにした')}]);return;
+    }
+    if(!readiness){n.closeness=clamp100(n.closeness+ri(1,4));n.affection=clamp100(n.affection+ri(0,3));n.trust=clamp100(n.trust+ri(0,2));}
+   }
+  }
+  if(p.relationshipStatus==='widowed'&&!p.married&&Math.random()<.025){let n=candidate();if(n){smallDecision('再び誰かと歩く',`${n.name}と話すうちに、もう一度誰かと人生を歩くことを考え始めた。`,['新しい関係を築く','今は思い出を大切にする'],[()=>{n.relationshipStatus='dating';p.relationshipStatus='dating';p.romancePartnerId=n.npcId;p.relationshipHistory.unshift({age:p.age,year:p.year,stage:'remarried',partner:n.name});n.affection=clamp100(n.affection+12);familyLog(`${n.name}と新しい関係を築き始めた。`)},()=>{p.honoredDeceasedPartner=true;p.mind=clamp(p.mind+3);familyLog('亡き伴侶との思い出を大切にして生きていくことにした。')}]);return;}}
+  checkRelationshipTitles();
+ }
+ function randKind(){const r=Math.random();return r<.12?'angel':r<.22?'fairy':r<.32?'baroque':r<.42?'artificial':r<.52?'longlife':'ordinary'}
+ function renderPeople(){
+  migrateBonds();const ns=p.npcRelations||[],children=p.childrenRecords||[];const spouse=p.partnerId?ns.find(n=>n.npcId===p.partnerId):(p.romancePartnerId?ns.find(n=>n.npcId===p.romancePartnerId):null);
+  $('overlay').style.display='grid';$('modal').innerHTML=`<button class="modal-close" onclick="closeV8Modal()">×</button><h2>人物・家族記録 <span class="sub">${ns.length}人</span></h2><section class="entry"><b>パートナー</b><div class="sub">${spouse?`${escV(spouse.name)} / ${p.married?'配偶者':spouse.relationshipStatus==='engaged'?'婚約者':'交際相手'} / ${spouse.age??'不明'}歳 / ${escV(spouse.job||'不明')} / ${spouse.alive===false?'故人':'存命'}`:p.married?'旧セーブ由来の配偶者記録（個人情報は未登録）':'現在パートナーはいません'}</div></section><section class="entry"><b>子ども・次世代</b><div class="sub">登録人数：${children.length}人 / 旧セーブ由来の人数：${p.childrenLegacyCount||0}人 / 記録上の子ども総数：${p.children||0}人</div>${children.map(c=>`<details><summary>${escV(c.name)} — ${c.age}歳 / ${escV(c.growthStage)}</summary><div class="sub">職業：${escV(c.job||'不明')} / 居場所：${escV(c.location||'不明')} / ${c.alive?'存命':'故人'}<br>${(c.history||[]).slice(-6).reverse().map(h=>`${h.age}歳：${escV(h.event)}`).join('<br>')}</div></details>`).join('')||'<div class="sub">個別の子ども記録はまだありません。</div>'}</section><h3>知人・友人・恋愛関係</h3><div class="person-list">${ns.map(n=>`<details class="person-row"><summary><span class="person-name">${escV(n.name)}</span><span class="person-meta">${escV(n.relationshipStatus||n.role||'知人')} · 信頼 ${n.trust??'—'}</span><span class="person-meta">${n.alive===false?'故人':'存命'}</span></summary><div class="person-detail">年齢：${n.age??'不明'}歳 / 職業：${escV(n.job||'不明')}<br>親密さ：${n.closeness??'—'} / 好意：${n.affection??'—'} / 対立：${n.conflict??0}<br>状態：${escV(n.status||'交流中')} / 居場所：${escV(n.location||'不明')}<br>${(n.relationshipHistory||n.history||[]).slice(-8).reverse().map(h=>`${h.age??'?'}歳：${escV(h.event)}`).join('<br>')}</div></details>`).join('')||'<p class="sub">まだ人物との出会いはありません。</p>'}</div><h3>家族の記録</h3>${(p.familyHistory||[]).slice(0,10).map(h=>`<div class="sub">${h.year}年 / ${h.age}歳 — ${escV(h.event)}</div>`).join('')||'<div class="sub">家族に関する記録はありません。</div>'}`;
+ }
+ // Stable life archive: attach family snapshots to the matching lifeId, never lives[0].
+ const previousDie=die;
+ die=function(cause){if(p&&!p.dead){migrateBonds();p.childrenCountAtDeath=p.children||0;p.relationshipArchive={status:p.relationshipStatus,partnerId:p.partnerId||null,history:(p.relationshipHistory||[]).slice(-80),familyHistory:(p.familyHistory||[]).slice(-100),children:(p.childrenRecords||[]).map(c=>({...c,history:(c.history||[]).slice(-30)})),npcRelations:(p.npcRelations||[]).map(n=>({...n,history:(n.history||[]).slice(-30),relationshipHistory:(n.relationshipHistory||[]).slice(-30)}))};checkRelationshipTitles();}const result=previousDie(cause);try{const lives=JSON.parse(storage.get('bakeLives','[]'));const idx=p?.lifeId?lives.findIndex(x=>x&&x.lifeId===p.lifeId):-1;if(idx>=0){lives[idx].relationshipArchive=p.relationshipArchive;lives[idx].children=p.children||0;lives[idx].married=!!p.married;storage.set('bakeLives',JSON.stringify(lives.slice(0,100)))}}catch(e){}return result};
+ // Yearly wrapper: base tick advances NPCs once; this adds child growth and family events.
+ const previousSeason=seasonTick;
+ seasonTick=function(){if(!p||p.dead)return;const beforeYear=p.year;previousSeason();if(!p||p.dead||p.afterlife||p.year===beforeYear)return;migrateBonds();if(p.isAngel){for(const n of p.npcRelations){if(n.alive!==false){n.age=(n.age||0)+1;n.years=(n.years||0)+1;if(n.age>=ri(75,96)&&Math.random()<.08){n.alive=false;n.status='故人';n.history.push({age:n.age,year:p.year,event:'死亡'});}}}}if(!p.specialLife){yearlyChildTick();if(!decision)relationshipTick();}checkRelationshipTitles();try{storage.set('bakeCurrent',JSON.stringify(p))}catch(e){}};
+ // Preserve the original people view's navigation point while exposing the richer archive.
+ window.showPeopleInfo=renderPeople;
+ // Extend migration used by existing saves; never synthesize spouse identity or child identities.
+ try{if(p)migrateBonds()}catch(e){}
+ // New titles are ordinary life titles; all prior title names and predicates remain untouched.
+ const newTitles=[
+  ['心を通わせた者','誰かと交際を始める','social',s=>(s.relationshipHistory||[]).some(x=>x.stage==='dating')],
+  ['生涯の伴侶','結婚し、伴侶との記録を残す','social',s=>(s.relationshipHistory||[]).some(x=>x.stage==='married')],
+  ['小さな命の守り手','子どもが成人するまで成長を見守る','social',s=>(s.childrenRecords||[]).some(c=>c.age>=18)],
+  ['賑やかな食卓','子どもを3人以上持つ','social',s=>(s.children||0)>=3],
+  ['親とは違う道','成人した子どもが親と異なる職業に就く','social',s=>(s.childrenRecords||[]).some(c=>c.age>=18&&c.job&&c.parentJob&&c.job!==c.parentJob)],
+  ['世代を越えて','孫の誕生を迎える','social',s=>(s.grandchildCount||0)>0],
+  ['最後の手紙','晩年に子どもから手紙を受け取る','social',s=>!!s.receivedChildLetter],
+  ['再び歩き出す者','死別後に新しい交際を始める','social',s=>(s.relationshipHistory||[]).some(x=>x.stage==='remarried')],
+  ['変わらぬ想い','亡き伴侶の思い出を大切にする','social',s=>!!s.honoredDeceasedPartner]
+ ];
+ for(const def of newTitles)if(!titleDefs.some(x=>x[0]===def[0]))titleDefs.push(def);
+ // Version marker for exports and visible footer.
+ const foot=document.querySelector('footer');if(foot)foot.textContent='BAKE LIFE v8.28 — BONDS & GENERATIONS';
+ const originalExport=exportSave;
+ exportSave=function(){const data={version:8.28,current:p,deathCauses:JSON.parse(storage.get('bakeDeathCauses','[]')),titles:JSON.parse(storage.get('bakeTitles','[]')),lives:JSON.parse(storage.get('bakeLives','[]')),ascendedLives:JSON.parse(storage.get('bakeAscendedLives','[]')),secretMeta:JSON.parse(storage.get('bakeSecretMeta','{}')),relationshipSchema:VERSION};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.28.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)};
 })();
 </script>
 

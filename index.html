@@ -2560,7 +2560,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  const KEY='bakeTogemaruStoryV1', META='bakeTogemaruMetaV1';
  const $=id=>document.getElementById(id);
  document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.46';
- const setFooter=()=>{const f=document.querySelector('footer');if(f)f.textContent='BAKE LIFE v8.46 — TOGEMARU ISOLATION & UI FIX';};
+ const setFooter=()=>{const f=document.querySelector('footer');if(f)f.textContent='BAKE LIFE v8.48 — TOGEMARU ISOLATION & UI FIX';};
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setFooter);else setFooter();
  const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){return {}}};
  const metaRead=()=>{try{return JSON.parse(localStorage.getItem(META)||'{}')}catch(e){return {}}};
@@ -2574,9 +2574,12 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  ];
  function currentGoal(s,m){let idx=Number.isInteger(m.goalIndex)?m.goalIndex:0;let g=goals[idx%goals.length];if(g.test(s)){m.completed=m.completed||[];if(!m.completed.includes(g.id))m.completed.push(g.id);m.points=(m.points||0)+1;m.goalIndex=(idx+1)%goals.length;g=goals[m.goalIndex];metaSave(m)}return g}
  function inject(){const root=$('togeModal');if(!root||root.dataset.v844)return;root.dataset.v844='1';
+  // Idempotency guard: one objective panel and one handbook note per rendered screen.
+  root.querySelectorAll('.toge-quest').forEach(x=>x.remove());
+  root.querySelectorAll('.toge-handbook-note').forEach(x=>x.remove());
   const s=read(),m=metaRead(),g=currentGoal(s,m),v=Math.min(g.max,g.progress(s));
   const hero=root.querySelector('.toge-hero');
-  if(hero){const stats=hero.querySelector('div:last-child');if(stats){const small=document.createElement('div');small.className='toge-muted';small.textContent=`探索手帳ポイント ${m.points||0} pt ・ 訪問 ${Math.max(0,(s.visited||[]).length)}か所`;stats.appendChild(small)}}
+  if(hero){const stats=hero.querySelector('div:last-child');if(stats){const small=document.createElement('div');small.className='toge-muted toge-handbook-note';small.textContent=`探索手帳ポイント ${m.points||0} pt ・ 訪問 ${Math.max(0,(s.visited||[]).length)}か所`;stats.appendChild(small)}}
   const panel=document.createElement('div');panel.className='toge-card toge-quest';panel.innerHTML=`<b>今回の気まぐれ目標</b><div class="toge-questline">${g.name} — ${g.desc}</div><div class="toge-progress"><i style="width:${Math.round(v/g.max*100)}%"></i></div><div class="toge-muted" style="margin-top:3px">進捗 ${v}/${g.max}　／　達成で手帳ポイント +1</div><div class="toge-compact-row" style="margin-top:6px"><div class="toge-compact-chip">訪問 <b>${(s.visited||[]).length}</b> / 6</div><div class="toge-compact-chip">発見 <b>${s.discoveryCount||0}</b> 回</div></div>`;
   const stats=root.querySelector('.toge-statgrid')?.closest('.toge-card');if(stats)stats.after(panel);else hero?.after(panel);
   // Reduce visual noise in the long location list; keep location names visible.
@@ -2590,9 +2593,9 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  const oldOpen=window.openTogemaruMode;
  if(oldOpen)window.openTogemaruMode=function(){oldOpen();setTimeout(inject,0)};
  const oldAct=window.togeAct;
- if(oldAct)window.togeAct=function(kind){oldAct(kind);const s=read(),m=metaRead();currentGoal(s,m);metaSave(m);setTimeout(()=>{const r=$('togeModal');if(r)r.dataset.v844='';inject()},0)};
+ if(oldAct)window.togeAct=function(kind){oldAct(kind);const s=read(),m=metaRead();currentGoal(s,m);metaSave(m)};
  const oldMove=window.togeMove;
- if(oldMove)window.togeMove=function(id){oldMove(id);const s=read(),m=metaRead();currentGoal(s,m);metaSave(m);setTimeout(()=>{const r=$('togeModal');if(r)r.dataset.v844='';inject()},0)};
+ if(oldMove)window.togeMove=function(id){oldMove(id);const s=read(),m=metaRead();currentGoal(s,m);metaSave(m)};
 })();
 </script>
 
@@ -2694,26 +2697,31 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
 </style>
 
 
-<style id="toge-v845-ui">
-/* v8.46: main-game-like status bars and compact command controls */
-#togeModal .toge-statgrid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:5px!important}
-#togeModal .toge-stat{position:relative;min-width:0;padding:6px 8px 10px!important;background:#252d3c;border:1px solid #465064;border-radius:7px;font-size:.72rem!important;line-height:1.2}
-#togeModal .toge-stat b{display:inline!important;float:right;font-size:.78rem!important;color:#f0d99d;white-space:nowrap}
-#togeModal .toge-stat:after{content:"";display:block;clear:both}
-#togeModal .toge-stat:before{content:"";position:absolute;left:7px;right:7px;bottom:5px;height:3px;border-radius:9px;background:#111a28}
-#togeModal .toge-stat b:after{content:""}
-#togeModal .toge-actions{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:4px!important}
-#togeModal .toge-actions button{min-height:34px!important;padding:5px 4px!important;font-size:.69rem!important;text-align:center!important;line-height:1.15!important;border-radius:7px!important}
-#togeModal .toge-card{padding:7px!important;margin:4px 0!important}
-#togeModal .toge-hero{padding:7px!important}
-#togeModal .toge-compact-command{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
-#togeModal .toge-compact-command button{min-height:32px!important;padding:4px!important;font-size:.68rem!important}
-#togeModal .toge-stat-meter{height:3px;margin-top:5px;background:#111a28;border-radius:8px;overflow:hidden}
-#togeModal .toge-stat-meter i{display:block;height:100%;background:linear-gradient(90deg,#8f9fbd,#e0c27e);border-radius:8px}
-@media(max-width:380px){#togeModal .toge-statgrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}#togeModal .toge-actions{grid-template-columns:repeat(3,minmax(0,1fr))!important}#togeModal .toge-actions button{font-size:.64rem!important;min-height:31px!important}}
+<style id="toge-v846-ui">
+/* v8.48: readable status gauges and thumb-friendly two-column controls */
+#togeModal .toge-statgrid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important}
+#togeModal .toge-stat{position:relative;display:grid!important;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:6px;row-gap:7px;min-width:0;padding:8px 9px!important;background:#252d3c!important;border:1px solid #465064!important;border-radius:8px!important;font-size:.76rem!important;line-height:1.2!important;overflow:hidden}
+#togeModal .toge-stat>span{min-width:0;overflow-wrap:anywhere}
+#togeModal .toge-stat b{display:block!important;float:none!important;justify-self:end;font-size:.8rem!important;font-weight:700;color:#f0d99d!important;white-space:nowrap}
+#togeModal .toge-stat:before,#togeModal .toge-stat:after{display:none!important;content:none!important}
+#togeModal .toge-stat-meter{grid-column:1/-1;display:block!important;width:100%;height:7px!important;margin:0!important;background:#111a28!important;border:1px solid #111a28;border-radius:99px!important;overflow:hidden}
+#togeModal .toge-stat-meter i{display:block!important;height:100%!important;min-width:0;max-width:100%;background:linear-gradient(90deg,#8298bd 0%,#c6b27d 65%,#ead49b 100%)!important;border-radius:99px!important;transition:width .25s ease}
+#togeModal .toge-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important;margin-top:8px!important}
+#togeModal .toge-actions button{display:flex!important;align-items:center;justify-content:center;text-align:center!important;white-space:normal!important;overflow-wrap:anywhere;min-width:0;min-height:44px!important;padding:8px 9px!important;font-size:.8rem!important;line-height:1.25!important;border-radius:8px!important}
+#togeModal .toge-card{padding:8px!important;margin:5px 0!important}
+#togeModal .toge-hero{padding:8px!important}
+#togeModal .toge-compact-command{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important}
+#togeModal .toge-compact-command button{min-height:42px!important;padding:7px 8px!important;font-size:.78rem!important}
+@media(max-width:380px){
+ #togeModal .toge-statgrid{gap:5px!important}
+ #togeModal .toge-stat{padding:7px!important;font-size:.72rem!important}
+ #togeModal .toge-stat b{font-size:.76rem!important}
+ #togeModal .toge-actions{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important}
+ #togeModal .toge-actions button{min-height:42px!important;padding:7px 6px!important;font-size:.76rem!important}
+}
 </style>
 <script>
-// v8.46 TOGEMARU ISOLATION + UI FIX
+// v8.48 TOGEMARU ISOLATION + UI FIX
 (function(){
  'use strict';
  const $=id=>document.getElementById(id);
@@ -2777,5 +2785,29 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
   const old=window[name];if(typeof old==='function')window[name]=function(){const out=old.apply(this,arguments);scheduleDecorate();return out};
  }
  // Deliberately no MutationObserver here: decorate() mutates the modal and would retrigger itself indefinitely.
+})();
+</script>
+
+
+<script>
+// v8.48: preserve Togemaru modal/page scroll after actions; keep objective panel single-instance.
+(function(){
+ 'use strict';
+ const names=['togeAct','togeMove','togeSelectPerson','togeSetAutonomy','togeSetForm'];
+ function keepScroll(fn){return function(){
+   const modal=document.getElementById('modal');
+   const modalTop=modal?modal.scrollTop:0;
+   const pageTop=window.scrollY||document.documentElement.scrollTop||0;
+   const result=fn.apply(this,arguments);
+   const restore=()=>{
+     const m=document.getElementById('modal');
+     if(m)m.scrollTop=modalTop;
+     window.scrollTo(0,pageTop);
+   };
+   setTimeout(restore,0);
+   setTimeout(restore,40);
+   return result;
+ };}
+ names.forEach(name=>{const fn=window[name];if(typeof fn==='function'&&!fn.__v848Scroll){const wrapped=keepScroll(fn);wrapped.__v848Scroll=true;window[name]=wrapped;}});
 })();
 </script>

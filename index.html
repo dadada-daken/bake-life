@@ -2316,7 +2316,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  window.previewCinematic=function(){cfg=read();present('history','✦','CINEMATIC PREVIEW','人生の記録','何気ない一日も、いつか振り返れば大切な一頁になる。')};
  const oldMore=showMoreMenu;showMoreMenu=function(){oldMore();const modal=$('modal');if(!modal||modal.querySelector('[data-cinematic-menu]'))return;const box=document.createElement('section');box.className='entry';box.setAttribute('data-cinematic-menu','1');box.innerHTML='<b>CINEMATIC LIFE / 演出</b><div class="controls" style="margin-top:8px"><button onclick="showCinematicSettings()">演出設定・プレビュー</button></div>';modal.appendChild(box)};
  const oldSummary=showLifeSummary; if(typeof oldSummary==='function'){showLifeSummary=function(){oldSummary.apply(this,arguments);const modal=$('modal');if(modal){const h=modal.querySelector('h2');if(h)h.insertAdjacentHTML('afterend','<p class="sub" style="text-align:center;letter-spacing:.12em;color:#d7c18a">A LIFE WRITTEN IN THE CHRONICLE</p>')}}}
- document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.41';const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.41 — TOGEMARU EXTRA STORY+';
+ document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.44';const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.44 — TOGEMARU EXTRA STORY+';
 })();
 </script>
 
@@ -2351,7 +2351,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  window.showLegacyChronicle=function(){if(!p)return;const wh=safe(p.worldHistory),album=safe(p.lifeAlbum);const region=safe(p.regionHistory);const highlights=[...wh.map(x=>({year:x.year,age:x.age,title:x.title,detail:x.detail})),...region.map(x=>({year:x.year,age:x.age,title:x.event,detail:x.place}))].sort((a,b)=>(a.year||0)-(b.year||0));$('overlay').style.display='grid';$('modal').innerHTML=`<button class="modal-close" onclick="closeV8Modal()">×</button><div class="sub">AFTERLIFE / LEGACY RECORD</div><h2>${esc(p.name)}が残したもの</h2><div class="info-grid"><div class="info-card"><small>世界史の記録</small><b>${wh.length}件</b></div><div class="info-card"><small>人生アルバム</small><b>${album.length}件</b></div><div class="info-card"><small>地域の記録</small><b>${region.length}件</b></div><div class="info-card"><small>称号</small><b>${safe(p.titles).length}個</b></div></div><p>このクッキーが生きた時代と、世界や地域に残した足跡です。</p>${highlights.slice(-30).reverse().map(x=>`<div class="entry"><b>${esc(x.year??'—')}年・${esc(x.age??'—')}歳 — ${esc(x.title||'記録')}</b><div class="sub">${esc(x.detail||'')}</div></div>`).join('')||'<p class="sub">歴史に残る記録はありません。名もない日々も、確かに生きた証です。</p>'}<button onclick="closeV8Modal()">閉じる</button>`};
  const priorMore=showMoreMenu;showMoreMenu=function(){priorMore.apply(this,arguments);const modal=$('modal');if(!modal||modal.querySelector('[data-chronicle-immersion]'))return;const box=document.createElement('section');box.className='entry';box.dataset.chronicleImmersion='1';box.innerHTML='<b>CHRONICLE IMMERSION / 人生の追体験</b><div class="controls" style="margin-top:8px"><button onclick="showLifeAlbum()">人生アルバム</button><button onclick="showReunionMemories()">再会と思い出</button><button onclick="showLegacyChronicle()">死後の歴史的影響</button></div>';modal.appendChild(box)};
  // Capture memories from pre-existing NPC histories when opening the album.
- document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.41';const foot=document.querySelector('footer');if(foot)foot.textContent='BAKE LIFE v8.41 — TOGEMARU EXTRA STORY+';
+ document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.44';const foot=document.querySelector('footer');if(foot)foot.textContent='BAKE LIFE v8.44 — TOGEMARU EXTRA STORY+';
 })();
 </script>
 
@@ -2521,6 +2521,75 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  window.seasonTick=function(){const before=p?.year;oldTick.apply(this,arguments);try{yearlyHardship(before)}catch(e){console.warn('negative life extension',e)}};
  const oldMore=window.showMoreMenu;
  if(typeof oldMore==='function')window.showMoreMenu=function(){oldMore.apply(this,arguments);const modal=document.getElementById('modal');if(!modal||modal.querySelector('[data-hardship-status]'))return;const debt=Math.max(0,Number(p?.debt)||0);const flags=p?.hardshipFlags||[];const box=document.createElement('section');box.className='entry';box.dataset.hardshipStatus='1';box.innerHTML=`<b>HARDSHIP / 生活状況</b><div class="sub" style="margin-top:5px">借金：${debt}G ／ 状態：${flags.length?flags.join('・'):'特になし'}</div><div class="sub">借金や不調は、選択と時間経過によって改善・悪化します。</div>`;modal.appendChild(box)};
+})();
+</script>
+
+
+<style>
+/* v8.44 TOGEMARU compact dashboard */
+#togeModal{padding:10px!important;max-height:88vh;overflow-y:auto}
+#togeModal h2{font-size:1.08rem!important;margin:4px 0 8px!important}
+#togeModal .sub{font-size:.62rem;letter-spacing:.08em}
+#togeModal .toge-hero{padding:8px;gap:9px}
+#togeModal .toge-mark{width:48px;height:48px;font-size:1.8rem;border-radius:12px}
+#togeModal .toge-card{padding:8px;margin:5px 0;border-radius:9px}
+#togeModal .toge-statgrid{gap:4px!important;margin-top:5px!important}
+#togeModal .toge-stat{padding:5px 7px;font-size:.68rem}
+#togeModal .toge-stat b{font-size:.88rem}
+#togeModal .toge-actions{gap:5px!important;margin-top:5px!important}
+#togeModal .toge-actions button{min-height:40px;padding:6px 8px;font-size:.78rem;line-height:1.25}
+#togeModal .choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+#togeModal .choices button{padding:7px!important;min-width:0;text-align:left;font-size:.76rem;line-height:1.25}
+#togeModal .choices button .toge-muted{display:none}
+#togeModal select{font-size:.82rem}
+#togeModal .toge-log{max-height:15vh}
+#togeModal .toge-compact-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+#togeModal .toge-compact-chip{background:#202938;border:1px solid #515a6b;border-radius:8px;padding:6px;font-size:.72rem}
+#togeModal .toge-compact-chip b{color:#f0d99d}
+#togeModal .toge-quest{border-color:#9b8258;background:linear-gradient(130deg,#353346,#293443)}
+#togeModal .toge-questline{font-size:.74rem;margin:4px 0;color:#e4e0d7}
+#togeModal .toge-questline.done{color:#b8e3b6}
+#togeModal .toge-progress{height:5px;background:#171e2a;border-radius:8px;overflow:hidden;margin-top:3px}
+#togeModal .toge-progress i{display:block;height:100%;background:#c7a66c}
+@media(max-width:380px){#togeModal{padding:7px!important}#togeModal .choices{grid-template-columns:1fr}#togeModal .toge-actions button{font-size:.73rem}}
+</style>
+<script>
+// v8.44 TOGEMARU GAMEPLAY — compact UI, rotating objectives, exploration rewards
+(function(){
+ 'use strict';
+ const KEY='bakeTogemaruStoryV1', META='bakeTogemaruMetaV1';
+ const $=id=>document.getElementById(id);
+ const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){return {}}};
+ const metaRead=()=>{try{return JSON.parse(localStorage.getItem(META)||'{}')}catch(e){return {}}};
+ const metaSave=x=>{try{localStorage.setItem(META,JSON.stringify(x))}catch(e){}};
+ const goals=[
+  {id:'wander',name:'あちこち見て回ろう',desc:'異なる場所を3か所訪れる',test:s=>(s.visited||[]).length>=3,progress:s=>Math.min(3,(s.visited||[]).length),max:3},
+  {id:'curious',name:'気になるものを調べよう',desc:'探索を5回行う',test:s=>(s.discoveryCount||0)>=5,progress:s=>Math.min(5,s.discoveryCount||0),max:5},
+  {id:'friends',name:'顔見知りを増やそう',desc:'3人と交流する',test:s=>Object.values(s.relations||{}).filter(r=>(r.meetings||0)>0).length>=3,progress:s=>Math.min(3,Object.values(s.relations||{}).filter(r=>(r.meetings||0)>0).length),max:3},
+  {id:'mischief',name:'ちょっとした騒ぎを起こそう',desc:'いたずら度を70以上にする',test:s=>(s.stats?.mischief||0)>=70,progress:s=>Math.min(70,s.stats?.mischief||0),max:70},
+  {id:'calm',name:'のんびり過ごそう',desc:'疲労を20以下にして満足度70以上',test:s=>(s.stats?.fatigue||0)<=20&&(s.stats?.satisfaction||0)>=70,progress:s=>(s.stats?.fatigue||0)<=20?70:Math.max(0,70-(s.stats?.fatigue||0)),max:70}
+ ];
+ function currentGoal(s,m){let idx=Number.isInteger(m.goalIndex)?m.goalIndex:0;let g=goals[idx%goals.length];if(g.test(s)){m.completed=m.completed||[];if(!m.completed.includes(g.id))m.completed.push(g.id);m.points=(m.points||0)+1;m.goalIndex=(idx+1)%goals.length;g=goals[m.goalIndex];metaSave(m)}return g}
+ function inject(){const root=$('togeModal');if(!root||root.dataset.v844)return;root.dataset.v844='1';
+  const s=read(),m=metaRead(),g=currentGoal(s,m),v=Math.min(g.max,g.progress(s));
+  const hero=root.querySelector('.toge-hero');
+  if(hero){const stats=hero.querySelector('div:last-child');if(stats){const small=document.createElement('div');small.className='toge-muted';small.textContent=`探索手帳ポイント ${m.points||0} pt ・ 訪問 ${Math.max(0,(s.visited||[]).length)}か所`;stats.appendChild(small)}}
+  const panel=document.createElement('div');panel.className='toge-card toge-quest';panel.innerHTML=`<b>今回の気まぐれ目標</b><div class="toge-questline">${g.name} — ${g.desc}</div><div class="toge-progress"><i style="width:${Math.round(v/g.max*100)}%"></i></div><div class="toge-muted" style="margin-top:3px">進捗 ${v}/${g.max}　／　達成で手帳ポイント +1</div><div class="toge-compact-row" style="margin-top:6px"><div class="toge-compact-chip">訪問 <b>${(s.visited||[]).length}</b> / 6</div><div class="toge-compact-chip">発見 <b>${s.discoveryCount||0}</b> 回</div></div>`;
+  const stats=root.querySelector('.toge-statgrid')?.closest('.toge-card');if(stats)stats.after(panel);else hero?.after(panel);
+  // Reduce visual noise in the long location list; keep location names visible.
+  const areaCard=[...root.querySelectorAll('.toge-card')].find(x=>x.textContent.includes('移動できる場所'));
+  if(areaCard){const buttons=areaCard.querySelectorAll('.choices button');buttons.forEach((b,i)=>{if(i>2)b.title=b.textContent.trim()})}
+ }
+ const mo=new MutationObserver(()=>{const r=$('togeModal');if(r&&!r.dataset.v844)inject()});
+ const start=()=>{const target=$('modal');if(target)mo.observe(target,{childList:true,subtree:true});inject()};
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
+ // Keep objective progress in sync when the base game redraws the screen.
+ const oldOpen=window.openTogemaruMode;
+ if(oldOpen)window.openTogemaruMode=function(){oldOpen();setTimeout(inject,0)};
+ const oldAct=window.togeAct;
+ if(oldAct)window.togeAct=function(kind){oldAct(kind);const s=read(),m=metaRead();currentGoal(s,m);metaSave(m);setTimeout(()=>{const r=$('togeModal');if(r)r.dataset.v844='';inject()},0)};
+ const oldMove=window.togeMove;
+ if(oldMove)window.togeMove=function(id){oldMove(id);const s=read(),m=metaRead();currentGoal(s,m);metaSave(m);setTimeout(()=>{const r=$('togeModal');if(r)r.dataset.v844='';inject()},0)};
 })();
 </script>
 

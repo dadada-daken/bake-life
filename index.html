@@ -2559,8 +2559,8 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  'use strict';
  const KEY='bakeTogemaruStoryV1', META='bakeTogemaruMetaV1';
  const $=id=>document.getElementById(id);
- document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.45';
- const setFooter=()=>{const f=document.querySelector('footer');if(f)f.textContent='BAKE LIFE v8.45 — TOGEMARU ISOLATION & UI FIX';};
+ document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.46';
+ const setFooter=()=>{const f=document.querySelector('footer');if(f)f.textContent='BAKE LIFE v8.46 — TOGEMARU ISOLATION & UI FIX';};
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setFooter);else setFooter();
  const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){return {}}};
  const metaRead=()=>{try{return JSON.parse(localStorage.getItem(META)||'{}')}catch(e){return {}}};
@@ -2593,6 +2593,54 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  if(oldAct)window.togeAct=function(kind){oldAct(kind);const s=read(),m=metaRead();currentGoal(s,m);metaSave(m);setTimeout(()=>{const r=$('togeModal');if(r)r.dataset.v844='';inject()},0)};
  const oldMove=window.togeMove;
  if(oldMove)window.togeMove=function(id){oldMove(id);const s=read(),m=metaRead();currentGoal(s,m);metaSave(m);setTimeout(()=>{const r=$('togeModal');if(r)r.dataset.v844='';inject()},0)};
+})();
+</script>
+
+
+<script>
+// v8.46: prevent base-game event overlays from interrupting the independent Togemaru story.
+(function(){
+ 'use strict';
+ let active=false, previousModalHTML='', previousOverlayDisplay='', previousPaused=true;
+ const modal=()=>document.getElementById('modal');
+ const overlay=()=>document.getElementById('overlay');
+ const oldOpen=window.openTogemaruMode;
+ if(typeof oldOpen==='function')window.openTogemaruMode=function(){
+   // Do not replace an unresolved main-game decision with the extra-story screen.
+   if(typeof decision!=='undefined'&&decision){return;}
+   if(!active){
+     active=true;window.__togeModeActive=true;
+     const m=modal(),o=overlay();
+     previousModalHTML=m?m.innerHTML:'';
+     previousOverlayDisplay=o?o.style.display:'';
+     previousPaused=!!paused;
+     paused=true;
+     if(typeof smallTimer!=='undefined'&&smallTimer){clearInterval(smallTimer);smallTimer=null;}
+     if(typeof autoTimer!=='undefined'&&autoTimer){clearTimeout(autoTimer);autoTimer=null;}
+   }
+   return oldOpen.apply(this,arguments);
+ };
+ const oldClose=window.closeTogemaruMode;
+ if(typeof oldClose==='function')window.closeTogemaruMode=function(){
+   // Save and close the extra story first.
+   oldClose.apply(this,arguments);
+   active=false;window.__togeModeActive=false;
+   const m=modal(),o=overlay();
+   if(m)m.innerHTML=previousModalHTML;
+   if(o)o.style.display=previousOverlayDisplay==='grid'?'grid':'none';
+   paused=previousPaused;
+   if(typeof syncPauseButtons==='function')syncPauseButtons();
+   if(typeof startClock==='function')startClock();
+   if(typeof render==='function'&&(!decision))render();
+ };
+ // Catch event-producing entry points as well as the regular seasonal tick.
+ for(const name of ['smallDecision','showDecision','openDecision','presentDecision']){
+   const fn=window[name];
+   if(typeof fn==='function')window[name]=function(){if(active||window.__togeModeActive)return;return fn.apply(this,arguments)};
+ }
+ // Keep the global state flag authoritative even if another extension wraps the launcher.
+ const priorAct=window.togeAct;
+ if(typeof priorAct==='function')window.togeAct=function(){return priorAct.apply(this,arguments)};
 })();
 </script>
 
@@ -2647,7 +2695,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
 
 
 <style id="toge-v845-ui">
-/* v8.45: main-game-like status bars and compact command controls */
+/* v8.46: main-game-like status bars and compact command controls */
 #togeModal .toge-statgrid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:5px!important}
 #togeModal .toge-stat{position:relative;min-width:0;padding:6px 8px 10px!important;background:#252d3c;border:1px solid #465064;border-radius:7px;font-size:.72rem!important;line-height:1.2}
 #togeModal .toge-stat b{display:inline!important;float:right;font-size:.78rem!important;color:#f0d99d;white-space:nowrap}
@@ -2665,7 +2713,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
 @media(max-width:380px){#togeModal .toge-statgrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}#togeModal .toge-actions{grid-template-columns:repeat(3,minmax(0,1fr))!important}#togeModal .toge-actions button{font-size:.64rem!important;min-height:31px!important}}
 </style>
 <script>
-// v8.45 TOGEMARU ISOLATION + UI FIX
+// v8.46 TOGEMARU ISOLATION + UI FIX
 (function(){
  'use strict';
  const $=id=>document.getElementById(id);
@@ -2728,7 +2776,6 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  for(const name of ['togeAct','togeMove','togeSelectPerson','togeSetAutonomy','togeSetForm']){
   const old=window[name];if(typeof old==='function')window[name]=function(){const out=old.apply(this,arguments);scheduleDecorate();return out};
  }
- const modal=$('modal');
- if(modal&&typeof MutationObserver!=='undefined')new MutationObserver(()=>{if(active)scheduleDecorate()}).observe(modal,{childList:true,subtree:true});
+ // Deliberately no MutationObserver here: decorate() mutates the modal and would retrigger itself indefinitely.
 })();
 </script>

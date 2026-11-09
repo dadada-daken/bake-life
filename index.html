@@ -2452,3 +2452,49 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','è
 
 </body>
 </html>
+
+<style>
+/* v8.42 TOGEMARU MOBILE-FIRST LAYOUT */
+.modal:has(#togeModal){width:min(760px,100%);max-width:760px;max-height:min(92dvh,920px);padding:16px;overflow-y:auto;overscroll-behavior:contain;box-sizing:border-box}
+#togeModal{width:100%;min-width:0;box-sizing:border-box;overflow-wrap:anywhere}
+#togeModal h2{font-size:clamp(1.05rem,3.5vw,1.45rem);line-height:1.25;margin:4px 42px 10px 0}
+#togeModal .toge-card{min-width:0;margin:6px 0;padding:9px}
+#togeModal .toge-hero{min-width:0;padding:9px;gap:9px}
+#togeModal .toge-statgrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+#togeModal .toge-stat{min-width:0;padding:7px}
+#togeModal .toge-actions{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+#togeModal .choices{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+#togeModal button{min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere;line-height:1.25;min-height:42px}
+#togeModal .toge-log{max-height:18vh;overflow-y:auto;overscroll-behavior:contain}
+#togeModal .modal-close{position:sticky;top:0;z-index:5;float:right;margin:0 0 2px 8px}
+@media(max-width:600px){
+ .overlay:has(#togeModal){padding:calc(4px + env(safe-area-inset-top)) 5px calc(4px + env(safe-area-inset-bottom));place-items:center}
+ .modal:has(#togeModal){width:100%;max-width:none;max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 8px);padding:10px;border-radius:13px}
+ #togeModal h2{font-size:1.08rem;margin-bottom:7px}
+ #togeModal .sub{font-size:.65rem;letter-spacing:.04em}
+ #togeModal .toge-hero{padding:8px;gap:8px}
+ #togeModal .toge-mark{width:48px;height:48px;border-radius:12px;font-size:1.8rem}
+ #togeModal .toge-card{padding:8px;margin:5px 0;border-radius:9px}
+ #togeModal .toge-statgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+ #togeModal .toge-stat{font-size:.7rem;padding:6px}
+ #togeModal .toge-stat b{font-size:.9rem}
+ #togeModal .toge-actions{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+ #togeModal .choices{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+ #togeModal .choices button,#togeModal .toge-actions button{font-size:.76rem;padding:7px 6px;min-height:44px}
+ #togeModal .toge-muted{font-size:.69rem;line-height:1.35}
+ #togeModal .controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+ #togeModal .controls button{font-size:.74rem;min-height:42px;padding:6px}
+ #togeModal select{font-size:16px!important;max-width:100%;box-sizing:border-box}
+ #togeModal .toge-log{max-height:15vh}
+}
+@media(max-width:360px){
+ #togeModal .choices{grid-template-columns:1fr}
+ #togeModal .toge-actions{grid-template-columns:1fr 1fr}
+ #togeModal .toge-mark{width:42px;height:42px;font-size:1.55rem}
+}
+@media(max-height:700px) and (max-width:600px){
+ .modal:has(#togeModal){max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 6px)}
+ #togeModal .toge-card{padding:6px;margin:4px 0}
+ #togeModal .toge-log{max-height:12vh}
+}
+</style>

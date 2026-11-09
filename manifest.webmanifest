@@ -1,0 +1,16 @@
+{
+  "name": "BAKE LIFE — PANIS ET CALAMITAS",
+  "short_name": "BAKE LIFE",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f4f5f8",
+  "theme_color": "#f4f5f8",
+  "icons": [
+    {
+      "src": "./icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

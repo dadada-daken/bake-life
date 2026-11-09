@@ -246,7 +246,7 @@ main{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 24px)}
  <div class="sub" style="margin-top:9px">※ゲームはこのブラウザ内で動作します。人生の記録と称号は自動保存されます。</div>
 </section>
 </main>
-<footer>BAKE LIFE v8.32 — YEARLY RELATIONSHIP FIX</footer>
+<footer>BAKE LIFE v8.33 — WORLD CHRONICLE</footer>
 <button id="pauseQuickBtn" class="pause-quick" onclick="togglePause()" aria-label="一時停止または再開">Ⅱ 一時停止</button>
 <nav id="v8Nav" aria-label="メインメニュー"><button onclick="scrollToPanel(0)"><span>🍪</span><span>人生</span></button><button onclick="scrollToLog()"><span>📖</span><span>記録</span></button><button onclick="showCollection()"><span>🏅</span><span>称号</span></button><button onclick="showRegionInfo()"><span>🗺️</span><span>地域</span></button><button onclick="showMoreMenu()"><span>☰</span><span>その他</span></button></nav>
 <div class="overlay" id="overlay"><div class="modal" id="modal"></div></div><input id="importSaveFile" type="file" accept="application/json,.json" hidden>
@@ -1932,7 +1932,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  ];
  for(const def of newTitles)if(!titleDefs.some(x=>x[0]===def[0]))titleDefs.push(def);
  // Version marker for exports and visible footer.
- const foot=document.querySelector('footer');if(foot)foot.textContent='BAKE LIFE v8.32 — YEARLY RELATIONSHIP FIX';
+ const foot=document.querySelector('footer');if(foot)foot.textContent='BAKE LIFE v8.33 — WORLD CHRONICLE';
  const originalExport=exportSave;
  exportSave=function(){const data={version:8.28,current:p,deathCauses:JSON.parse(storage.get('bakeDeathCauses','[]')),titles:JSON.parse(storage.get('bakeTitles','[]')),lives:JSON.parse(storage.get('bakeLives','[]')),ascendedLives:JSON.parse(storage.get('bakeAscendedLives','[]')),secretMeta:JSON.parse(storage.get('bakeSecretMeta','{}')),relationshipSchema:VERSION};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.28.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)};
 })();
@@ -2055,12 +2055,109 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
   }
  }
  const oldTick=seasonTick;
- seasonTick=function(){oldTick();if(!p||p.dead)return;try{initWork();if(!decision)familyDeepTick();if(!decision)workTick();}catch(e){console.error('v8.32 extension',e)}};
+ seasonTick=function(){oldTick();if(!p||p.dead)return;try{initWork();if(!decision)familyDeepTick();if(!decision)workTick();}catch(e){console.error('v8.33 extension',e)}};
  const oldWorkInfo=showWorkInfo;
  showWorkInfo=function(){if(!p)return oldWorkInfo();initWork();oldWorkInfo();const modal=$('modal');if(!modal)return;const extra=document.createElement('section');extra.className='entry';extra.innerHTML=`<h3>業務記録・v8.32</h3><p>便利屋任務の受注：${p.missionsAccepted}件 / 完了：${p.missionsCompleted}件 / 失敗：${p.missionsFailed}件</p><p>便利屋への発注：${p.clientRequests}件 / 異端審問官の間引き任務：${p.inquisitorCulls}回 / 悪魔連戦突破：${p.demonWavesCleared}回</p><p class="sub">便利屋以外の職業では任務を受注できません。その他の職業では便利屋を雇う依頼イベントが発生します。異端審問官は専用の連続戦闘任務を受けます。</p>${(p.missionHistory||[]).slice(0,8).map(m=>`<div class="sub">${m.year||p.year}年 / ${m.age??p.age}歳 — ${String(m.title).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}：${m.success?'成功':'失敗・辞退'}</div>`).join('')}`;modal.appendChild(extra)};
  document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.32';
- const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.32 — YEARLY RELATIONSHIP FIX';
+ const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.33 — WORLD CHRONICLE';
  if(typeof exportSave==='function'){const prevExport=exportSave;exportSave=function(){const oldCreate=URL.createObjectURL;const oldClick=HTMLAnchorElement.prototype.click;try{const data={version:8.32,current:p,deathCauses:JSON.parse(storage.get('bakeDeathCauses','[]')),titles:JSON.parse(storage.get('bakeTitles','[]')),lives:JSON.parse(storage.get('bakeLives','[]')),ascendedLives:JSON.parse(storage.get('bakeAscendedLives','[]')),secretMeta:JSON.parse(storage.get('bakeSecretMeta','{}')),workSchema:1,relationshipSchema:2};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.32.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}catch(e){prevExport()}}}
+})();
+
+</script>
+<script>
+(function(){
+ 'use strict';
+ const WORLD_KEY='bakeWorldChronicleV1';
+ const safeParse=(raw,fallback)=>{try{return JSON.parse(raw)||fallback}catch(e){return fallback}};
+ const world=()=>{let w=safeParse(storage.get(WORLD_KEY,'{}'),{});if(!w||typeof w!=='object')w={};w.history=Array.isArray(w.history)?w.history:[];w.metrics={technology:50,economy:50,faith:50,security:50,boundary:10,...(w.metrics||{})};return w};
+ const saveWorld=w=>storage.set(WORLD_KEY,JSON.stringify(w));
+ const cap=(v)=>Math.max(0,Math.min(100,Number(v)||0));
+ const hobbyList=[
+  {id:'music',name:'音楽',desc:'演奏や歌、作曲を楽しむ。',stat:'skill',bonus:1},
+  {id:'reading',name:'読書',desc:'物語や学術書を読み、知識を蓄える。',stat:'knowledge',bonus:1},
+  {id:'cooking',name:'料理',desc:'新しい菓子や料理を作る。',stat:'skill',bonus:1},
+  {id:'craft',name:'ものづくり',desc:'道具や装飾品、機械を作る。',stat:'skill',bonus:1},
+  {id:'gardening',name:'園芸',desc:'植物を育て、季節の移り変わりを楽しむ。',stat:'happiness',bonus:1},
+  {id:'travel',name:'旅行',desc:'知らない土地を訪れ、見聞を広げる。',stat:'social',bonus:1},
+  {id:'collect',name:'収集',desc:'珍しい品や記念品を集める。',stat:'knowledge',bonus:1},
+  {id:'sports',name:'運動',desc:'身体を動かし、健康を保つ。',stat:'health',bonus:1},
+  {id:'games',name:'遊戯',desc:'ボードゲームや電子遊戯に没頭する。',stat:'mind',bonus:1},
+  {id:'faith',name:'信仰・祈り',desc:'祈りや儀礼を通じて心を整える。',stat:'mind',bonus:1}
+ ];
+ function worldEra(w){const m=w.metrics;if(m.boundary>=65)return '境界侵食期';if(m.economy<=28)return '長期不況期';if(m.security<=25)return '不安定・紛争期';if(m.technology>=72)return '技術革新期';if(m.faith>=72)return '信仰隆盛期';if(m.economy>=72&&m.security>=55)return '繁栄期';return '緩やかな変動期'}
+ function addWorldRecord(title,detail,kind='event'){
+  const w=world();const rec={year:p?.year||0,age:p?.age||0,life:p?.name||'不明',place:p?.place||'不明',title,detail,kind};
+  w.history.unshift(rec);w.history.sort((a,b)=>(Number(b.year)||0)-(Number(a.year)||0));w.history=w.history.slice(0,240);w.era=worldEra(w);saveWorld(w);
+  p.worldHistory=Array.isArray(p.worldHistory)?p.worldHistory:[];p.worldHistory.unshift({year:rec.year,age:rec.age,title,detail,kind});p.worldHistory=p.worldHistory.slice(0,80);
+ }
+ function pushChronicleEvent(){
+  if(!p||p.dead||p.afterlife||p.specialLife)return;
+  p.worldChronicleProcessedYear=Number(p.worldChronicleProcessedYear)||Number(p.year)-1;
+  if(p.worldChronicleProcessedYear===p.year)return;
+  p.worldChronicleProcessedYear=p.year;
+  if(Math.random()>.075)return;
+  const r=p.regionState||(p.regionState={economy:50,security:50,healthcare:50,technology:50,prosperity:50,disaster:0});
+  const pool=[
+   {title:'新技術の発表',detail:'研究機関から、生活や産業を変える新技術が発表された。',metric:'technology',delta:4,local:'technology',ld:5,opts:['新技術を学ぶ','慎重に様子を見る','距離を置く'],fx:[()=>{p.knowledge=cap(p.knowledge+5);p.skill=cap(p.skill+2);p.stress=cap(p.stress+2)},()=>{p.mind=cap(p.mind+2)},()=>{p.happiness=cap(p.happiness-1)}]},
+   {title:'景気後退',detail:'市場が冷え込み、商店や工房の閉鎖が相次いでいる。',metric:'economy',delta:-5,local:'economy',ld:-7,opts:['支出を切り詰める','地域の商店を支援する（10G）','新しい仕事を探す'],fx:[()=>{p.money=Math.max(0,p.money-5);p.stress=cap(p.stress+3)},()=>{if(p.money>=10){p.money-=10;p.helped=(p.helped||0)+1;r.prosperity=cap(r.prosperity+2)}else{p.stress=cap(p.stress+2);log('支援する余裕はなかった。','bad')}},()=>{p.skill=cap(p.skill+2);p.stress=cap(p.stress+2)}]},
+   {title:'地域の復興',detail:'住民や職人たちの協力で、荒れていた地域の復興が進み始めた。',metric:'economy',delta:3,local:'prosperity',ld:6,opts:['復興作業に参加する','寄付をする（15G）','見守る'],fx:[()=>{p.helped=(p.helped||0)+2;p.skill=cap(p.skill+2);p.stress=cap(p.stress+2)},()=>{if(p.money>=15){p.money-=15;p.fame=(p.fame||0)+1;p.happiness=cap(p.happiness+2)}else{p.happiness=cap(p.happiness-1);log('寄付をするには所持金が足りなかった。','bad')}},()=>{p.knowledge=cap(p.knowledge+1)}]},
+   {title:'治安の悪化',detail:'犯罪組織や武装集団の活動が目立ち、夜間の外出を控える住民が増えた。',metric:'security',delta:-6,local:'security',ld:-8,opts:['自衛手段を整える','地域の見回りに協力する','しばらく外出を控える'],fx:[()=>{p.skill=cap(p.skill+2);p.money=Math.max(0,p.money-5)},()=>{p.helped=(p.helped||0)+1;p.social=cap(p.social+2);p.health=cap(p.health-2)},()=>{p.stress=cap(p.stress-2);p.social=cap(p.social-1)}]},
+   {title:'信仰の隆盛',detail:'グロリア聖糖信仰を中心に、巡礼や地域の祭礼が盛んになっている。',metric:'faith',delta:5,local:'prosperity',ld:2,opts:['祭礼に参加する','信仰について学ぶ','距離を置く'],fx:[()=>{p.happiness=cap(p.happiness+4);p.social=cap(p.social+2)},()=>{p.knowledge=cap(p.knowledge+4);p.faith=p.faith||{level:0};p.faith.level=cap((p.faith.level||0)+4)},()=>{p.mind=cap(p.mind+1)}]},
+   {title:'境界点の異常拡大',detail:'地図にない道や建物が現れ、住民の記憶と公的記録に食い違いが生じている。',metric:'boundary',delta:8,local:'disaster',ld:8,opts:['調査に協力する','避難する','関わらない'],fx:[()=>{p.boundaryResearch=(p.boundaryResearch||0)+1;p.knowledge=cap(p.knowledge+5);p.stress=cap(p.stress+5)},()=>{p.boundaryEscapes=(p.boundaryEscapes||0)+1;p.money=Math.max(0,p.money-8);p.health=cap(p.health+2)},()=>{p.stress=cap(p.stress+2)}]},
+   {title:'バロック集団発生',detail:'複数の地域で原因不明の変異が報告され、医療機関と行政が対応に追われている。',metric:'security',delta:-3,local:'healthcare',ld:-5,opts:['支援活動に参加する','情報を集める','自分と家族を守る'],fx:[()=>{p.helped=(p.helped||0)+2;p.stress=cap(p.stress+5);p.baroqueRisk=cap((p.baroqueRisk||0)+2)},()=>{p.knowledge=cap(p.knowledge+4);p.stress=cap(p.stress+2)},()=>{p.money=Math.max(0,p.money-4);p.stress=cap(p.stress-3)}]},
+   {title:'大規模災害',detail:'広い範囲で災害が発生した。交通や物流が止まり、復旧には長い時間がかかりそうだ。',metric:'economy',delta:-4,local:'disaster',ld:12,opts:['避難・救助を優先する','物資を確保する','復旧作業に加わる'],fx:[()=>{p.health=cap(p.health-3);p.helped=(p.helped||0)+2},()=>{p.money=Math.max(0,p.money-8);p.stress=cap(p.stress-1)},()=>{p.skill=cap(p.skill+3);p.health=cap(p.health-4);p.helped=(p.helped||0)+1}]}
+  ];
+  let ev=pool[Math.floor(Math.random()*pool.length)];
+  // 既存の世界情勢に応じて、関連事件が少し起こりやすくなる。
+  if((p.layer==='境界点'||(r.disaster||0)>55)&&Math.random()<.55)ev=pool[5];
+  if((r.economy||50)<30&&Math.random()<.55)ev=pool[1];
+  const w=world();w.metrics[ev.metric]=cap(w.metrics[ev.metric]+ev.delta);r[ev.local]=cap((r[ev.local]||50)+ev.ld);r.prosperity=cap((r.prosperity||50)+(ev.local==='prosperity'?0:-1));saveWorld(w);
+  addWorldRecord(ev.title,ev.detail,'world');
+  p.regionHistory=Array.isArray(p.regionHistory)?p.regionHistory:[];p.regionHistory.unshift({age:p.age,place:p.place,event:ev.title,year:p.year});p.regionHistory=p.regionHistory.slice(0,60);
+  try{const key='bakeRegionalChronicle';const all=safeParse(storage.get(key,'{}'),{});const place=p.place||'不明';all[place]=all[place]||{events:[],state:{}};all[place].state={...(p.regionState||{})};all[place].events.unshift({name:ev.title,age:p.age,year:p.year,life:p.name});all[place].events=all[place].events.slice(0,30);storage.set(key,JSON.stringify(all))}catch(e){}
+  if(!decision){smallDecision('WORLD CHRONICLE / '+ev.title,ev.detail+' この出来事は地域の情勢だけでなく、あなたの人生にも影響するかもしれない。',ev.opts,ev.fx)}
+  else {log(`【世界史】${ev.title}。${ev.detail}`,'event')}
+  const updated=world();updated.era=worldEra(updated);saveWorld(updated);
+ }
+ function hobbyTick(){
+  if(!p||p.dead||p.afterlife||p.specialLife)return;
+  p.hobbySeasonCounter=(p.hobbySeasonCounter||0)+1;
+  if(p.hobby){const h=hobbyList.find(x=>x.id===p.hobby);if(h&&p.seasonIndex===0){p[h.stat]=cap((p[h.stat]||0)+h.bonus);p.hobbyYears=(p.hobbyYears||0)+1;}}
+  if(!p.hobby||decision||p.hobbySeasonCounter-(p.lastHobbyEventSeason||0)<5||Math.random()>.24)return;
+  p.lastHobbyEventSeason=p.hobbySeasonCounter;const h=hobbyList.find(x=>x.id===p.hobby);if(!h)return;
+  const opts=['時間をかけて取り組む','誰かと一緒に楽しむ','今日は休む'];
+  smallDecision(`趣味の時間：${h.name}`,`${h.desc} 最近、少しずつ上達や新しい出会いを感じている。どう過ごそう？`,opts,[()=>{p[h.stat]=cap((p[h.stat]||0)+3);p.stress=cap(p.stress-2);p.hobbyPractice=(p.hobbyPractice||0)+1;addLog(`${h.name}にじっくり取り組んだ。`,'good')},()=>{p.social=cap(p.social+2);p.happiness=cap(p.happiness+3);p.friends=(p.friends||0)+1;p.hobbyConnections=(p.hobbyConnections||0)+1;addLog(`${h.name}を通じて誰かと交流した。`,'good')},()=>{p.health=cap(p.health+1);p.stress=cap(p.stress-3);addLog('趣味から少し離れ、休息を取った。','event')}]);
+ }
+ function showHobbyMenu(){
+  if(!p){showModal('趣味・余暇','人生を開始すると趣味を選べます。',['閉じる'],[()=>{}],false);return;}
+  const current=hobbyList.find(h=>h.id===p.hobby);
+  showModal('HOBBY / 趣味・余暇',`現在の趣味：${current?current.name:'未設定'}\n趣味は季節ごとのイベントや、毎年の小さな能力成長につながります。`,hobbyList.map(h=>h.name).concat(['趣味を持たない','戻る']),hobbyList.map(h=>()=>{p.hobby=h.id;p.hobbyStartedYear=p.year;addLog(`新しい趣味として「${h.name}」を始めた。`,'good');showHobbyMenu()}).concat([()=>{p.hobby=null;addLog('特定の趣味を持たずに過ごすことにした。','event');showHobbyMenu()},()=>showMoreMenu()]),false);
+ }
+ function showWorldChronicle(){
+  const w=world();const metrics=[['技術水準',w.metrics.technology],['経済',w.metrics.economy],['信仰',w.metrics.faith],['治安',w.metrics.security],['境界異常',w.metrics.boundary]];
+  $('overlay').style.display='grid';$('modal').innerHTML=`<button class="modal-close" onclick="closeV8Modal()">×</button><h2>WORLD CHRONICLE / 世界史年表</h2><section class="entry"><b>現在の時代：${escapeHtml(w.era||worldEra(w))}</b><div class="sub">世界史に記録された出来事：${w.history.length}件</div></section><div class="info-grid">${metrics.map(([k,v])=>`<div class="info-card"><small>${k}</small><b>${Math.round(v)}/100</b></div>`).join('')}</div><h3>世界の歴史</h3>${w.history.slice(0,80).map(x=>`<div class="entry ${x.kind==='world'?'event':''}"><b>${escapeHtml(x.year)}年：${escapeHtml(x.title)}</b><div class="sub">${escapeHtml(x.life)} / ${escapeHtml(x.place)}</div><div>${escapeHtml(x.detail)}</div></div>`).join('')||'<p class="sub">まだ歴史的な出来事は記録されていません。</p>'}<h3>この人生の記録</h3>${(p?.worldHistory||[]).slice(0,30).map(x=>`<div class="sub">${x.year}年 / ${x.age}歳 — ${escapeHtml(x.title)}</div>`).join('')||'<p class="sub">この人生にはまだ世界史の記録がありません。</p>'}`;
+ }
+ function showFamilyTree(){
+  if(!p){showModal('家系図','人生を開始すると家族の記録が表示されます。',['閉じる'],[()=>{}],false);return;}
+  const children=Array.isArray(p.childrenRecords)?p.childrenRecords:[];const partner=(p.npcRelations||[]).find(n=>n.npcId===(p.partnerId||p.romancePartnerId));
+  $('overlay').style.display='grid';$('modal').innerHTML=`<button class="modal-close" onclick="closeV8Modal()">×</button><h2>FAMILY TREE / 家系・次世代</h2><section class="entry"><b>${escapeHtml(p.name)}</b><div class="sub">${p.age}歳 / ${escapeHtml(p.family||'家族情報なし')} / ${p.married?'既婚':p.relationshipStatus==='widowed'?'死別':'未婚・その他'}</div></section>${partner?`<div class="entry">伴侶：${escapeHtml(partner.name)}（${partner.alive===false?'故人':'存命'}・${partner.age??'?'}歳）</div>`:''}<h3>子ども（第1世代）</h3>${children.map(c=>`<details class="person-row"><summary>${escapeHtml(c.name)} — ${c.age}歳 / ${c.alive===false?'故人':'存命'}</summary><div class="sub">${escapeHtml(c.job||'子ども')} / ${escapeHtml(c.location||'居住地不明')}<br>子ども：${c.children||0}人<br>${(c.history||[]).slice(-8).reverse().map(x=>`${x.age}歳：${escapeHtml(x.event)}`).join('<br>')}</div></details>`).join('')||'<p class="sub">まだ子どもはいません。</p>'}<section class="entry"><b>次世代の記録</b><div class="sub">孫：${p.grandchildCount||0}人（子どもからの報告ベース） / 家族支援：${p.familySupport||0}回</div><div class="sub">家族の出来事：${(p.familyHistory||[]).length}件</div></section><h3>遺言・相続方針</h3><p class="sub">${p.willRecipient?`希望する相続先：${escapeHtml(p.willRecipient)}`:'遺言はまだ設定されていません。'}</p><button onclick="openWillMenu()">遺言を設定する</button>`;
+ }
+ function openWillMenu(){if(!p)return;const opts=[];const fns=[];const spouse=(p.npcRelations||[]).find(n=>n.npcId===(p.partnerId||p.romancePartnerId)&&n.alive!==false);if(spouse){opts.push(`${spouse.name}に残す`);fns.push(()=>{p.willRecipient=spouse.name;p.willRecipientId=spouse.npcId;p.willSetYear=p.year;addLog(`${spouse.name}に財産や形見を残す遺言を記した。`,'event');showFamilyTree()})}for(const c of (p.childrenRecords||[]).filter(c=>c.alive!==false)){opts.push(`${c.name}に残す`);fns.push(()=>{p.willRecipient=c.name;p.willRecipientId=c.childId;p.willSetYear=p.year;addLog(`${c.name}に財産や形見を残す遺言を記した。`,'event');showFamilyTree()})}opts.push('地域や支援団体に寄付する','遺言を設定しない','戻る');fns.push(()=>{p.willRecipient='地域・支援団体';p.willRecipientId=null;p.willSetYear=p.year;addLog('財産を地域や支援団体に残す遺言を記した。','good');showFamilyTree()},()=>{p.willRecipient=null;p.willRecipientId=null;addLog('遺言を設定しないことにした。','event');showFamilyTree()},()=>showFamilyTree());showModal('遺言・相続','自分が亡くなった後、財産や形見を誰に託すか決めておける。これは記録上の希望であり、相続先のその後の人生を強制するものではない。',opts,fns,false)}
+ function showWorldMenu(){showModal('WORLD CHRONICLE','世界の変化と人生の記録を確認できます。',['世界史年表','趣味・余暇','家系図・遺言','戻る'],[()=>showWorldChronicle(),()=>showHobbyMenu(),()=>showFamilyTree(),()=>showMoreMenu()],false)}
+ // Make new records available through the existing menu without changing the mobile navigation layout.
+ const oldMore=showMoreMenu;showMoreMenu=function(){oldMore();const modal=$('modal');if(!modal)return;const box=document.createElement('section');box.className='entry';box.innerHTML='<b>WORLD CHRONICLE / 大型拡張</b><div class="controls" style="margin-top:8px"><button onclick="showWorldChronicle()">世界史年表</button><button onclick="showHobbyMenu()">趣味・余暇</button><button onclick="showFamilyTree()">家系図・遺言</button></div>';modal.appendChild(box)};
+ window.showWorldChronicle=showWorldChronicle;window.showHobbyMenu=showHobbyMenu;window.showFamilyTree=showFamilyTree;window.openWillMenu=openWillMenu;
+ const oldTick=seasonTick;
+ seasonTick=function(){const beforeYear=p?.year;oldTick();if(!p||p.dead)return;try{if(p.year!==beforeYear){pushChronicleEvent()}hobbyTick();if(p.year!==beforeYear&&p.age>=18&&!p.specialLife&&!decision&&Math.random()<.07){const candidates=(p.npcRelations||[]).filter(n=>n&&n.alive!==false&&!n.isChild&&n.relationshipStatus!=='separated'&&(p.age-(n.lastContactAge??0)>=5)&&((n.trust??(n.bond||0)*5)>=35));if(candidates.length){const n=candidates[Math.floor(Math.random()*candidates.length)];smallDecision('昔の知人との再会',`${n.name}と偶然再会した。以前より年を重ね、${n.location||'別の場所'}で暮らしているという。`,['近況を聞き、交流を再開する','短く挨拶して別れる','気づかないふりをする'],[()=>{n.trust=cap((n.trust??(n.bond||0)*5)+8);n.closeness=cap((n.closeness||0)+10);n.lastContactAge=p.age;n.lastContactYear=p.year;n.reunionCount=(n.reunionCount||0)+1;n.history=Array.isArray(n.history)?n.history:[];n.history.push({age:p.age,year:p.year,event:'久しぶりに再会した'});p.friends=(p.friends||0)+1;addLog(`${n.name}との交流が再び始まった。`,'good')},()=>{n.lastContactAge=p.age;n.lastContactYear=p.year;p.happiness=cap(p.happiness+1);addLog(`${n.name}と短く言葉を交わした。`,'event')},()=>{n.trust=cap((n.trust??0)-3);p.stress=cap(p.stress+1);addLog(`${n.name}とは言葉を交わさずに別れた。`,'event')}])}}}catch(e){console.error('WORLD CHRONICLE tick',e)}};
+ // Record the legacy/will outcome at death without changing the existing death mechanics.
+ const oldDie=die;die=function(cause){if(p&&!p.dead&&p.willRecipient){p.inheritanceRecord={recipient:p.willRecipient,recipientId:p.willRecipientId||null,year:p.year,age:p.age,amount:p.money||0};addWorldRecord('遺言が残された',`${p.name}は${p.willRecipient}に財産や形見を託す意思を記録していた。対象額：${p.money||0}G。`,'family')}return oldDie(cause)};
+ // Export the persistent world timeline alongside the normal save; old import remains compatible.
+ const oldExport=exportSave;exportSave=function(){try{const data={version:8.33,current:p,deathCauses:safeParse(storage.get('bakeDeathCauses','[]'),[]),titles:safeParse(storage.get('bakeTitles','[]'),[]),lives:safeParse(storage.get('bakeLives','[]'),[]),ascendedLives:safeParse(storage.get('bakeAscendedLives','[]'),[]),secretMeta:safeParse(storage.get('bakeSecretMeta','{}'),{}),eventDex:safeParse(storage.get('bakeEventDex','{}'),{}),legacyLedger:safeParse(storage.get('bakeLegacyLedger','[]'),[]),regionalChronicle:safeParse(storage.get('bakeRegionalChronicle','{}'),{}),worldChronicle:world()};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.33.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}catch(e){oldExport()}};
+ $('importSaveFile')?.addEventListener('change',async ev=>{const file=ev.target.files?.[0];if(!file)return;try{const data=JSON.parse(await file.text());if(data.worldChronicle&&typeof data.worldChronicle==='object'){const incoming=data.worldChronicle;incoming.history=Array.isArray(incoming.history)?incoming.history.slice(0,240):[];incoming.metrics={technology:50,economy:50,faith:50,security:50,boundary:10,...(incoming.metrics||{})};storage.set(WORLD_KEY,JSON.stringify(incoming))}}catch(e){console.warn('world chronicle import skipped',e)}});
+ // Keep the existing current-life state intact when loading a legacy file.
+ const oldMigrate=migrateV8State;migrateV8State=function(state){const s=oldMigrate(state);s.hobbySeasonCounter=Number(s.hobbySeasonCounter)||0;s.worldHistory=Array.isArray(s.worldHistory)?s.worldHistory:[];s.worldChronicleProcessedYear=Number.isFinite(Number(s.worldChronicleProcessedYear))?Number(s.worldChronicleProcessedYear):Number(s.year)||0;s.relationshipProcessedYear=Number.isFinite(Number(s.relationshipProcessedYear))?Number(s.relationshipProcessedYear):Number(s.year)||0;return s};
+ // Version labels.
+ document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.33';const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.33 — WORLD CHRONICLE';
 })();
 
 </script>

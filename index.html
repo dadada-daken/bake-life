@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>PANIS ET CALAMITAS — ベイク大陸ライフ v8.36</title>
+<title>PANIS ET CALAMITAS — ベイク大陸ライフ v8.43</title>
 <style>
 :root{--bg:#171923;--panel:#222635;--panel2:#2b3042;--ink:#f4f0e8;--muted:#aeb4c5;--gold:#e6c477;--green:#76c9a2;--red:#e58b8b;--line:#3b4257}
 *{box-sizing:border-box}body{margin:0;padding-bottom:env(safe-area-inset-bottom);background:radial-gradient(circle at top,#30364b,#171923 60%);color:var(--ink);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;line-height:1.55}
@@ -2060,7 +2060,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  seasonTick=function(){oldTick();if(!p||p.dead)return;try{initWork();if(!decision)familyDeepTick();if(!decision)workTick();}catch(e){console.error('v8.36 extension',e)}};
  const oldWorkInfo=showWorkInfo;
  showWorkInfo=function(){if(!p)return oldWorkInfo();initWork();oldWorkInfo();const modal=$('modal');if(!modal)return;const extra=document.createElement('section');extra.className='entry';extra.innerHTML=`<h3>業務記録・v8.36</h3><p>便利屋任務の受注：${p.missionsAccepted}件 / 完了：${p.missionsCompleted}件 / 失敗：${p.missionsFailed}件</p><p>便利屋への発注：${p.clientRequests}件 / 異端審問官の間引き任務：${p.inquisitorCulls}回 / 悪魔連戦突破：${p.demonWavesCleared}回</p><p class="sub">便利屋以外の職業では任務を受注できません。その他の職業では便利屋を雇う依頼イベントが発生します。異端審問官は専用の連続戦闘任務を受けます。</p>${(p.missionHistory||[]).slice(0,8).map(m=>`<div class="sub">${m.year||p.year}年 / ${m.age??p.age}歳 — ${String(m.title).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}：${m.success?'成功':'失敗・辞退'}</div>`).join('')}`;modal.appendChild(extra)};
- document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.36';
+ document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.43';
  const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.36 — WORLD CHRONICLE / BUGFIX';
  if(typeof exportSave==='function'){const prevExport=exportSave;exportSave=function(){const oldCreate=URL.createObjectURL;const oldClick=HTMLAnchorElement.prototype.click;try{const data={version:8.35,current:p,deathCauses:JSON.parse(storage.get('bakeDeathCauses','[]')),titles:JSON.parse(storage.get('bakeTitles','[]')),lives:JSON.parse(storage.get('bakeLives','[]')),ascendedLives:JSON.parse(storage.get('bakeAscendedLives','[]')),secretMeta:JSON.parse(storage.get('bakeSecretMeta','{}')),workSchema:1,relationshipSchema:2};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.36.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}catch(e){prevExport()}}}
 })();
@@ -2159,7 +2159,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  // Keep the existing current-life state intact when loading a legacy file.
  const oldMigrate=migrateV8State;migrateV8State=function(state){const s=oldMigrate(state);s.hobbySeasonCounter=Number(s.hobbySeasonCounter)||0;s.worldHistory=Array.isArray(s.worldHistory)?s.worldHistory:[];s.worldChronicleProcessedYear=Number.isFinite(Number(s.worldChronicleProcessedYear))?Number(s.worldChronicleProcessedYear):Number(s.year)||0;s.relationshipProcessedYear=Number.isFinite(Number(s.relationshipProcessedYear))?Number(s.relationshipProcessedYear):Number(s.year)||0;return s};
  // Version labels.
- document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.36';const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.36 — WORLD CHRONICLE / BUGFIX';
+ document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.43';const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.36 — WORLD CHRONICLE / BUGFIX';
 })();
 
 </script>
@@ -2218,7 +2218,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
   const oldTick=seasonTick;
   seasonTick=function(){oldTick();updateBoundaryArc();};
  }
- document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.36';
+ document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.43';
  const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.36 — WORLD CHRONICLE / BUGFIX';
 })();
 </script>
@@ -2252,7 +2252,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  window.jumpQualityAge=function(){if(!p||p.dead||decision)return;const target=Number(prompt('何歳まで進めますか？（最大50年先）',String(Math.min(100,(p.age||0)+5))));if(!Number.isFinite(target)||target<=p.age||target>p.age+50){alert('現在の年齢より先、かつ50年以内を指定してください。');return}const wasPaused=paused;clearInterval(timer);clearTimeout(autoTimer);paused=true;let guard=0;while(p&&!p.dead&&!decision&&p.age<target&&guard<200){seasonTick();guard++}render();syncPauseButtons?.();if(!p.dead&&!decision){paused=wasPaused;lastTick=Date.now();clockCarry=0;if(!paused)startClock()}else{paused=true;syncPauseButtons?.()}addLog(`年齢ジャンプを実行した。${target}歳を目標に進行し、${p.age}歳で停止した。`,'event')};
  const oldMore=showMoreMenu;showMoreMenu=function(){oldMore();const modal=$('modal');if(!modal)return;const box=document.createElement('section');box.className='entry';box.innerHTML='<b>LIFE QUALITY / 便利機能</b><div class="controls" style="margin-top:8px"><button onclick="showDetailedStatus()">詳細ステータス</button><button onclick="showLogSearch()">記録を検索</button><button onclick="showPeopleManager()">人物・お気に入り</button><button onclick="jumpQualityAge()">年齢ジャンプ</button><button onclick="showSaveSlots()">セーブスロット</button></div>';modal.appendChild(box)};
  const oldSettings=showSettings;showSettings=function(){oldSettings();const m=$('modal');if(m&&!m.querySelector('[data-quality-slot]')){const b=document.createElement('button');b.textContent='セーブスロット管理';b.setAttribute('data-quality-slot','1');b.onclick=showSaveSlots;m.querySelector('.choices')?.appendChild(b)}};
- document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.36';const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.36 — LIFE QUALITY UPDATE';
+ document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.43';const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.36 — LIFE QUALITY UPDATE';
 })();
 
 </script>
@@ -2447,6 +2447,80 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  window.togeShowPeople=function(){$id('modal').innerHTML=`<div id="togeModal"><button class="modal-close" onclick="openTogemaruMode()">×</button><div class="sub">RELATIONSHIP RECORD</div><h2>人物との関係</h2>${people.map(x=>{const r=st.relations[x.id]||{};return `<div class="toge-card"><b>${x.name}</b><div class="toge-muted">${x.role} / 交流 ${r.meetings||0}回 / 親しみ ${r.affection||0} / 信頼 ${r.trust||0} / 警戒 ${r.wariness||0}</div></div>`}).join('')}</div>`};
  window.togeReset=function(){if(!confirm('トゲ丸編のセーブデータだけを初期化します。通常モードの人生データには影響しません。よろしいですか？'))return;st=initial();st.started=true;save();present()};
  load();
+})();
+</script>
+
+<script>
+// v8.43 NEGATIVE LIFE SYSTEM — hardship, debt, health and social consequences
+(function(){
+ 'use strict';
+ if(window.__bakeNegativeLifeV843)return;window.__bakeNegativeLifeV843=true;
+ const clampN=(v)=>Math.max(0,Math.min(100,Number(v)||0));
+ const oldTick=window.seasonTick;
+ function addDebt(n,why){if(!p)return;p.debt=Math.max(0,Math.floor((p.debt||0)+n));p.debt=Math.min(99999,p.debt);if(why)addLog(why,'bad');}
+ function hardshipStatus(){
+  if(!p)return;
+  p.debt=Math.max(0,Number(p.debt)||0);p.hardshipFlags=Array.isArray(p.hardshipFlags)?p.hardshipFlags:[];
+  const flags=[];
+  if(p.debt>=100)flags.push('借金');
+  if(p.money<=0&&p.age>=18)flags.push('生活困窮');
+  if(p.health<=25)flags.push('重い体調不良');
+  if(p.stress>=70)flags.push('過労・精神的負荷');
+  if(p.social<=15)flags.push('社会的孤立');
+  p.hardshipFlags=flags;
+ }
+ function yearlyHardship(oldYear){
+  if(!p||p.dead||p.afterlife||p.year===oldYear||p.specialLife)return;
+  p.debt=Math.max(0,Number(p.debt)||0);
+  p.hardshipCount=Number(p.hardshipCount)||0;
+  if(p.debt>0){const interest=Math.max(1,Math.ceil(p.debt*.04));p.debt=Math.min(99999,p.debt+interest);if(p.money>0&&Math.random()<.22){const pay=Math.min(p.money,Math.max(1,Math.floor(p.debt*.08)));p.money-=pay;p.debt=Math.max(0,p.debt-pay);addLog(`借金の返済に${pay}Gを充てた。残債 ${p.debt}G。`,'bad')}}
+  hardshipStatus();
+  if(decision)return;
+  // Debt spiral: low cash and adult life can force a difficult choice.
+  if(p.age>=18&&p.money<18&&Math.random()<.095){
+   const amount=ri(25,65);smallDecision('生活費の不足',`収入だけでは生活費を賄えない。${amount}Gを借りるか、支出を切り詰めるか。`,['借金をして当面をしのぐ','必要な支出を削る','知人や地域に助けを求める'],[
+    ()=>{addDebt(amount,`${amount}Gの借金をした。返済の見通しはまだ立っていない。`);p.stress=clampN(p.stress+4)},
+    ()=>{p.health=clampN(p.health-5);p.happiness=clampN(p.happiness-4);p.stress=clampN(p.stress+7);p.hardshipCount++;addLog('食事や医療、生活用品を切り詰めた。暮らしは維持できたが、心身に負担が残った。','bad')},
+    ()=>{if(Math.random()<.55){p.money+=ri(8,22);p.social=clampN(p.social+2);addLog('知人や地域の支援を受け、ひとまず危機を乗り越えた。','good')}else{p.social=clampN(p.social-5);p.stress=clampN(p.stress+5);addLog('助けを求めたが、十分な支援は得られなかった。','bad')}}
+   ]);return;
+  }
+  // Health problems can be treated, ignored, or managed with rest.
+  if(p.age>=12&&p.health<48&&Math.random()<.10){
+   smallDecision('長引く体調不良','疲労や不調が続いている。放置すれば悪化するかもしれない。',['治療を受ける（費用15G）','仕事や学業を休む','無理をして続ける'],[
+    ()=>{if(p.money>=15){p.money-=15;p.health=clampN(p.health+13);p.stress=clampN(p.stress-4);addLog('治療を受け、症状は少し落ち着いた。','good')}else{p.health=clampN(p.health-3);addLog('治療費が足りず、十分な処置を受けられなかった。','bad')}},
+    ()=>{p.health=clampN(p.health+7);p.stress=clampN(p.stress-9);if(p.job!=='無職'&&p.job!=='子ども')p.money=Math.max(0,p.money-5);addLog('休養を優先した。収入は減ったが、体調は少し持ち直した。','event')},
+    ()=>{p.health=clampN(p.health-9);p.stress=clampN(p.stress+8);addLog('不調を押して日常を続けた。身体への負担が増している。','bad')}
+   ]);return;
+  }
+  // Social fracture: low trust / isolation can close support routes.
+  if(p.age>=16&&p.social<24&&Math.random()<.075){
+   smallDecision('人間関係のすれ違い','周囲との連絡が減り、困っていても声をかけにくくなっている。',['自分から謝り、関係を修復する','距離を置いて一人で過ごす','共通の知人に仲介を頼む'],[
+    ()=>{p.social=clampN(p.social+9);p.happiness=clampN(p.happiness+3);p.stress=clampN(p.stress-4);addLog('気まずさを抱えながらも、自分から歩み寄った。','good')},
+    ()=>{p.social=clampN(p.social-4);p.stress=clampN(p.stress-2);addLog('人付き合いから距離を置いた。気は楽になったが、孤立も深まった。','event')},
+    ()=>{if(Math.random()<.6){p.social=clampN(p.social+6);addLog('共通の知人が間に入り、話し合いの機会が生まれた。','good')}else{p.social=clampN(p.social-3);p.stress=clampN(p.stress+3);addLog('仲介はうまくいかず、気まずさが残った。','bad')}}
+   ]);return;
+  }
+  // Rare structural shock: job loss or regional trouble.
+  if(p.age>=18&&!p.isAngel&&p.job!=='無職'&&p.job!=='子ども'&&Math.random()<.018){
+   smallDecision('突然の失職','勤め先の経営悪化や人員整理により、仕事を失う可能性が出てきた。',['退職を受け入れ、次の仕事を探す','条件の悪い仕事でも残る','貯金を使って独立・再出発する'],[
+    ()=>{const lost=p.job;p.job='無職';p.jobYears=0;p.jobChanges=(p.jobChanges||0)+1;p.stress=clampN(p.stress+7);addLog(`${lost}の仕事を失った。次の職を探さなければならない。`,'bad')},
+    ()=>{p.money+=ri(3,9);p.health=clampN(p.health-4);p.stress=clampN(p.stress+6);addLog('不利な条件を受け入れて仕事を続けた。収入は保てたが負担が増えた。','event')},
+    ()=>{if(p.money>=35){p.money-=35;p.ownBusiness=true;p.skill=clampN(p.skill+5);p.stress=clampN(p.stress+4);addLog('貯金を元手に小さな独立を試みた。成功する保証はない。','event')}else{p.debt=(p.debt||0)+35;addLog('資金が足りず、借金をして再出発することにした。','bad')}}
+   ]);return;
+  }
+  // Baroque-related pressure: only a warning / support opportunity, not forced onset.
+  if(!p.isPureAngel&&!p.isAngel&&p.baroqueStage===0&&p.stress>=55&&Math.random()<.055){
+   smallDecision('説明のつかない違和感','強いストレスが続く中、身体感覚や周囲の音に小さな違和感を覚えた。',['医療機関で検査する','信頼できる相手に相談する','気のせいだと考えて放置する'],[
+    ()=>{if(p.money>=8){p.money-=8;p.baroqueRisk=clampN((p.baroqueRisk||0)-5);p.mind=clampN(p.mind+2);addLog('検査では決定的な異常は見つからなかった。経過観察となった。','event')}else{p.stress=clampN(p.stress+2);addLog('検査費用を用意できず、受診を見送った。','bad')}},
+    ()=>{p.stress=clampN(p.stress-8);p.mind=clampN(p.mind+3);addLog('誰かに話を聞いてもらい、少しだけ落ち着きを取り戻した。','good')},
+    ()=>{p.stress=clampN(p.stress+5);p.baroqueRisk=clampN((p.baroqueRisk||0)+4);addLog('違和感を無視した。原因は分からないまま、胸の奥に残っている。','bad')}
+   ]);return;
+  }
+  hardshipStatus();
+ }
+ window.seasonTick=function(){const before=p?.year;oldTick.apply(this,arguments);try{yearlyHardship(before)}catch(e){console.warn('negative life extension',e)}};
+ const oldMore=window.showMoreMenu;
+ if(typeof oldMore==='function')window.showMoreMenu=function(){oldMore.apply(this,arguments);const modal=document.getElementById('modal');if(!modal||modal.querySelector('[data-hardship-status]'))return;const debt=Math.max(0,Number(p?.debt)||0);const flags=p?.hardshipFlags||[];const box=document.createElement('section');box.className='entry';box.dataset.hardshipStatus='1';box.innerHTML=`<b>HARDSHIP / 生活状況</b><div class="sub" style="margin-top:5px">借金：${debt}G ／ 状態：${flags.length?flags.join('・'):'特になし'}</div><div class="sub">借金や不調は、選択と時間経過によって改善・悪化します。</div>`;modal.appendChild(box)};
 })();
 </script>
 

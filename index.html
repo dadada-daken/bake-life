@@ -230,7 +230,6 @@ main{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 24px)}
  <h2>PERSONAL RECORD / 人物記録</h2>
  <div class="hero"><div class="avatar" id="avatar">🍪</div><div><div class="name" id="name">未生成</div><div class="sub" id="identity">新しい人生を始めてください</div><div class="chips" id="traits"></div></div></div>
  <div class="restart-row"><button class="primary restart-shortcut" onclick="newLife()">↻ 新しい人生を始める</button><span class="sub">別の人生を始めたいときはここから</span></div>
-<div class="restart-row" style="margin-top:8px"><button class="togemaru-launch" onclick="openTogemaruMode()">✦ 番外編：トゲ丸編</button><span class="sub">通常人生とは独立した小さな冒険</span></div>
  <div style="height:7px"></div><div class="meta"><div><span>年齢</span><b id="age">—</b></div><div><span>所持金</span><b id="money">—</b></div><div><span>職業</span><b id="job">—</b></div></div>
  <div style="height:7px"></div><h2>STATUS / 状態</h2><div class="stats" id="stats"></div><div class="baroquePanel" id="baroquePanel"><h3>BAROQUE / バロック記録</h3><div id="baroqueInfo" class="sub">現在、確認されている異常はありません。</div></div>
  <div style="height:7px"></div>
@@ -2289,9 +2288,9 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  function dismissCinema(){
   const el=document.getElementById('cinemaCurtain');if(el)el.classList.remove('show');
   clearTimeout(hideTimer);
-  // Restore the exact running/paused state from when this presentation began.
-  if(cinemaWasPaused!==null&&typeof p!=='undefined'&&p&&!p.dead&&!decision&&!window.__togeModeActive){
-   paused=cinemaWasPaused;
+  // The presentation layer never owns progression. Restore a previously running life.
+  if(cinemaWasPaused===false&&typeof p!=='undefined'&&p&&!p.dead&&!decision){
+   paused=false;
    if(typeof syncPauseButtons==='function')syncPauseButtons();
    if(typeof startClock==='function'){lastTick=Date.now();clockCarry=0;startClock();}
   }
@@ -2378,88 +2377,6 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
 })();
 </script>
 
-<style>
-.togemaru-launch{background:linear-gradient(120deg,#44364b,#2e394e)!important;border-color:#b99b68!important;color:#f5dfb0!important;width:100%;font-weight:750}
-#togeModal .toge-hero{border:1px solid #806b4b;border-radius:13px;padding:12px;background:linear-gradient(135deg,#343044,#202838);display:flex;gap:12px;align-items:center}
-#togeModal .toge-mark{width:68px;height:68px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(145deg,#533c48,#252b3a);font-size:2.4rem;flex:none}
-#togeModal .toge-statgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
-#togeModal .toge-stat{background:#303649;padding:8px;border-radius:9px;font-size:.75rem}
-#togeModal .toge-stat b{display:block;color:#f0d99d;font-size:1rem}
-#togeModal .toge-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
-#togeModal .toge-actions button{text-align:left;min-height:48px}
-#togeModal .toge-card{background:#2b3040;border:1px solid #454d62;border-radius:10px;padding:10px;margin:7px 0}
-#togeModal .toge-log{max-height:24vh;overflow:auto}
-#togeModal .toge-muted{color:#b9bfd0;font-size:.76rem}
-#togeModal .toge-lock{opacity:.65;border-style:dashed!important}
-@media(max-width:520px){#togeModal .toge-statgrid{grid-template-columns:repeat(2,minmax(0,1fr))}#togeModal .toge-mark{width:56px;height:56px}}
-</style>
-<script>
-// v8.41 TOGEMARU EXTRA STORY+ — independent mini-simulation, stages 1–5
-(function(){
- 'use strict';
- const KEY='bakeTogemaruStoryV1';
- const $id=id=>document.getElementById(id);
- const escT=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- const areas=[
-  {id:'dome',name:'グロリアスベイクドーム',desc:'天使たちが暮らす金色の都市。仕事中の天使を見つけられる。',unlocked:true},
-  {id:'lab',name:'天使たちの実験室',desc:'魔法陣や研究器具が並ぶ。トゲ丸の妙な反応が見られる。',unlocked:true},
-  {id:'city',name:'地上の都市部',desc:'一般クッキーたちの暮らしと、食べ物や遊びが待っている。',unlocked:true},
-  {id:'mangrove',name:'バターマングローブ地方',desc:'巨大な樹木と奇妙な生き物が暮らす森。',req:3},
-  {id:'marsh',name:'城塞跡地・天空都市マシュマリア',desc:'古い遺跡と空に浮かぶ都市。',req:5},
-  {id:'boundary',name:'境界点',desc:'世界の綻び。トゲ丸の存在に反応する場所。',req:7}
- ];
- const people=[
-  {id:'decru',name:'デクルシヴァ',role:'異端審問官',line:'「……おい。そこは書類の上だ。降りろ」'},
-  {id:'sen',name:'セネシオ',role:'副官・料理人',line:'「お腹は空いていませんか？ 少し休んでいきなさい」'},
-  {id:'maru',name:'マルメロ',role:'記録官',line:'「おやおや。今日は何を壊してくれるのかな？」'},
-  {id:'cel',name:'セレスティアル',role:'ベイクドームの主',line:'「ふふ。君は本当に面白いね。どこまで分かっているのかな？」'},
-  {id:'trop',name:'トロピカルブリーズ',role:'門番',line:'「そちらは門の外ですよ。お出かけは一緒に行きましょうね」'},
-  {id:'pul',name:'パルモンバルゴ',role:'外交局',line:'「今回の騒動も記録しておきましょう。……あとで報告書が増えますね」'},
-  {id:'teo',name:'テオナナカトル',role:'古き王',line:'「おや、小さきものよ。今宵は何を見つけた？」'}
- ];
- const initial=()=>({version:1,started:false,actions:0,discoveryCount:0,area:'dome',selectedPerson:'decru',autonomy:true,form:'normal',formUnlocked:false,stats:{curiosity:60,affection:35,wariness:25,satisfaction:65,mischief:45,fatigue:10},relations:{},discoveries:[],events:[],titles:[],endings:[],log:[],ending:'',lastEvent:'',visited:['dome'],flags:{labReaction:false,celObserved:false,boundarySeen:false}});
- let st;
- function load(){try{const raw=localStorage.getItem(KEY);const q=raw?JSON.parse(raw):null;st=q&&q.version===1?Object.assign(initial(),q):initial();st.stats=Object.assign(initial().stats,st.stats||{});st.selectedPerson=st.selectedPerson||'decru';st.autonomy=st.autonomy!==false;st.flags=Object.assign(initial().flags,st.flags||{});st.discoveryCount=Number.isFinite(st.discoveryCount)?st.discoveryCount:((st.discoveries||[]).length);st.relations=st.relations||{};st.flags=st.flags||initial().flags;st.log=Array.isArray(st.log)?st.log:[];st.discoveries=Array.isArray(st.discoveries)?st.discoveries:[];st.events=Array.isArray(st.events)?st.events:[];st.titles=Array.isArray(st.titles)?st.titles:[];st.endings=Array.isArray(st.endings)?st.endings:[];st.visited=Array.isArray(st.visited)?st.visited:['dome'];}catch(e){st=initial()} }
- function save(){try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}}
- function log(t){st.log.unshift({n:st.actions,text:t,area:area().name});st.log=st.log.slice(0,60);}
- function area(){return areas.find(x=>x.id===st.area)||areas[0]}
- function stat(k,d){st.stats[k]=Math.max(0,Math.min(100,(st.stats[k]||0)+d))}
- function unlockTitles(){const defs=[['初めてのおでかけ',st.actions>=1],['実験室の侵入者',st.discoveries.includes('lab')],['天使の天敵',(st.stats.mischief>=75)],['小さな観測者',st.flags.boundarySeen],['人ならざる姿',st.formUnlocked]];defs.forEach(([n,ok])=>{if(ok&&!st.titles.includes(n))st.titles.push(n)})}
- function present(){const modal=$id('modal'),overlay=$id('overlay');if(!modal||!overlay)return;overlay.style.display='grid';modal.id='modal';modal.innerHTML=`<div id="togeModal"><button class="modal-close" onclick="closeTogemaruMode()">×</button><div class="sub">EXTRA STORY / INDEPENDENT SAVE</div><h2>TOGEMARU — 小さな気まぐれ</h2><div class="toge-hero"><div class="toge-mark">${st.form==='human'?'✦':'🦔'}</div><div><b style="font-size:1.1rem">トゲ丸</b><div class="toge-muted">${st.form==='human'?'人型形態':'通常形態'} ／ ${escT(area().name)}</div><div class="toge-muted">行動 ${st.actions}回 ・ 発見 ${st.discoveryCount}回</div></div></div>
- <div class="toge-card"><b>トゲ丸の様子</b><div class="toge-statgrid" style="margin-top:8px">${[['好奇心','curiosity'],['懐き度','affection'],['警戒心','wariness'],['満足度','satisfaction'],['いたずら度','mischief'],['疲労','fatigue']].map(([n,k])=>`<div class="toge-stat">${n}<b>${st.stats[k]}/100</b></div>`).join('')}</div></div>
- ${st.formUnlocked?`<div class="toge-card"><b>形態切替</b><div class="controls" style="margin-top:7px"><button onclick="togeSetForm('normal')" ${st.form==='normal'?'disabled':''}>通常形態</button><button onclick="togeSetForm('human')" ${st.form==='human'?'disabled':''}>人型形態</button></div></div>`:`<div class="toge-card toge-lock"><b>？？？ — 未解放</b><div class="toge-muted">実験室・人物交流・境界点の発見を重ねると、何かが起こるかもしれない。</div></div>`}
- <div class="toge-card"><b>交流相手を選ぶ</b><select id="togePerson" onchange="togeSelectPerson(this.value)" style="width:100%;margin-top:7px;padding:9px;border-radius:8px;background:#202633;color:#f5ead2;border:1px solid #786b58">${people.map(x=>`<option value="${x.id}" ${st.selectedPerson===x.id?'selected':''}>${x.name} — ${x.role}</option>`).join('')}</select><div class="toge-actions" style="margin-top:8px"><button onclick="togeAct('talk')">♡ 選んだ相手と交流</button><button onclick="togeAct('gift')">✧ 小さな贈り物</button></div></div><div class="toge-card"><b>何をする？</b><div class="toge-actions" style="margin-top:8px"><button onclick="togeAct('explore')">⌕ 探索・調べる</button><button onclick="togeAct('talk')">♡ 選んだ相手ともう一度交流</button><button onclick="togeAct('mischief')">♧ いたずらする</button><button onclick="togeAct('play')">◇ 遊ぶ</button><button onclick="togeAct('rest')">☾ 休む</button><button onclick="togeAct('special')">✦ 気まぐれ行動</button></div></div>
- <div class="toge-card"><b>移動できる場所</b><div class="choices" style="margin-top:7px">${areas.map(a=>{const ok=a.unlocked||st.discoveryCount>=(a.req||999);return `<button class="${ok?'':'toge-lock'}" ${ok?`onclick="togeMove('${a.id}')"`:'disabled'}>${ok?'→':'🔒'} ${a.name}<div class="toge-muted">${ok?a.desc:`探索 ${a.req}回で解放`}</div></button>`}).join('')}</div></div>
- <div class="toge-card"><b>気まぐれAI</b><div class="toge-muted">トゲ丸が時々、自分から行動します。</div><label style="display:flex;gap:8px;align-items:center;margin-top:7px"><input type="checkbox" ${st.autonomy?'checked':''} onchange="togeSetAutonomy(this.checked)"> 自律行動を有効にする</label></div><div class="toge-card"><b>記録・コレクション</b><div class="controls" style="margin-top:7px"><button onclick="togeShowAlbum()">思い出 ${st.events.length}件</button><button onclick="togeShowTitles()">称号 ${st.titles.length}個</button><button onclick="togeShowPeople()">人物関係</button><button onclick="togeShowEndings()">結末の記録</button></div></div>
- <div class="toge-card"><b>最近の出来事</b><div class="toge-log">${st.log.slice(0,8).map(x=>`<div class="entry"><small>${x.n}回目 / ${escT(x.area)}</small>${escT(x.text)}</div>`).join('')||'<p class="toge-muted">まだ思い出はありません。</p>'}</div></div>
- <div class="controls"><button onclick="closeTogemaruMode()">通常モードへ戻る</button><button onclick="togeReset()">トゲ丸編を最初から</button></div><p class="toge-muted">このモードの進行・称号・記録は通常モードのセーブデータと完全に独立しています。</p></div>`;
- }
- window.openTogemaruMode=function(){load();st.started=true;save();present()};
- window.closeTogemaruMode=function(){save();const o=$id('overlay');if(o)o.style.display='none'};
- window.togeSelectPerson=function(id){if(people.some(x=>x.id===id)){st.selectedPerson=id;save();present()}};
- window.togeSetAutonomy=function(v){st.autonomy=!!v;save();present()};
- window.togeMove=function(id){const a=areas.find(x=>x.id===id);if(!a)return;const ok=a.unlocked||st.discoveryCount>=(a.req||999);if(!ok)return;const from=area().name;st.area=id;if(!st.visited.includes(id))st.visited.push(id);st.actions++;stat('curiosity',2);stat('fatigue',3);log(`${from}から${a.name}へ移動した。${a.desc}`);if(id==='boundary'){st.flags.boundarySeen=true;stat('wariness',5);log('境界点に足を踏み入れた瞬間、周囲の景色が一拍だけ遅れて動いた。');}save();unlockTitles();present()};
- window.togeAct=function(kind){if(st.stats.fatigue>=95&&kind!=='rest'){log('疲れて動けない。少し休むことにした。');stat('satisfaction',-2);save();present();return}st.actions++;let msg='';
-  if(kind==='rest'){stat('fatigue',-24);stat('satisfaction',8);stat('wariness',-3);msg='丸くなってひと休みした。誰かが毛布をかけてくれた気がする。'}
-  if(kind==='play'){stat('satisfaction',12);stat('fatigue',7);stat('curiosity',3);msg=st.form==='human'?['窓辺に座り、街の動きを眺めた。人の姿だと見えるものが少し違う。','小さな道具を器用に組み立ててみた。','誰かの真似をして、飲み物を一口だけ味わった。'][Math.floor(Math.random()*3)]:['床の上で小さなものを転がして遊んだ。','自分の影を追いかけていたら、いつの間にか時間が過ぎていた。','羽根を一枚見つけた。誰のものかは分からない。'][Math.floor(Math.random()*3)]}
-  if(kind==='mischief'){stat('mischief',10);stat('satisfaction',5);stat('fatigue',6);const target=people[Math.floor(Math.random()*people.length)];st.relations[target.id]=st.relations[target.id]||{affection:0,trust:0,wariness:0,meetings:0};st.relations[target.id].wariness+=1;msg=['書類の束を少しだけずらした。誰かが困っている。','物陰から飛び出して、通りかかった天使を驚かせた。','大事そうなペンを転がしてみた。追いかけっこが始まった。'][Math.floor(Math.random()*3)]}
-  if(kind==='talk'||kind==='gift'){const target=people.find(x=>x.id===st.selectedPerson)||people[0];const r=st.relations[target.id]||(st.relations[target.id]={affection:0,trust:0,wariness:0,meetings:0});r.meetings++;r.affection+=kind==='gift'?5:2;r.trust+=kind==='gift'?3:1;stat('affection',kind==='gift'?5:3);stat('satisfaction',5);msg=kind==='gift'?`${target.name}に小さな贈り物を渡した。思いがけず喜んでもらえた。`:st.form==='human'?`${target.name}は人型になったトゲ丸を見て、少し驚いた。${target.id==='decru'?'「……お前、そっちの姿にもなれるのかよ」':target.line}`:`${target.name}と一緒に過ごした。${target.line}`;if(target.id==='cel'){st.flags.celObserved=true;st.flags.celMeet=true}if(target.id==='decru'&&r.meetings>=3)st.flags.decruBond=true}
-  if(kind==='explore'){stat('curiosity',8);stat('fatigue',5);const key=st.area==='lab'?'lab':st.area==='boundary'?'boundary':st.area==='mangrove'?'mangrove':st.area==='marsh'?'marsh':st.area;const newFind=!st.discoveries.includes(key);if(newFind)st.discoveries.push(key);st.discoveryCount=(st.discoveryCount||0)+1;if(st.area==='lab'){st.flags.labReaction=true;msg=newFind?'魔法陣の中に入り込んだ。術式がトゲ丸の存在に反応し、見たことのない光を放った。':'魔法陣をもう一度調べた。今度は何も起きない。けれど、記録装置には小さな波形が残っていた。'}else if(st.area==='boundary'){st.flags.boundarySeen=true;msg='空間の継ぎ目に触れた。ほんの一瞬、知らない景色と自分の知らない姿が見えた。'}else if(st.area==='mangrove')msg=newFind?'巨大な根の隙間に、小さな巣を見つけた。森の主が遠くからこちらを見ている気配がする。':'森の奥で、古い王の笑い声のようなものを聞いた。';else if(st.area==='marsh')msg=newFind?'城塞跡の壁に、ベイクドームの記録とは異なる古い紋様を見つけた。':'空に浮かぶ都市の影が、ほんの一瞬だけ別の形に見えた。';else msg=`${area().name}を調べた。${newFind?'新しい発見があった。':'以前にも見つけたものだ。'}小さな痕跡を記録した。`;}
-  if(kind==='special'){stat('curiosity',5);stat('wariness',4);stat('fatigue',4);if(st.flags.labReaction&&st.flags.celObserved&&st.flags.boundarySeen&&!st.formUnlocked){st.formUnlocked=true;msg='身体の輪郭が一瞬だけ揺らいだ。トゲ丸は見慣れない姿へと変化する。人型形態が解放された。';st.events.push({name:'輪郭の向こう側',text:msg,n:st.actions});}else{msg=['突然、何もない場所をじっと見つめた。','誰も呼んでいないのに、振り返った。','いつもと違う声で小さく鳴いた。'][Math.floor(Math.random()*3)];if(st.actions%5===0){st.events.push({name:'小さな違和感',text:msg,n:st.actions});}}}
-  if(kind!=='special'&&st.flags.labReaction&&st.flags.celObserved&&st.flags.boundarySeen&&!st.formUnlocked&&st.actions>=8){st.formUnlocked=true;msg+=' そのとき、身体の輪郭が変わりかけた。人型形態が解放された。'}
-  if(st.autonomy&&kind!=='rest'&&Math.random()<.16){const auto=['気になる音を追いかけて、少しだけ先へ進んだ。','誰かの足元に寄っていき、反応をうかがった。','見つけたものを大事そうに隠した。'][Math.floor(Math.random()*3)];msg+='\n【気まぐれ】'+auto;stat('curiosity',2);stat('satisfaction',2)}
-  if(st.form==='human'&&st.formUnlocked&&st.actions%4===0){st.flags.humanInsight=true;msg+=' 人型の姿でいると、以前は気づかなかった視線や表情が分かる。'}
-  stat('fatigue',kind==='rest'?0:2);st.lastEvent=msg;st.events.push({name:kind,text:msg,n:st.actions,area:area().name});if(st.events.length>100)st.events=st.events.slice(-100);log(msg);unlockTitles();save();present();
- };
- window.togeSetForm=function(form){if(!st.formUnlocked)return;if(form!=='normal'&&form!=='human')return;st.form=form;log(form==='human'?'人型形態に変化した。':'通常形態に戻った。');save();present()};
- window.togeShowAlbum=function(){const m=$id('modal');m.innerHTML=`<div id="togeModal"><button class="modal-close" onclick="openTogemaruMode()">×</button><div class="sub">MEMORY ALBUM</div><h2>トゲ丸の思い出</h2>${st.events.slice().reverse().map(e=>`<div class="toge-card"><b>${escT(e.name)}</b><div class="toge-muted">${e.n}回目 / ${escT(e.area||'')}</div>${escT(e.text)}</div>`).join('')||'<p>まだ記録はありません。</p>'}</div>`};
- window.togeShowTitles=function(){const all=[['初めてのおでかけ','行動を1回行う'],['実験室の侵入者','実験室で初めて調査する'],['天使の天敵','いたずら度75以上'],['小さな観測者','境界点を発見する'],['人ならざる姿','人型形態を解放する']];$id('modal').innerHTML=`<div id="togeModal"><button class="modal-close" onclick="openTogemaruMode()">×</button><div class="sub">TOGEMARU TITLES</div><h2>トゲ丸の称号</h2>${all.map(([n,h])=>`<div class="toge-card"><b>${st.titles.includes(n)?'✦ '+n:'？？？'}</b><div class="toge-muted">${st.titles.includes(n)?h:'ヒント：'+h}</div></div>`).join('')}</div>`};
- window.togeShowEndings=function(){const defs=[["小さな守り手","好奇心60以上・バターマングローブで探索"],["記録の外側","人型形態を解放し、セレスティアルと3回交流"],["異端審問官の相棒","デクルシヴァとの親しみが10以上"],["境界を渡るもの","境界点を発見し、探索を3回行う"]];const done=[st.stats.curiosity>=60&&st.discoveries.includes("mangrove"),st.formUnlocked&&(st.relations.cel?.meetings||0)>=3,(st.relations.decru?.affection||0)>=10,st.flags.boundarySeen&&st.discoveries.includes("boundary")&&st.actions>=12];done.forEach((v,i)=>{if(v&&!st.endings.includes(defs[i][0]))st.endings.push(defs[i][0])});save();$id("modal").innerHTML=`<div id="togeModal"><button class="modal-close" onclick="openTogemaruMode()">×</button><div class="sub">ENDING ARCHIVE</div><h2>トゲ丸の結末</h2>${defs.map((d,i)=>`<div class="toge-card"><b>${done[i]?"✦ "+d[0]:"？？？"}</b><div class="toge-muted">${done[i]?"達成済み":`ヒント：${d[1]}`}</div></div>`).join("")}</div>`};
- window.togeShowPeople=function(){$id('modal').innerHTML=`<div id="togeModal"><button class="modal-close" onclick="openTogemaruMode()">×</button><div class="sub">RELATIONSHIP RECORD</div><h2>人物との関係</h2>${people.map(x=>{const r=st.relations[x.id]||{};return `<div class="toge-card"><b>${x.name}</b><div class="toge-muted">${x.role} / 交流 ${r.meetings||0}回 / 親しみ ${r.affection||0} / 信頼 ${r.trust||0} / 警戒 ${r.wariness||0}</div></div>`}).join('')}</div>`};
- window.togeReset=function(){if(!confirm('トゲ丸編のセーブデータだけを初期化します。通常モードの人生データには影響しません。よろしいですか？'))return;st=initial();st.started=true;save();present()};
- load();
-})();
-</script>
 
 <script>
 // v8.43 NEGATIVE LIFE SYSTEM — hardship, debt, health and social consequences
@@ -2536,308 +2453,26 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
 </script>
 
 
-<style>
-/* v8.44 TOGEMARU compact dashboard */
-#togeModal{padding:10px!important;max-height:88vh;overflow-y:auto}
-#togeModal h2{font-size:1.08rem!important;margin:4px 0 8px!important}
-#togeModal .sub{font-size:.62rem;letter-spacing:.08em}
-#togeModal .toge-hero{padding:8px;gap:9px}
-#togeModal .toge-mark{width:48px;height:48px;font-size:1.8rem;border-radius:12px}
-#togeModal .toge-card{padding:8px;margin:5px 0;border-radius:9px}
-#togeModal .toge-statgrid{gap:4px!important;margin-top:5px!important}
-#togeModal .toge-stat{padding:5px 7px;font-size:.68rem}
-#togeModal .toge-stat b{font-size:.88rem}
-#togeModal .toge-actions{gap:5px!important;margin-top:5px!important}
-#togeModal .toge-actions button{min-height:40px;padding:6px 8px;font-size:.78rem;line-height:1.25}
-#togeModal .choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
-#togeModal .choices button{padding:7px!important;min-width:0;text-align:left;font-size:.76rem;line-height:1.25}
-#togeModal .choices button .toge-muted{display:none}
-#togeModal select{font-size:.82rem}
-#togeModal .toge-log{max-height:15vh}
-#togeModal .toge-compact-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
-#togeModal .toge-compact-chip{background:#202938;border:1px solid #515a6b;border-radius:8px;padding:6px;font-size:.72rem}
-#togeModal .toge-compact-chip b{color:#f0d99d}
-#togeModal .toge-quest{border-color:#9b8258;background:linear-gradient(130deg,#353346,#293443)}
-#togeModal .toge-questline{font-size:.74rem;margin:4px 0;color:#e4e0d7}
-#togeModal .toge-questline.done{color:#b8e3b6}
-#togeModal .toge-progress{height:5px;background:#171e2a;border-radius:8px;overflow:hidden;margin-top:3px}
-#togeModal .toge-progress i{display:block;height:100%;background:#c7a66c}
-@media(max-width:380px){#togeModal{padding:7px!important}#togeModal .choices{grid-template-columns:1fr}#togeModal .toge-actions button{font-size:.73rem}}
-</style>
 <script>
-// v8.44 TOGEMARU GAMEPLAY — compact UI, rotating objectives, exploration rewards
+// v8.51 MAIN CLOCK RECOVERY — cinematic close restores a running life.
 (function(){
  'use strict';
- const KEY='bakeTogemaruStoryV1', META='bakeTogemaruMetaV1';
- const $=id=>document.getElementById(id);
- document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.46';
- const setFooter=()=>{const f=document.querySelector('footer');if(f)f.textContent='BAKE LIFE v8.50 — TOGEMARU ISOLATION & UI FIX';};
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setFooter);else setFooter();
- const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){return {}}};
- const metaRead=()=>{try{return JSON.parse(localStorage.getItem(META)||'{}')}catch(e){return {}}};
- const metaSave=x=>{try{localStorage.setItem(META,JSON.stringify(x))}catch(e){}};
- const goals=[
-  {id:'wander',name:'あちこち見て回ろう',desc:'異なる場所を3か所訪れる',test:s=>(s.visited||[]).length>=3,progress:s=>Math.min(3,(s.visited||[]).length),max:3},
-  {id:'curious',name:'気になるものを調べよう',desc:'探索を5回行う',test:s=>(s.discoveryCount||0)>=5,progress:s=>Math.min(5,s.discoveryCount||0),max:5},
-  {id:'friends',name:'顔見知りを増やそう',desc:'3人と交流する',test:s=>Object.values(s.relations||{}).filter(r=>(r.meetings||0)>0).length>=3,progress:s=>Math.min(3,Object.values(s.relations||{}).filter(r=>(r.meetings||0)>0).length),max:3},
-  {id:'mischief',name:'ちょっとした騒ぎを起こそう',desc:'いたずら度を70以上にする',test:s=>(s.stats?.mischief||0)>=70,progress:s=>Math.min(70,s.stats?.mischief||0),max:70},
-  {id:'calm',name:'のんびり過ごそう',desc:'疲労を20以下にして満足度70以上',test:s=>(s.stats?.fatigue||0)<=20&&(s.stats?.satisfaction||0)>=70,progress:s=>(s.stats?.fatigue||0)<=20?70:Math.max(0,70-(s.stats?.fatigue||0)),max:70}
- ];
- function currentGoal(s,m){let idx=Number.isInteger(m.goalIndex)?m.goalIndex:0;let g=goals[idx%goals.length];if(g.test(s)){m.completed=m.completed||[];if(!m.completed.includes(g.id))m.completed.push(g.id);m.points=(m.points||0)+1;m.goalIndex=(idx+1)%goals.length;g=goals[m.goalIndex];metaSave(m)}return g}
- function inject(){const root=$('togeModal');if(!root)return;
-  // Clean duplicate remnants before checking the render marker. Keep at most one panel/note.
-  const quests=[...root.querySelectorAll('.toge-quest')];quests.slice(1).forEach(x=>x.remove());
-  const notes=[...root.querySelectorAll('.toge-handbook-note')];notes.slice(1).forEach(x=>x.remove());
-  if(root.dataset.v844)return;root.dataset.v844='1';
-  const s=read(),m=metaRead(),g=currentGoal(s,m),v=Math.min(g.max,g.progress(s));
-  const hero=root.querySelector('.toge-hero');
-  if(hero){const stats=hero.querySelector('div:last-child');if(stats){const small=document.createElement('div');small.className='toge-muted toge-handbook-note';small.textContent=`探索手帳ポイント ${m.points||0} pt ・ 訪問 ${Math.max(0,(s.visited||[]).length)}か所`;stats.appendChild(small)}}
-  const panel=document.createElement('div');panel.className='toge-card toge-quest';panel.innerHTML=`<b>今回の気まぐれ目標</b><div class="toge-questline">${g.name} — ${g.desc}</div><div class="toge-progress"><i style="width:${Math.round(v/g.max*100)}%"></i></div><div class="toge-muted" style="margin-top:3px">進捗 ${v}/${g.max}　／　達成で手帳ポイント +1</div><div class="toge-compact-row" style="margin-top:6px"><div class="toge-compact-chip">訪問 <b>${(s.visited||[]).length}</b> / 6</div><div class="toge-compact-chip">発見 <b>${s.discoveryCount||0}</b> 回</div></div>`;
-  const stats=root.querySelector('.toge-statgrid')?.closest('.toge-card');if(stats)stats.after(panel);else hero?.after(panel);
-  // Reduce visual noise in the long location list; keep location names visible.
-  const areaCard=[...root.querySelectorAll('.toge-card')].find(x=>x.textContent.includes('移動できる場所'));
-  if(areaCard){const buttons=areaCard.querySelectorAll('.choices button');buttons.forEach((b,i)=>{if(i>2)b.title=b.textContent.trim()})}
- }
- const mo=new MutationObserver(()=>{const r=$('togeModal');if(r&&!r.dataset.v844)inject()});
- const start=()=>{const target=$('modal');if(target)mo.observe(target,{childList:true,subtree:true});inject()};
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
- // Keep objective progress in sync when the base game redraws the screen.
- const oldOpen=window.openTogemaruMode;
- if(oldOpen)window.openTogemaruMode=function(){oldOpen();setTimeout(inject,0)};
- const oldAct=window.togeAct;
- if(oldAct)window.togeAct=function(kind){oldAct(kind);const s=read(),m=metaRead();currentGoal(s,m);metaSave(m)};
- const oldMove=window.togeMove;
- if(oldMove)window.togeMove=function(id){oldMove(id);const s=read(),m=metaRead();currentGoal(s,m);metaSave(m)};
-})();
-</script>
-
-
-<script>
-// v8.46: prevent base-game event overlays from interrupting the independent Togemaru story.
-(function(){
- 'use strict';
- let active=false, previousModalHTML='', previousOverlayDisplay='', previousPaused=true;
- const modal=()=>document.getElementById('modal');
- const overlay=()=>document.getElementById('overlay');
- const oldOpen=window.openTogemaruMode;
- if(typeof oldOpen==='function')window.openTogemaruMode=function(){
-   // Do not replace an unresolved main-game decision with the extra-story screen.
-   if(typeof decision!=='undefined'&&decision){return;}
-   if(!active){
-     active=true;window.__togeModeActive=true;
-     const m=modal(),o=overlay();
-     previousModalHTML=m?m.innerHTML:'';
-     previousOverlayDisplay=o?o.style.display:'';
-     previousPaused=!!paused;
-     paused=true;
-     if(typeof smallTimer!=='undefined'&&smallTimer){clearInterval(smallTimer);smallTimer=null;}
-     if(typeof autoTimer!=='undefined'&&autoTimer){clearTimeout(autoTimer);autoTimer=null;}
+ document.addEventListener('click',function(ev){
+  const btn=ev.target&&ev.target.closest?ev.target.closest('#cinemaClose'):null;
+  if(!btn)return;
+  setTimeout(()=>{
+   if(typeof p!=='undefined'&&p&&!p.dead&&!decision){
+    paused=false;
+    if(typeof syncPauseButtons==='function')syncPauseButtons();
+    if(typeof startClock==='function'){lastTick=Date.now();clockCarry=0;startClock();}
    }
-   return oldOpen.apply(this,arguments);
- };
- const oldClose=window.closeTogemaruMode;
- if(typeof oldClose==='function')window.closeTogemaruMode=function(){
-   // Save and close the extra story first.
-   oldClose.apply(this,arguments);
-   active=false;window.__togeModeActive=false;
-   const m=modal(),o=overlay();
-   if(m)m.innerHTML=previousModalHTML;
-   if(o)o.style.display=previousOverlayDisplay==='grid'?'grid':'none';
-   paused=previousPaused;
-   if(typeof syncPauseButtons==='function')syncPauseButtons();
-   if(typeof startClock==='function')startClock();
-   if(typeof render==='function'&&(!decision))render();
- };
- // Catch event-producing entry points as well as the regular seasonal tick.
- for(const name of ['smallDecision','showDecision','openDecision','presentDecision']){
-   const fn=window[name];
-   if(typeof fn==='function')window[name]=function(){if(active||window.__togeModeActive)return;return fn.apply(this,arguments)};
- }
- // Keep the global state flag authoritative even if another extension wraps the launcher.
- const priorAct=window.togeAct;
- if(typeof priorAct==='function')window.togeAct=function(){return priorAct.apply(this,arguments)};
+  },0);
+ });
 })();
 </script>
-
-
-<script>
-// v8.50: reliably restore the main-life clock after cinematic presentation dismissal.
-(function(){
- 'use strict';
- const close=document.getElementById('cinemaClose');
- if(close && !close.dataset.v850){close.dataset.v850='1';close.addEventListener('click',()=>{
-  setTimeout(()=>{if(typeof p!=='undefined'&&p&&!p.dead&&!decision&&!window.__togeModeActive){
-   if(typeof syncPauseButtons==='function')syncPauseButtons();
-   if(typeof startClock==='function'){lastTick=Date.now();clockCarry=0;startClock();}
-  }},0);
- });}
-})();
-</script>
-
 </body>
 </html>
 
-<style>
-/* v8.42 TOGEMARU MOBILE-FIRST LAYOUT */
-.modal:has(#togeModal){width:min(760px,100%);max-width:760px;max-height:min(92dvh,920px);padding:16px;overflow-y:auto;overscroll-behavior:contain;box-sizing:border-box}
-#togeModal{width:100%;min-width:0;box-sizing:border-box;overflow-wrap:anywhere}
-#togeModal h2{font-size:clamp(1.05rem,3.5vw,1.45rem);line-height:1.25;margin:4px 42px 10px 0}
-#togeModal .toge-card{min-width:0;margin:6px 0;padding:9px}
-#togeModal .toge-hero{min-width:0;padding:9px;gap:9px}
-#togeModal .toge-statgrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
-#togeModal .toge-stat{min-width:0;padding:7px}
-#togeModal .toge-actions{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
-#togeModal .choices{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
-#togeModal button{min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere;line-height:1.25;min-height:42px}
-#togeModal .toge-log{max-height:18vh;overflow-y:auto;overscroll-behavior:contain}
-#togeModal .modal-close{position:sticky;top:0;z-index:5;float:right;margin:0 0 2px 8px}
-@media(max-width:600px){
- .overlay:has(#togeModal){padding:calc(4px + env(safe-area-inset-top)) 5px calc(4px + env(safe-area-inset-bottom));place-items:center}
- .modal:has(#togeModal){width:100%;max-width:none;max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 8px);padding:10px;border-radius:13px}
- #togeModal h2{font-size:1.08rem;margin-bottom:7px}
- #togeModal .sub{font-size:.65rem;letter-spacing:.04em}
- #togeModal .toge-hero{padding:8px;gap:8px}
- #togeModal .toge-mark{width:48px;height:48px;border-radius:12px;font-size:1.8rem}
- #togeModal .toge-card{padding:8px;margin:5px 0;border-radius:9px}
- #togeModal .toge-statgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
- #togeModal .toge-stat{font-size:.7rem;padding:6px}
- #togeModal .toge-stat b{font-size:.9rem}
- #togeModal .toge-actions{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
- #togeModal .choices{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
- #togeModal .choices button,#togeModal .toge-actions button{font-size:.76rem;padding:7px 6px;min-height:44px}
- #togeModal .toge-muted{font-size:.69rem;line-height:1.35}
- #togeModal .controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
- #togeModal .controls button{font-size:.74rem;min-height:42px;padding:6px}
- #togeModal select{font-size:16px!important;max-width:100%;box-sizing:border-box}
- #togeModal .toge-log{max-height:15vh}
-}
-@media(max-width:360px){
- #togeModal .choices{grid-template-columns:1fr}
- #togeModal .toge-actions{grid-template-columns:1fr 1fr}
- #togeModal .toge-mark{width:42px;height:42px;font-size:1.55rem}
-}
-@media(max-height:700px) and (max-width:600px){
- .modal:has(#togeModal){max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 6px)}
- #togeModal .toge-card{padding:6px;margin:4px 0}
- #togeModal .toge-log{max-height:12vh}
-}
-</style>
 
 
-<style id="toge-v846-ui">
-/* v8.50: readable status gauges and thumb-friendly two-column controls */
-#togeModal .toge-statgrid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important}
-#togeModal .toge-stat{position:relative;display:grid!important;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:6px;row-gap:7px;min-width:0;padding:8px 9px!important;background:#252d3c!important;border:1px solid #465064!important;border-radius:8px!important;font-size:.76rem!important;line-height:1.2!important;overflow:hidden}
-#togeModal .toge-stat>span{min-width:0;overflow-wrap:anywhere}
-#togeModal .toge-stat b{display:block!important;float:none!important;justify-self:end;font-size:.8rem!important;font-weight:700;color:#f0d99d!important;white-space:nowrap}
-#togeModal .toge-stat:before,#togeModal .toge-stat:after{display:none!important;content:none!important}
-#togeModal .toge-stat-meter{grid-column:1/-1;display:block!important;width:100%;height:7px!important;margin:0!important;background:#111a28!important;border:1px solid #111a28;border-radius:99px!important;overflow:hidden}
-#togeModal .toge-stat-meter i{display:block!important;height:100%!important;min-width:0;max-width:100%;background:linear-gradient(90deg,#8298bd 0%,#c6b27d 65%,#ead49b 100%)!important;border-radius:99px!important;transition:width .25s ease}
-#togeModal .toge-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important;margin-top:8px!important}
-#togeModal .toge-actions button{display:flex!important;align-items:center;justify-content:center;text-align:center!important;white-space:normal!important;overflow-wrap:anywhere;min-width:0;min-height:44px!important;padding:8px 9px!important;font-size:.8rem!important;line-height:1.25!important;border-radius:8px!important}
-#togeModal .toge-card{padding:8px!important;margin:5px 0!important}
-#togeModal .toge-hero{padding:8px!important}
-#togeModal .toge-compact-command{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important}
-#togeModal .toge-compact-command button{min-height:42px!important;padding:7px 8px!important;font-size:.78rem!important}
-@media(max-width:380px){
- #togeModal .toge-statgrid{gap:5px!important}
- #togeModal .toge-stat{padding:7px!important;font-size:.72rem!important}
- #togeModal .toge-stat b{font-size:.76rem!important}
- #togeModal .toge-actions{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important}
- #togeModal .toge-actions button{min-height:42px!important;padding:7px 6px!important;font-size:.76rem!important}
-}
-</style>
-<script>
-// v8.50 TOGEMARU ISOLATION + UI FIX
-(function(){
- 'use strict';
- const $=id=>document.getElementById(id);
- const read=()=>{try{return JSON.parse(localStorage.getItem('bakeTogemaruStoryV1')||'{}')}catch(e){return {}}};
- let active=false,wasPaused=false;
- function decorate(){
-  const root=$('togeModal'); if(!root)return;
-  // Replace the old six numeric tiles with the same label/value/bar language as the main status panel.
-  const keys=[['curiosity','好奇心'],['affection','懐き度'],['wariness','警戒心'],['satisfaction','満足度'],['mischief','いたずら度'],['fatigue','疲労']];
-  const data=read(),stats=data.stats||{};
-  const grid=root.querySelector('.toge-statgrid');
-  if(grid){
-   grid.innerHTML=keys.map(([key,label])=>{const v=Math.max(0,Math.min(100,Number(stats[key])||0));const pct=key==='wariness'||key==='fatigue'?100-v:v;return `<div class="toge-stat"><span>${label}</span><b>${v}/100</b><div class="toge-stat-meter"><i style="width:${pct}%"></i></div></div>`}).join('');
-  }
-  // Compress action command labels and remove the duplicate talk command from the general command panel.
-  const cards=[...root.querySelectorAll('.toge-card')];
-  const actionCard=cards.find(c=>c.textContent.includes('何をする？'));
-  if(actionCard){
-   const btns=[...actionCard.querySelectorAll('.toge-actions button')];
-   const labels=['⌕ 探索','♡ 交流','♧ いたずら','◇ 遊ぶ','☾ 休む','✦ 気まぐれ'];
-   btns.forEach((b,i)=>{if(labels[i])b.textContent=labels[i]});
-   const talk=btns.find(b=>b.textContent.includes('交流'));
-   if(talk)talk.remove();
-  }
-  const social=cards.find(c=>c.textContent.includes('交流相手を選ぶ'));
-  if(social){const bs=social.querySelectorAll('.toge-actions button');if(bs[0])bs[0].textContent='♡ 交流';if(bs[1])bs[1].textContent='✧ 贈り物'}
- }
- const scheduleDecorate=()=>setTimeout(decorate,0);
- // Stop the main simulation at its source while the extra story owns the shared modal.
- const oldOpen=window.openTogemaruMode;
- if(oldOpen)window.openTogemaruMode=function(){
-  if(!active){active=true;window.__togeModeActive=true;wasPaused=!!paused;paused=true;clearInterval(smallTimer);smallTimer=null;clearTimeout(autoTimer);}
-  oldOpen.apply(this,arguments);scheduleDecorate();
- };
- const oldClose=window.closeTogemaruMode;
- if(oldClose)window.closeTogemaruMode=function(){
-  oldClose.apply(this,arguments);
-  active=false;window.__togeModeActive=false;
-  paused=wasPaused;
-  if(typeof startClock==='function')startClock();
-  if(typeof render==='function')render();
- };
- // Guard every central progression/redraw path, including calls from other extensions.
- if(typeof seasonTick==='function'){
-  const old=seasonTick;
-  seasonTick=function(){if(active||window.__togeModeActive)return;return old.apply(this,arguments)};
-  window.seasonTick=seasonTick;
- }
- if(typeof advanceSeason==='function'){
-  const old=advanceSeason;
-  advanceSeason=function(){if(active||window.__togeModeActive)return;return old.apply(this,arguments)};
-  window.advanceSeason=advanceSeason;
- }
- if(typeof render==='function'){
-  const old=render;
-  render=function(){if(active||window.__togeModeActive)return;return old.apply(this,arguments)};
-  window.render=render;
- }
- // Re-decorate after any mini-story action or submenu transition.
- for(const name of ['togeAct','togeMove','togeSelectPerson','togeSetAutonomy','togeSetForm']){
-  const old=window[name];if(typeof old==='function')window[name]=function(){const out=old.apply(this,arguments);scheduleDecorate();return out};
- }
- // Deliberately no MutationObserver here: decorate() mutates the modal and would retrigger itself indefinitely.
-})();
-</script>
 
-
-<script>
-// v8.50: restore the actual scrolling element after Togemaru re-renders.
-(function(){
- 'use strict';
- const names=['togeAct','togeMove','togeSelectPerson','togeSetAutonomy','togeSetForm'];
- function keepScroll(fn){return function(){
-   // #togeModal is the element with overflow-y:auto; #modal itself is not the scroller.
-   const inner=document.getElementById('togeModal');
-   const innerTop=inner?inner.scrollTop:0;
-   const pageTop=window.scrollY||document.documentElement.scrollTop||0;
-   const result=fn.apply(this,arguments);
-   const restore=()=>{
-     const next=document.getElementById('togeModal');
-     if(next){next.style.scrollBehavior='auto';next.scrollTop=innerTop;}
-     window.scrollTo(0,pageTop);
-   };
-   // present() replaces #togeModal itself; restore after its replacement and after observers finish.
-   setTimeout(restore,0);
-   setTimeout(restore,50);
-   setTimeout(restore,180);
-   return result;
- };}
- names.forEach(name=>{const fn=window[name];if(typeof fn==='function'&&!fn.__v849Scroll){const wrapped=keepScroll(fn);wrapped.__v849Scroll=true;window[name]=wrapped;}});
-})();
-</script>

@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" sizes="1024x1024" href="./icon.png?v=855">
 <link rel="manifest" href="./manifest.webmanifest?v=855">
 <meta name="description" content="PANIS ET CALAMITAS — ベイク大陸ライフシミュレーション">
-<title>PANIS ET CALAMITAS — ベイク大陸ライフ v8.56</title>
+<title>PANIS ET CALAMITAS — ベイク大陸ライフ v8.57</title>
 <style>
 :root{--bg:#171923;--panel:#222635;--panel2:#2b3042;--ink:#f4f0e8;--muted:#aeb4c5;--gold:#e6c477;--green:#76c9a2;--red:#e58b8b;--line:#3b4257}
 *{box-sizing:border-box}body{margin:0;padding-bottom:env(safe-area-inset-bottom);background:radial-gradient(circle at top,#30364b,#171923 60%);color:var(--ink);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;line-height:1.55}
@@ -2456,9 +2456,9 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
 <script>
 // v8.55 release metadata: normalize legacy version labels after all extensions load.
 (function(){
-  document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.56';
+  document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.57';
   const footer=document.querySelector('footer');
-  if(footer) footer.textContent='BAKE LIFE v8.56 — PANIS ET CALAMITAS';
+  if(footer) footer.textContent='BAKE LIFE v8.57 — PANIS ET CALAMITAS';
 })();
 </script>
 
@@ -2558,7 +2558,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
 
 
 <script>
-/* BAKE LIFE v8.56 — BOUNDARY EXISTENCE UPDATE
+/* BAKE LIFE v8.57 — BOUNDARY FINAL EXISTENCE UPDATE
    Adds boundary living conditions, gradual existence erosion and record rewriting.
    Existing boundary exploration and layer travel remain intact. */
 (function installBoundaryExistenceUpdate(){
@@ -2672,6 +2672,94 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  try{ensure()}catch(e){}
  const titleDefsSafe=typeof titleDefs!=='undefined'?titleDefs:null;
  if(titleDefsSafe&&!titleDefsSafe.some(x=>x[0]==='境界に名を奪われた者'))titleDefsSafe.push(['境界に名を奪われた者','境界点の存在侵食が段階IIIに到達し、経歴記録が改変される','special',s=>(s.boundaryErosionStage||0)>=3&&(s.boundaryRewriteCount||0)>0]);
+})();
+</script>
+
+
+<script>
+/* BAKE LIFE v8.57 — BOUNDARY FINAL EXISTENCE UPDATE
+   Fourth phase: irreversible boundary fates, anomaly lives and special records. */
+(function installBoundaryFinalFates(){
+ 'use strict';
+ const clampF=(v,a=0,b=100)=>Math.max(a,Math.min(b,Number(v)||0));
+ const logF=(m,t='bad')=>{try{addLog(m,t)}catch(e){}};
+ const safeF=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const isHere=()=>!!(p&&!p.dead&&!p.afterlife&&p.layer==='境界点');
+ function safeReturn(){
+  const candidates=(typeof places!=='undefined'&&Array.isArray(places))?places.filter(x=>(x.risk??2)<=2):[];
+  const preferred=candidates.find(x=>x.n===p.homePlace)||candidates.find(x=>x.n===p.originPlace)||candidates[0];
+  if(preferred&&typeof setLayerLocation==='function')setLayerLocation(preferred.n,'境界点からの不完全な帰還');
+  else {p.layer=p.homeLayer||'通常層';p.place=p.originPlace||p.birthPlace||p.place;p.risk=Math.min(2,p.risk||2);}
+ }
+ function setFate(kind,label,desc){
+  p.boundaryFate=kind;p.boundaryFateLabel=label;p.boundaryFateDescription=desc;p.boundaryFateAge=p.age||0;p.boundaryFateYear=p.year||0;p.boundaryFinaleResolved=true;
+  p.boundaryAlterations=Array.isArray(p.boundaryAlterations)?p.boundaryAlterations:[];
+  p.boundaryAlterations.push({kind:'finale',text:desc,age:p.age||0,year:p.year||0});
+ }
+ function triggerFinale(){
+  if(!isHere()||p.boundaryFinaleResolved||p.boundaryFinalePending||p.boundaryExposure<90||decision)return;
+  p.boundaryFinalePending=true;
+  bigDecision('【存在侵食 IV／存在の再定義】',
+   'あなたを構成していた記録、記憶、身体の境界が保てなくなった。境界点は、あなたに新しい定義を与えようとしている。ここで選ぶものは、これまでの人生を大きく変える。',
+   ['自分自身を保つため、最後まで抵抗する','異常を抱えたまま、通常地域へ帰還する','境界点の一部となり、ここに留まる','自分を手放し、別の存在として生き直す'],
+   [
+    ()=>{
+     p.boundaryFinalePending=false;setFate('self_preserved','自我を保った者','存在の再定義に抗い、自分の名前と記憶を守り抜いた。');
+     p.boundaryExposure=72;p.boundaryErosionStage=3;p.mind=clampF((p.mind||0)-18);p.stress=clampF((p.stress||0)+15);p.health=clampF((p.health||0)-8);
+     p.boundarySelfPreserved=true;logF('あなたは自分の名前を繰り返し唱えた。境界点は完全な書き換えに失敗した。しかし、侵食は終わっていない。','good');
+    },
+    ()=>{
+     p.boundaryFinalePending=false;setFate('damaged_return','異常を連れて帰った者','境界点から帰還したが、身体と記録に消えない異常を残した。');
+     p.boundaryExposure=55;p.boundaryErosionStage=3;p.boundaryReturnedAltered=true;safeReturn();p.health=clampF((p.health||0)-12);p.mind=clampF((p.mind||0)-8);
+     logF('あなたは境界点から帰還した。周囲の景色は正常だ。だが、鏡の中のあなたはまだ境界点を見つめている。','bad');
+    },
+    ()=>{
+     p.boundaryFinalePending=false;setFate('boundary_fusion','境界点と融合した者','個体としての境界を失い、境界点そのものの一部になった。');
+     p.boundaryEntity=true;p.boundaryExposure=100;logF('あなたの輪郭は土地の景色へ溶けていった。以後、境界点で道を尋ねる者は、ときおりあなたの声を聞く。','bad');
+     die('境界点との融合');
+    },
+    ()=>{
+     p.boundaryFinalePending=false;setFate('anomaly_replacement','別の存在へ置換された者','元の個体情報は失われ、境界点が定義した別の存在として人生を終えた。');
+     p.boundaryReplaced=true;p.boundaryEntity=true;logF('あなたの名前は記録から消えた。そこにいたものは、あなたによく似た別の何かとして歩き始めた。','bad');
+     die('境界点による存在置換');
+    }
+   ]);
+ }
+ if(typeof seasonTick==='function'){
+  const old=seasonTick;
+  seasonTick=function(){old();try{if(p&&!p.dead){if(!Number.isFinite(p.boundaryFinaleResolved))p.boundaryFinaleResolved=false;if(!p.boundaryFinalePending){const echoes=JSON.parse(storage.get('bakeBoundaryEchoes','[]'));if(p.layer==='境界点'&&Array.isArray(echoes)&&echoes.length&&!p.boundaryEchoSeen&&Math.random()<.22){const echo=echoes[Math.floor(Math.random()*echoes.length)];p.boundaryEchoSeen=true;p.boundaryResearch=(p.boundaryResearch||0)+1;addLog(`境界点の奥で、かつてここに残った${echo.label||'誰か'}の気配を感じた。${echo.name||'その存在'}は、今もこの場所の一部なのかもしれない。`,'event')}triggerFinale()}}}catch(e){console.warn('Boundary finale skipped',e)}};
+ }
+ // Special outcomes are retained in life archive, independently of the ordinary death cause.
+ const defs=typeof titleDefs!=='undefined'?titleDefs:null;
+ if(defs){
+  const additions=[
+   ['境界点に呑まれし者','境界点との融合を選び、その人生を終える','special',s=>s.boundaryFate==='boundary_fusion'],
+   ['帰還者の傷痕','存在侵食IVから異常を抱えたまま帰還する','special',s=>s.boundaryFate==='damaged_return'],
+   ['自我の防衛者','存在侵食IVの最終選択で自分自身を保つ','special',s=>s.boundaryFate==='self_preserved'],
+   ['存在を譲り渡した者','境界点による存在置換を受け入れる','secret',s=>s.boundaryFate==='anomaly_replacement']
+  ];
+  additions.forEach(d=>{if(!defs.some(x=>x[0]===d[0]))defs.push(d)});
+ }
+ if(typeof die==='function'){
+  const oldDie=die;
+  die=function(cause){oldDie(cause);try{
+   if(p&&p.boundaryFate){
+    const key='bakeLives';let arr=JSON.parse(storage.get(key,'[]'));if(Array.isArray(arr)&&arr.length){arr[0].boundaryFate=p.boundaryFate;arr[0].boundaryFateLabel=p.boundaryFateLabel;arr[0].boundaryFateDescription=p.boundaryFateDescription;arr[0].boundaryExposure=p.boundaryExposure;arr[0].boundaryRecordHistory=(p.boundaryRecordHistory||[]).slice();storage.set(key,JSON.stringify(arr));}
+    if(['boundary_fusion','anomaly_replacement'].includes(p.boundaryFate)){let echoes=JSON.parse(storage.get('bakeBoundaryEchoes','[]'));if(!Array.isArray(echoes))echoes=[];if(!echoes.some(x=>x.lifeId===p.lifeId))echoes.unshift({lifeId:p.lifeId,name:p.name,fate:p.boundaryFate,label:p.boundaryFateLabel,place:p.place,year:p.year});storage.set('bakeBoundaryEchoes',JSON.stringify(echoes.slice(0,30)));}
+    const modal=document.getElementById('modal');if(modal&&modal.querySelector('.dead')){const note=document.createElement('section');note.className='entry';note.innerHTML=`<b>BOUNDARY FATE / 境界点の最終記録</b><p>${safeF(p.boundaryFateLabel)}</p><p class="sub">${safeF(p.boundaryFateDescription)}</p>`;modal.querySelector('.dead').appendChild(note)}
+   }
+  }catch(e){console.warn('Boundary fate archive skipped',e)}};
+ }
+ // The active status panel also explains the final-stage outcome and keeps it visible after return.
+ if(typeof window.showBoundaryStatus==='function'){
+  const oldStatus=window.showBoundaryStatus;
+  window.showBoundaryStatus=function(){oldStatus();try{
+   if(!p)return;const modal=document.getElementById('modal');if(!modal)return;
+   const entry=document.createElement('section');entry.className='entry';entry.innerHTML=p.boundaryFate?`<b>存在侵食 IV／最終的な存在状態</b><p>${safeF(p.boundaryFateLabel)}</p><p class="sub">${safeF(p.boundaryFateDescription)}</p>`:`<b>存在侵食 IV</b><p>存在侵食度が90に達すると、存在の再定義が始まり、最終的な選択を迫られます。</p>`;modal.appendChild(entry);
+  }catch(e){}};
+ }
+ // If a save already reached the final threshold before this update, offer the finale on next season.
+ try{if(p){p.boundaryFinaleResolved=!!p.boundaryFinaleResolved;p.boundaryFinalePending=false}}catch(e){}
 })();
 </script>
 

@@ -3,7 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>PANIS ET CALAMITAS — ベイク大陸ライフ v8.43</title>
+<meta name="theme-color" content="#f4f5f8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="BAKE LIFE">
+<link rel="icon" type="image/png" sizes="1024x1024" href="./icon.png?v=852">
+<link rel="apple-touch-icon" sizes="1024x1024" href="./icon.png?v=852">
+<link rel="manifest" href="./manifest.webmanifest?v=852">
+<meta name="description" content="PANIS ET CALAMITAS — ベイク大陸ライフシミュレーション">
+<title>PANIS ET CALAMITAS — ベイク大陸ライフ v8.52</title>
 <style>
 :root{--bg:#171923;--panel:#222635;--panel2:#2b3042;--ink:#f4f0e8;--muted:#aeb4c5;--gold:#e6c477;--green:#76c9a2;--red:#e58b8b;--line:#3b4257}
 *{box-sizing:border-box}body{margin:0;padding-bottom:env(safe-area-inset-bottom);background:radial-gradient(circle at top,#30364b,#171923 60%);color:var(--ink);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;line-height:1.55}
@@ -222,7 +229,8 @@ main{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 24px)}
 .pause-quick{position:fixed;right:12px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:30;background:#806b3c!important;border:1px solid #d0b36e!important;box-shadow:0 4px 18px #0008;font-weight:750;padding:9px 13px!important;min-height:42px!important;border-radius:999px!important}
 @media(max-width:600px){.stats{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:3px!important}.stat{display:block;min-width:0;padding:5px 2px!important;text-align:center}.statline{display:flex;flex-direction:column;align-items:center;gap:1px;font-size:.56rem!important;line-height:1.2;white-space:nowrap}.statline b{font-size:.62rem;white-space:nowrap}.bar{display:block;width:100%;height:3px!important;margin:3px 0 0!important}.pause-quick{right:10px;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 10px);font-size:.78rem!important}}
 </style>
-<style>@keyframes slFade{from{opacity:0}to{opacity:1}}#specialLifeStartBanner button{min-width:180px}</style>\n</head>
+<style>@keyframes slFade{from{opacity:0}to{opacity:1}}#specialLifeStartBanner button{min-width:180px}</style>
+</head>
 <body>
 <header><div class="eyebrow">A LIFE SIMULATION IN BAKE CONTINENT</div><h1>PANIS ET CALAMITAS</h1><p>ひとつの生地に、ひとつの人生。——あなたは、その一生を見届ける。</p></header>
 <main>
@@ -599,11 +607,11 @@ function beginLife(chosenName,specialMatch=null){
  p.personality=createPersonality(p.trait);
  if(birthProfile)applyBirthProfile(birthProfile);
  if(specialMatch&&specialMatch.profile){const sp=specialMatch.profile;isAngel=!!sp.angel;p.specialLifeId=specialMatch.id;p.specialLife=true;p.specialLifeEventsDone=[];p.specialLifeOrigin=sp.name;p.place=sp.place;p.layer=layerOfPlace(sp.place);p.homeLayer=p.layer;p.desc=`${sp.name}としての既存個体記録。${sp.place}を起点に、この個体固有の人生を歩む。`;p.risk=sp.risk??1;p.job=sp.job;p.trait=sp.trait;p.personality=createPersonality(p.trait);p.family=sp.family;p.health=sp.health;p.mind=sp.mind;p.knowledge=sp.knowledge;p.social=sp.social;p.skill=sp.skill;p.happiness=sp.happiness;p.money=sp.money;p.stress=sp.stress||0;p.magicMark=!!sp.magicMark;p.isAngel=!!sp.angel;p.isPureAngel=!!sp.pureAngel;p.fallen=!!sp.fallen;p.fallStage=sp.fallen?3:0;p.angelType=sp.pureAngel?"純天使":sp.angel?"昇天使":p.angelType;p.afterlife=!!sp.afterlife;p.afterlifeAge=0;p.longLived=!!sp.longLived;p.specialLifeMilestones=sp.milestones||[];p.specialLifeCompleted=false;p.specialLifePlayed=true;if(sp.angel){p.careerLocked=false;p.holyFavor=10}if(sp.afterlife){p.age=0;p.afterlifeAge=0;p.job=sp.job;p.isAngel=true}if(sp.fallen){p.inquisitorAlert=35;p.fallStage=3;p.fallen=true}p.originType="既存個体の専用人生";p.birthType="既存個体の専用人生";p.birthTypeId="special_life";p.birthTypeDescription="登録済みの個体記録に基づく専用人生。";p.birthTypeHistory=[{age:0,year:p.year,event:"既存個体の専用人生として開始"}];}
- $("overlay").style.display="none";$ ("log").innerHTML="";addLog(`${p.name}が${p.place}で生まれた。${p.desc} 家庭環境：${p.family}。出生タイプ：${p.birthType}。`,"good");
+ paused=false;decision=false;$("overlay").style.display="none";$ ("log").innerHTML="";addLog(`${p.name}が${p.place}で生まれた。${p.desc} 家庭環境：${p.family}。出生タイプ：${p.birthType}。`,"good");
  p.npcRelations=[{name:"ミルクティー味クッキー",role:"幼馴染",bond:ri(8,22),alive:true,location:p.place,years:0,age:ri(0,2),job:"子ども",status:"近所で暮らしている",history:[]},{name:"アーモンドタルト味クッキー",role:"近所の友人",bond:ri(3,18),alive:true,location:p.place,years:0,age:ri(0,3),job:"子ども",status:"近所で暮らしている",history:[]},{name:"黒糖ビスケット味クッキー",role:"家族ぐるみの知人",bond:ri(5,20),alive:true,location:p.place,years:0,age:ri(0,5),job:"子ども",status:"家族ぐるみの知人",history:[]}];
  if(isAngel&&!p.specialLife){p.job="見習い天使";p.angelType="純天使";p.isPureAngel=true;p.knowledge+=15;p.holyFavor=ri(0,12);addLog("純天使として生を受けた。地上のクッキーとは異なる規範と文化の中で育っていく。","event")}
  if(p.specialLife){addLog(`CHRONOS RECORD ACCESS：${p.name}の既存個体記録に接続した。これは専用人生であり、未来の選択はまだ確定していない。`,`event`);if(p.afterlife){addLog("あなたはベイクドームでの人生を開始した。地上の生とは異なる時間が流れている。","good")}else addLog(`${p.name}としての専用人生が始まった。既定の過去を持ちながら、これからの選択はあなたに委ねられている。`,`good`)}
- render();paused=true;startClock();
+ render();paused=false;startClock();if(typeof syncPauseButtons==='function')syncPauseButtons();
 }
 const specialStoryEvents={
  mulberry:[{age:6,title:"都市の片隅の子ども",desc:"都市部の片隅で、便利屋の仕事を見聞きする。大人たちは誰かの困りごとを片付けているらしい。",opts:["手伝えることを探す","余計なことには首を突っ込まない"],effects:[()=>{p.skill=clamp(p.skill+3);p.social=clamp(p.social+2);addLog("小さな手伝いをして、仕事の段取りを覚えた。","good")},()=>{p.mind=clamp(p.mind+2);addLog("他人の問題に深入りしない距離感を覚えた。","event")} ]},{age:14,title:"役に立つこと、稼げること",desc:"家計や将来を考え始める。好き嫌いだけでは進路を決められない。",opts:["実務的な技能を身につける","人脈を作っておく"],effects:[()=>{p.skill=clamp(p.skill+7);p.knowledge=clamp(p.knowledge+3)},()=>{p.social=clamp(p.social+7);p.money+=8}]},{age:25,title:"ハンディーズの看板",desc:"依頼を受ける場所も、帰る場所も必要になった。小さな便利屋ハンディーズをどう運営する？",opts:["採算を重視する","依頼人との信頼を重視する"],effects:[()=>{p.money+=45;p.stress=clamp(p.stress+5);p.job="ハンディーズ代表"},()=>{p.social=clamp(p.social+10);p.fame+=5;p.job="ハンディーズ代表"}]},{age:32,title:"魔導刻印の限界",desc:"腕の魔導刻印は便利だが、身体への負担は蓄積する。仕事のためにどこまで使うべきか。",opts:["必要な時は惜しまず使う","使用条件を厳しく決める"],effects:[()=>{p.skill=clamp(p.skill+10);p.health=clamp(p.health-10);p.stress=clamp(p.stress+8)},()=>{p.health=clamp(p.health+4);p.egoStability=clamp(p.egoStability+5)}]}],
@@ -1317,7 +1325,7 @@ function deleteSlot(i){const slots=safeRead("bakeSaveSlots",{});if(!slots[i]||!c
 function importSaveDialog(){$ ("importSaveFile").click()}
 $("importSaveFile").addEventListener("change",async ev=>{const file=ev.target.files?.[0];if(!file)return;try{const data=JSON.parse(await file.text());if(!data||typeof data!=="object"||!data.current)throw new Error("セーブデータの形式が違います");if(!confirm(`v${data.version||"?"}のセーブを読み込みます。現在の人生データを置き換えますか？`))return;if(data.secretMeta)storage.set("bakeSecretMeta",JSON.stringify(data.secretMeta));clearInterval(timer);clearInterval(smallTimer);clearTimeout(autoTimer);p=migrateV8State(data.current);for(const [k,v] of Object.entries({bakeDeathCauses:data.deathCauses||[],bakeTitles:data.titles||[],bakeLives:data.lives||[],bakeAscendedLives:data.ascendedLives||[]}))storage.set(k,JSON.stringify(v));storage.set("bakeCurrent",JSON.stringify(p));decision=null;paused=true;$("overlay").style.display="none";$("log").innerHTML="";(p.logs||[]).slice().reverse().forEach(x=>{const e=document.createElement("div");e.className="entry "+(x.type||"");e.innerHTML=`<small>${x.year||p.year}年 / ${x.age??p.age}歳</small>${escapeHtml(x.text||"")}`;$ ("log").append(e)});render();startClock();addLog(`v${data.version||"?"}のセーブデータを読み込んだ。`,"good");}catch(err){alert("読み込みに失敗しました："+err.message)}finally{ev.target.value=""}});
 
-function exportSave(){let data={version:8.26,current:p,deathCauses:JSON.parse(storage.get("bakeDeathCauses","[]")),titles:JSON.parse(storage.get("bakeTitles","[]")),lives:JSON.parse(storage.get("bakeLives","[]")),ascendedLives:JSON.parse(storage.get("bakeAscendedLives","[]"))};let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="bake-continent-life-record.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}
+function exportSave(){let data={version:8.52,current:p,deathCauses:JSON.parse(storage.get("bakeDeathCauses","[]")),titles:JSON.parse(storage.get("bakeTitles","[]")),lives:JSON.parse(storage.get("bakeLives","[]")),ascendedLives:JSON.parse(storage.get("bakeAscendedLives","[]"))};let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="bake-continent-life-record.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}
 window.addEventListener("beforeunload",()=>{if(p)storage.set("bakeCurrent",JSON.stringify(p))});
 try{const cfg=JSON.parse(storage.get("bakeSettings","{}"));if(cfg.font==="large")document.documentElement.style.fontSize="18px";if(cfg.font==="small")document.documentElement.style.fontSize="14px";if(cfg.motion==="simple")document.body.classList.add("reduced-motion");if(cfg.motion==="fast")document.body.classList.add("fast-motion");}catch(e){}
 (function init(){let old=storage.get("bakeCurrent", "");if(old){try{let q=JSON.parse(old);if(q&&!q.dead){p=q;;p.birthType=p.birthType||"旧セーブ由来・未記録";p.birthTypeId=p.birthTypeId||"legacy_unknown";p.birthTypeDescription=p.birthTypeDescription||"旧セーブに出生背景の記録はありません。";p.birthTypeHistory=p.birthTypeHistory||[];p.layer=p.layer||layerOfPlace(p.place);p.homeLayer=p.homeLayer||p.layer;p.layerHistory=p.layerHistory||[];p.layerVisitCount=p.layerVisitCount||0;p.layerCrossings=p.layerCrossings||0;p.boundaryIntrusions=p.boundaryIntrusions||0;p.boundaryRewriteCount=p.boundaryRewriteCount||0;delete p.hunger;delete p.hungerCrises;p.titles=(p.titles||[]).map(x=>x==="飢えを知る者"?"困窮を乗り越えた者":x);p.ageMilestones=p.ageMilestones||[];if(!p.personality)p.personality=createPersonality(p.trait);p.butterMangroveEvents=p.butterMangroveEvents||0;p.butterMangroveResearch=p.butterMangroveResearch||false;p.teonanacatlEncounter=p.teonanacatlEncounter||false;p.marmeloTruthSeen=p.marmeloTruthSeen||false;p.directiveCount=p.directiveCount||0;p.directiveHistory=p.directiveHistory||[];p.terraceRelations=p.terraceRelations||{};p.terraceEncountered=p.terraceEncountered||[];p.terraceProtection=p.terraceProtection||"";p.terraceEvents=p.terraceEvents||0;p.isPureAngel=p.isPureAngel===true||(p.isAngel&&p.angelType==="純天使");p.observationEnded=p.observationEnded||false;p.lastObservationPromptAge=p.lastObservationPromptAge||0;p.fallStage=p.fallStage||0;p.inquisitorAlert=p.inquisitorAlert||0;p.instantFall=p.instantFall||false;p.formerColleagueMet=p.formerColleagueMet||false;p.evasionComplete=p.evasionComplete||false;p.mentalCollapseEventSeen=p.mentalCollapseEventSeen||false;p.baroqueRampage=p.baroqueRampage||false;p.baroqueRampageStarted=p.baroqueRampageStarted||false;p.baroqueRampageWins=p.baroqueRampageWins||0;p.baroqueRampageLosses=p.baroqueRampageLosses||0;p.baroqueWhisperResists=p.baroqueWhisperResists||0;p.baroqueWhisperFollowed=p.baroqueWhisperFollowed||0;p.baroqueConfrontations=p.baroqueConfrontations||0;p.baroqueRampageRecovered=p.baroqueRampageRecovered||false;p.baroqueSecretRecovery=p.baroqueSecretRecovery||false;p.calamityRecords=p.calamityRecords||[];p.calamitySurvived=p.calamitySurvived||[];p.calamityArchive=p.calamityArchive||[];p.calamityArrivalCount=p.calamityArrivalCount||0;p.calamityArchive=p.calamityArchive||[];p.calamityArrivalCount=p.calamityArrivalCount||0;p.npcRelations=p.npcRelations||[];p.familySupport=p.familySupport||0;p.friendshipYears=p.friendshipYears||0;p.careerFields=p.careerFields||[];p.regionState=p.regionState||{economy:50,security:50,healthcare:50,technology:50,prosperity:50,disaster:0};p.professionRank=p.professionRank||0;p.rebuildProjects=p.rebuildProjects||0;p.cyberneticLevel=p.cyberneticLevel||0;p.fairyYears=p.fairyYears||0;p.baroqueSocialYears=p.baroqueSocialYears||0;p.terraceCouncil=p.terraceCouncil||0;delete p.hunger;delete p.hungerCrises;
@@ -1419,7 +1427,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  const oldMore=showMoreMenu;showMoreMenu=function(){oldMore();let m=$('modal');if(m){let wrap=m.querySelector('.choices');if(wrap){let b=document.createElement('button');b.textContent='秘密の記録・全人生アーカイブ';b.onclick=showSecretArchive;wrap.appendChild(b)}}};
  const oldRegion=showRegionInfo;showRegionInfo=function(){oldRegion();let m=$('modal');if(m){let meta=initSecretMeta();let div=document.createElement('div');div.className='entry';div.innerHTML=`<b>地域の秘密の発見</b><div class="sub">訪問記録：${(meta.regions||[]).length}地域 / 秘密の発見：${(meta.discoveries||[]).length}件。地域ごとの探索や人生を重ねることで、新しい記録が見つかる。</div><button onclick="showSecretArchive()">秘密の記録を見る</button>`;m.appendChild(div)}};
  const oldCollection=showCollection;showCollection=function(){syncSecretTitleLedger();oldCollection();let m=$('modal');if(m){let b=m.querySelector('button:last-child');let x=document.createElement('button');x.textContent='秘密の記録・全人生アーカイブ';x.onclick=showSecretArchive;b?.before(x)}};
- const oldExport=exportSave;exportSave=function(){let data={version:8.26,current:p,deathCauses:JSON.parse(storage.get('bakeDeathCauses','[]')),titles:JSON.parse(storage.get('bakeTitles','[]')),lives:JSON.parse(storage.get('bakeLives','[]')),ascendedLives:JSON.parse(storage.get('bakeAscendedLives','[]')),secretMeta:initSecretMeta()};let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.19.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)};
+ const oldExport=exportSave;exportSave=function(){let data={version:8.52,current:p,deathCauses:JSON.parse(storage.get('bakeDeathCauses','[]')),titles:JSON.parse(storage.get('bakeTitles','[]')),lives:JSON.parse(storage.get('bakeLives','[]')),ascendedLives:JSON.parse(storage.get('bakeAscendedLives','[]')),secretMeta:initSecretMeta()};let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.19.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)};
  // v8.8: robust mobile easter egg. Tap the title seven times within 6 seconds.
  let tapTimer=null,taps=0;const title=document.querySelector('header h1');
  function secretTapFeedback(message){let el=document.getElementById('secretTapHint');if(!el){el=document.createElement('div');el.id='secretTapHint';el.style.cssText='position:fixed;left:50%;bottom:calc(78px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:10001;background:#202536;border:1px solid #b89a59;color:#f4e7bd;padding:9px 14px;border-radius:12px;font-size:13px;box-shadow:0 4px 18px #0009;max-width:90vw;text-align:center;pointer-events:none';document.body.appendChild(el)}el.textContent=message;el.style.display='block';clearTimeout(el._hide);el._hide=setTimeout(()=>{el.style.display='none'},1800)}
@@ -2452,22 +2460,12 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
 })();
 </script>
 
-
 <script>
-// v8.51 MAIN CLOCK RECOVERY — cinematic close restores a running life.
+// v8.52 release metadata: normalize legacy version labels after all extensions load.
 (function(){
- 'use strict';
- document.addEventListener('click',function(ev){
-  const btn=ev.target&&ev.target.closest?ev.target.closest('#cinemaClose'):null;
-  if(!btn)return;
-  setTimeout(()=>{
-   if(typeof p!=='undefined'&&p&&!p.dead&&!decision){
-    paused=false;
-    if(typeof syncPauseButtons==='function')syncPauseButtons();
-    if(typeof startClock==='function'){lastTick=Date.now();clockCarry=0;startClock();}
-   }
-  },0);
- });
+  document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.52';
+  const footer=document.querySelector('footer');
+  if(footer) footer.textContent='BAKE LIFE v8.52 — PANIS ET CALAMITAS';
 })();
 </script>
 </body>

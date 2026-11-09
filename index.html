@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" sizes="1024x1024" href="./icon.png?v=855">
 <link rel="manifest" href="./manifest.webmanifest?v=855">
 <meta name="description" content="PANIS ET CALAMITAS — ベイク大陸ライフシミュレーション">
-<title>PANIS ET CALAMITAS — ベイク大陸ライフ v8.55</title>
+<title>PANIS ET CALAMITAS — ベイク大陸ライフ v8.56</title>
 <style>
 :root{--bg:#171923;--panel:#222635;--panel2:#2b3042;--ink:#f4f0e8;--muted:#aeb4c5;--gold:#e6c477;--green:#76c9a2;--red:#e58b8b;--line:#3b4257}
 *{box-sizing:border-box}body{margin:0;padding-bottom:env(safe-area-inset-bottom);background:radial-gradient(circle at top,#30364b,#171923 60%);color:var(--ink);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;line-height:1.55}
@@ -2456,9 +2456,9 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
 <script>
 // v8.55 release metadata: normalize legacy version labels after all extensions load.
 (function(){
-  document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.55';
+  document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.56';
   const footer=document.querySelector('footer');
-  if(footer) footer.textContent='BAKE LIFE v8.55 — PANIS ET CALAMITAS';
+  if(footer) footer.textContent='BAKE LIFE v8.56 — PANIS ET CALAMITAS';
 })();
 </script>
 
@@ -2553,6 +2553,125 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
   el.innerHTML=`<b>BAROQUE / ${stages[stage]}</b>${extra}<br><span class="sub">原因は未特定。寛解後も変異の痕跡が残る場合があります。</span>`;
  }catch(e){console.warn('v8.55 baroque render',e)}};
  try{if(p)ensure(p)}catch(e){}
+})();
+</script>
+
+
+<script>
+/* BAKE LIFE v8.56 — BOUNDARY EXISTENCE UPDATE
+   Adds boundary living conditions, gradual existence erosion and record rewriting.
+   Existing boundary exploration and layer travel remain intact. */
+(function installBoundaryExistenceUpdate(){
+ 'use strict';
+ const clampN=(v,min=0,max=100)=>Math.max(min,Math.min(max,Number(v)||0));
+ const escB=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const isBoundary=()=>!!(p&&!p.dead&&!p.afterlife&&p.layer==='境界点');
+ const ensure=()=>{
+  if(!p)return;
+  if(!Number.isFinite(p.boundaryExposure))p.boundaryExposure=0;
+  if(!Number.isFinite(p.boundaryStaySeasons))p.boundaryStaySeasons=0;
+  if(!Number.isFinite(p.boundaryErosionStage))p.boundaryErosionStage=0;
+  if(!Array.isArray(p.boundaryAlterations))p.boundaryAlterations=[];
+  if(!Array.isArray(p.boundaryRecordHistory))p.boundaryRecordHistory=[];
+  if(!Number.isFinite(p.boundaryStabilizerUses))p.boundaryStabilizerUses=0;
+ };
+ const log=(msg,type='bad')=>{try{addLog(msg,type)}catch(e){if(p&&Array.isArray(p.logs))p.logs.unshift({text:msg,type})}};
+ const pushAlteration=(kind,text)=>{ensure();if(!p.boundaryAlterations.some(x=>x.kind===kind)){p.boundaryAlterations.push({kind,text,age:p.age||0,year:p.year||0});}};
+ function applyStage(stage){
+  ensure(); if(stage<=p.boundaryErosionStage)return;
+  p.boundaryErosionStage=stage;
+  if(stage===1){
+   pushAlteration('body','身体の一部が境界点の環境に適応し、輪郭や素材感が不安定になった');
+   p.boundaryBodyAlteration=p.boundaryBodyAlteration||['皮膚の一部が半透明になる','影の形が身体と一致しなくなる','指先に結晶状の模様が浮かぶ'][Math.floor(Math.random()*3)];
+   p.health=clampN((p.health||0)-3);p.knowledge=clampN((p.knowledge||0)+2);
+   log(`【存在侵食 I／部分的な揺らぎ】${p.boundaryBodyAlteration}。鏡に映る姿が、わずかに遅れて動く。`,'bad');
+  }
+  if(stage===2){
+   pushAlteration('mind','感情や記憶の境界が曖昧になり、他人の経験が自分の記憶のように感じられる');
+   p.boundaryMentalAlteration=p.boundaryMentalAlteration||['知らない場所を故郷だと感じる','特定の感情だけが遠く感じられる','他人の思い出が自分のものとして浮かぶ'][Math.floor(Math.random()*3)];
+   p.mind=clampN((p.mind||0)-7);p.stress=clampN((p.stress||0)+8);
+   log(`【存在侵食 II／自己認識の混線】${p.boundaryMentalAlteration}。自分の記憶なのか、誰かの記憶なのか判別できない。`,'bad');
+  }
+  if(stage===3){
+   pushAlteration('record','世界側の個体記録が書き換わり、別の出生・家族・経歴が正しい記録として登録される');
+   const old={place:p.birthPlace||p.originPlace||p.place,family:p.family,birthType:p.birthType,birthTypeDescription:p.birthTypeDescription,job:p.job};
+   p.boundaryOriginalRecord=p.boundaryOriginalRecord||old;
+   const falseOrigins=['白紙の平原','模造された故郷','逆さ都市','記録されない集落'];
+   const falseFamilies=['記録上の保護者不明','境界点の住人たち','存在しない家族'];
+   p.boundaryRecordOverlay={birthplace:falseOrigins[Math.floor(Math.random()*falseOrigins.length)],family:falseFamilies[Math.floor(Math.random()*falseFamilies.length)],note:'この記録は境界点によって再構成された。本人の記憶・既存の記録と一致しない。'};
+   p.birthPlace=p.boundaryRecordOverlay.birthplace;p.family=p.boundaryRecordOverlay.family;p.birthType='境界点による再登録個体';p.birthTypeId='boundary_rewritten';
+   p.boundaryRecordHistory.push({age:p.age||0,year:p.year||0,before:old,after:{...p.boundaryRecordOverlay}});
+   p.boundaryRewriteCount=(p.boundaryRewriteCount||0)+1;
+   p.birthTypeDescription='【記録改変】'+p.boundaryRecordOverlay.birthplace+'で生まれ、'+p.boundaryRecordOverlay.family+'に育てられたという記録が追加されている。';
+   p.mind=clampN((p.mind||0)-10);p.stress=clampN((p.stress||0)+12);
+   log('【存在侵食 III／経歴の再定義】出生記録と家族記録が書き換わった。記録塔は改変後の情報を正史として受理している。元の記録は、あなたの手元にしか残っていない。','bad');
+  }
+ }
+ function boundarySeason(){
+  if(!p||p.dead)return;ensure();
+  if(isBoundary()){
+   p.boundaryStaySeasons++;
+   const placeRisk=clampN((p.risk||4)*2,0,14);
+   const stressRisk=(p.stress||0)>=65?5:(p.stress||0)>=40?2:0;
+   const mindRisk=(p.mind||0)<30?5:(p.mind||0)<50?2:0;
+   const protection=p.boundaryProtectionUntil&&p.boundaryProtectionUntil>(p.age||0)?-7:0;
+   const gain=Math.max(1,Math.round(4+placeRisk/2+stressRisk+mindRisk+protection+(Math.random()*3)));
+   p.boundaryExposure=clampN(p.boundaryExposure+gain);
+   // Environmental hardship: needs and recovery are unreliable here.
+   if(Math.random()<.32){p.health=clampN((p.health||0)-2);log('境界点では食料も休息も安定しない。食事を取ったはずなのに、空腹感だけが残った。','bad')}
+   if(Math.random()<.22){p.stress=clampN((p.stress||0)+3);p.happiness=clampN((p.happiness||0)-2);log('一晩眠ったはずなのに疲労が抜けない。窓の外では、昨日と同じ景色が繰り返されている。','bad')}
+   if(Math.random()<.18){p.knowledge=clampN((p.knowledge||0)+2);log('地図にない道筋を記録した。記録した直後、その道は地図の裏側へ移動した。','event')}
+   if(p.boundaryExposure>=18)applyStage(1);
+   if(p.boundaryExposure>=42)applyStage(2);
+   if(p.boundaryExposure>=68)applyStage(3);
+   if(p.boundaryExposure>=35&&Math.random()<.12){
+    const incidents=[
+     '帰路の標識に、あなたの名前が刻まれていた。だが文字は、あなたが生まれるより前の字体だった。',
+     '食卓に見覚えのない家族写真が置かれていた。写真の全員が、あなたを中央にして笑っている。',
+     '同じ一日が繰り返された。NPCは昨日と同じ会話をしたが、あなたのことだけを少し違う名前で呼んだ。',
+     '自分と同じ姿のクッキーが遠くを歩いていた。追いかけると、足跡だけがあなたの靴跡に変わった。'
+    ];
+    log(incidents[Math.floor(Math.random()*incidents.length)],'bad');
+   }
+  }else if(p.boundaryExposure>0){
+   // Leaving the boundary slows erosion; established alterations remain until specifically treated.
+   p.boundaryExposure=clampN(p.boundaryExposure-2);
+   if(p.boundaryExposure===0&&p.boundaryErosionStage>0)log('境界点の影響は弱まった。しかし、身体や記憶に生じた変化は残っている。','event');
+  }
+ }
+ if(typeof seasonTick==='function'){
+  const oldSeasonTick=seasonTick;
+  seasonTick=function(){oldSeasonTick();try{if(p&&!p.dead)boundarySeason()}catch(e){console.warn('Boundary season update skipped',e)}};
+ }
+ window.showBoundaryStatus=function(){
+  if(!p){alert('人生データがありません。');return}ensure();
+  const stage=p.boundaryErosionStage||0,ex=p.boundaryExposure||0;
+  const stageName=['未侵食','部分的な揺らぎ','自己認識の混線','経歴の再定義'][stage]||'未確認';
+  const old=p.boundaryOriginalRecord||{};const overlay=p.boundaryRecordOverlay;
+  const history=(p.boundaryRecordHistory||[]).slice(-4).reverse().map(x=>`<div class="sub">${escB(x.year)}年／${escB(x.age)}歳：${escB(x.after?.birthplace||'記録不明')}・${escB(x.after?.family||'記録不明')}</div>`).join('')||'<div class="sub">記録改変はまだ確認されていない。</div>';
+  const alters=(p.boundaryAlterations||[]).map(x=>`<div class="sub">・${escB(x.text)}</div>`).join('')||'<div class="sub">目立った変化はない。</div>';
+  const isHere=isBoundary();
+  $('overlay').style.display='grid';
+  $('modal').innerHTML=`<button class="modal-close" onclick="closeV8Modal()">×</button><div class="sub" style="letter-spacing:.15em;color:#c6a96a">BOUNDARY POINT / EXISTENCE RECORD</div><h2>境界点・存在侵食記録</h2><section class="entry"><b>現在の状態：${stageName}</b><p>存在侵食度：${ex}/100　／　境界点滞在：${p.boundaryStaySeasons||0}季</p><div style="height:9px;background:var(--panel2,#333);border-radius:9px;overflow:hidden"><div style="height:100%;width:${ex}%;background:linear-gradient(90deg,#8a9b9c,#c58b62,#b84c65)"></div></div><p class="sub">${isHere?'現在、境界点に滞在中です。時間・食事・睡眠・記録が安定しません。':'境界点の外にいます。侵食はゆっくり弱まりますが、既に起きた改変は残ります。'}</p></section><section class="entry"><b>確認された変化</b>${alters}</section>${overlay?`<section class="entry"><b>現在の改変記録</b><p>出生地：${escB(overlay.birthplace)}<br>家族：${escB(overlay.family)}</p><p class="sub">元の出生地：${escB(old.place||'不明')}／元の家族：${escB(old.family||'不明')}</p><p class="sub">${escB(overlay.note)}</p></section>`:''}<section class="entry"><b>改変履歴</b>${history}</section><div class="choices">${isHere&&p.money>=45?'<button class="primary" onclick="boundaryStabilize()">安定化処置を受ける（45G）</button>':''}<button onclick="closeV8Modal()">記録を閉じる</button></div>`;
+ };
+ window.boundaryStabilize=function(){
+  if(!p||p.dead||!isBoundary())return;
+  if((p.money||0)<45){log('安定化処置に必要な費用が足りない。','event');showBoundaryStatus();return}
+  p.money-=45;p.boundaryExposure=clampN((p.boundaryExposure||0)-18);p.stress=clampN((p.stress||0)-5);p.boundaryStabilizerUses=(p.boundaryStabilizerUses||0)+1;p.boundaryProtectionUntil=(p.age||0)+2;
+  log('簡易安定化装置を使用した。空間の揺らぎが一時的に弱まり、存在侵食の進行が抑えられた。','good');showBoundaryStatus();
+ };
+ if(typeof showMoreMenu==='function'){
+  const oldMore=showMoreMenu;
+  showMoreMenu=function(){oldMore();const wrap=$('modal')?.querySelector('.choices');if(wrap&&!Array.from(wrap.querySelectorAll('button')).some(b=>b.textContent.includes('存在侵食記録'))){const b=document.createElement('button');b.textContent='境界点・存在侵食記録';b.onclick=window.showBoundaryStatus;wrap.appendChild(b)}};
+ }
+ if(typeof render==='function'){
+  const oldRender=render;
+  render=function(){oldRender();try{if(p&&p.boundaryExposure>0){const id=$('identity');if(id&&!id.dataset.boundaryHint){id.dataset.boundaryHint='1';const hint=document.createElement('span');hint.id='boundaryIdentityHint';hint.style.cssText='display:block;font-size:11px;color:#c58b62;margin-top:3px';id.insertAdjacentElement('afterend',hint)}const hint=$('boundaryIdentityHint');if(hint)hint.textContent=`境界点侵食 ${Math.round(p.boundaryExposure)}/100 ・ ${['未侵食','部分的な揺らぎ','自己認識の混線','経歴の再定義'][p.boundaryErosionStage||0]}`}}catch(e){}};
+ }
+ // Keep legacy saves compatible; do not rewrite their original birth/family fields.
+ try{ensure()}catch(e){}
+ const titleDefsSafe=typeof titleDefs!=='undefined'?titleDefs:null;
+ if(titleDefsSafe&&!titleDefsSafe.some(x=>x[0]==='境界に名を奪われた者'))titleDefsSafe.push(['境界に名を奪われた者','境界点の存在侵食が段階IIIに到達し、経歴記録が改変される','special',s=>(s.boundaryErosionStage||0)>=3&&(s.boundaryRewriteCount||0)>0]);
 })();
 </script>
 

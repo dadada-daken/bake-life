@@ -2284,9 +2284,20 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  const PREF='bakeCinematicSettingsV1';
  const read=()=>{try{return JSON.parse(localStorage.getItem(PREF)||'{"enabled":true,"intensity":"full"}')}catch(e){return {enabled:true,intensity:'full'}}};
  const write=v=>{try{localStorage.setItem(PREF,JSON.stringify(v))}catch(e){}};
- let cfg=read(),hideTimer=null,lastKey='',lastAt=0,lastAnyAt=0;
+ let cfg=read(),hideTimer=null,lastKey='',lastAt=0,lastAnyAt=0,cinemaWasPaused=null;
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- const ensure=()=>{let el=document.getElementById('cinemaCurtain');if(el)return el;el=document.createElement('div');el.id='cinemaCurtain';el.setAttribute('role','status');el.setAttribute('aria-live','polite');el.innerHTML='<div class="cinema-card"><div class="cinema-mark" id="cinemaMark">✦</div><div class="cinema-kicker" id="cinemaKicker">A MOMENT IN LIFE</div><h2 id="cinemaHeading"></h2><p id="cinemaBody"></p><button class="cinema-close" type="button" id="cinemaClose">記録へ戻る</button></div>';document.body.appendChild(el);el.querySelector('#cinemaClose').addEventListener('click',()=>{el.classList.remove('show');clearTimeout(hideTimer)});return el};
+ function dismissCinema(){
+  const el=document.getElementById('cinemaCurtain');if(el)el.classList.remove('show');
+  clearTimeout(hideTimer);
+  // Restore the exact running/paused state from when this presentation began.
+  if(cinemaWasPaused!==null&&typeof p!=='undefined'&&p&&!p.dead&&!decision&&!window.__togeModeActive){
+   paused=cinemaWasPaused;
+   if(typeof syncPauseButtons==='function')syncPauseButtons();
+   if(typeof startClock==='function'){lastTick=Date.now();clockCarry=0;startClock();}
+  }
+  cinemaWasPaused=null;
+ }
+ const ensure=()=>{let el=document.getElementById('cinemaCurtain');if(el)return el;el=document.createElement('div');el.id='cinemaCurtain';el.setAttribute('role','status');el.setAttribute('aria-live','polite');el.innerHTML='<div class="cinema-card"><div class="cinema-mark" id="cinemaMark">✦</div><div class="cinema-kicker" id="cinemaKicker">A MOMENT IN LIFE</div><h2 id="cinemaHeading"></h2><p id="cinemaBody"></p><button class="cinema-close" type="button" id="cinemaClose">記録へ戻る</button></div>';document.body.appendChild(el);el.querySelector('#cinemaClose').addEventListener('click',dismissCinema);return el};
  const classify=t=>{
   if(/誕生|生まれた|人生が始ま|新しい人生が始/.test(t))return ['birth','✧','A NEW LIFE','生まれた日'];
   if(/結婚|婚姻|夫婦|伴侶とな|交際を始め|告白.*受け入れ/.test(t))return ['romance','♡','A SHARED LIFE','二人の関係が変わった'];
@@ -2298,9 +2309,9 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  function present(kind,mark,kicker,heading,body){
   if(!cfg.enabled||cfg.intensity==='off')return;
   const key=[kind,heading,body].join('|'),now=Date.now();if(key===lastKey&&now-lastAt<1800)return;if(now-lastAnyAt<1100)return;if(document.getElementById('chronicleTravel')?.classList.contains('show'))return;lastKey=key;lastAt=now;lastAnyAt=now;
-  const el=ensure();el.className=kind;el.querySelector('#cinemaMark').textContent=mark;el.querySelector('#cinemaKicker').textContent=kicker;el.querySelector('#cinemaHeading').textContent=heading;el.querySelector('#cinemaBody').textContent=body;
+  const el=ensure();if(cinemaWasPaused===null)cinemaWasPaused=!!paused;el.className=kind;el.querySelector('#cinemaMark').textContent=mark;el.querySelector('#cinemaKicker').textContent=kicker;el.querySelector('#cinemaHeading').textContent=heading;el.querySelector('#cinemaBody').textContent=body;
   clearTimeout(hideTimer);requestAnimationFrame(()=>el.classList.add('show'));
-  if(cfg.intensity==='simple'){hideTimer=setTimeout(()=>el.classList.remove('show'),1800)}else{hideTimer=setTimeout(()=>el.classList.remove('show'),4200)}
+  if(cfg.intensity==='simple'){hideTimer=setTimeout(dismissCinema,1800)}else{hideTimer=setTimeout(dismissCinema,4200)}
  }
  if(typeof addLog==='function'){
   const oldAddLog=addLog;
@@ -2560,7 +2571,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  const KEY='bakeTogemaruStoryV1', META='bakeTogemaruMetaV1';
  const $=id=>document.getElementById(id);
  document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.46';
- const setFooter=()=>{const f=document.querySelector('footer');if(f)f.textContent='BAKE LIFE v8.49 — TOGEMARU ISOLATION & UI FIX';};
+ const setFooter=()=>{const f=document.querySelector('footer');if(f)f.textContent='BAKE LIFE v8.50 — TOGEMARU ISOLATION & UI FIX';};
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setFooter);else setFooter();
  const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){return {}}};
  const metaRead=()=>{try{return JSON.parse(localStorage.getItem(META)||'{}')}catch(e){return {}}};
@@ -2648,6 +2659,21 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
 })();
 </script>
 
+
+<script>
+// v8.50: reliably restore the main-life clock after cinematic presentation dismissal.
+(function(){
+ 'use strict';
+ const close=document.getElementById('cinemaClose');
+ if(close && !close.dataset.v850){close.dataset.v850='1';close.addEventListener('click',()=>{
+  setTimeout(()=>{if(typeof p!=='undefined'&&p&&!p.dead&&!decision&&!window.__togeModeActive){
+   if(typeof syncPauseButtons==='function')syncPauseButtons();
+   if(typeof startClock==='function'){lastTick=Date.now();clockCarry=0;startClock();}
+  }},0);
+ });}
+})();
+</script>
+
 </body>
 </html>
 
@@ -2699,7 +2725,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
 
 
 <style id="toge-v846-ui">
-/* v8.49: readable status gauges and thumb-friendly two-column controls */
+/* v8.50: readable status gauges and thumb-friendly two-column controls */
 #togeModal .toge-statgrid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important}
 #togeModal .toge-stat{position:relative;display:grid!important;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:6px;row-gap:7px;min-width:0;padding:8px 9px!important;background:#252d3c!important;border:1px solid #465064!important;border-radius:8px!important;font-size:.76rem!important;line-height:1.2!important;overflow:hidden}
 #togeModal .toge-stat>span{min-width:0;overflow-wrap:anywhere}
@@ -2722,7 +2748,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
 }
 </style>
 <script>
-// v8.49 TOGEMARU ISOLATION + UI FIX
+// v8.50 TOGEMARU ISOLATION + UI FIX
 (function(){
  'use strict';
  const $=id=>document.getElementById(id);
@@ -2791,7 +2817,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
 
 
 <script>
-// v8.49: restore the actual scrolling element after Togemaru re-renders.
+// v8.50: restore the actual scrolling element after Togemaru re-renders.
 (function(){
  'use strict';
  const names=['togeAct','togeMove','togeSelectPerson','togeSetAutonomy','togeSetForm'];

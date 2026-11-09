@@ -2255,5 +2255,72 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
 })();
 
 </script>
+
+<style id="cinematicLifeStyles">
+#cinemaCurtain{position:fixed;inset:0;z-index:1200;display:flex;align-items:center;justify-content:center;padding:22px;background:radial-gradient(ellipse at center,rgba(39,35,49,.88),rgba(7,9,16,.97));opacity:0;pointer-events:none;transition:opacity .45s ease}
+#cinemaCurtain.show{opacity:1;pointer-events:none}
+#cinemaCurtain .cinema-card{width:min(560px,94vw);text-align:center;padding:28px 22px;border:1px solid rgba(224,196,132,.6);border-radius:18px;background:linear-gradient(145deg,rgba(34,34,48,.97),rgba(18,20,31,.98));box-shadow:0 20px 80px #0009;transform:translateY(14px) scale(.98);transition:transform .5s ease}
+#cinemaCurtain.show .cinema-card{transform:translateY(0) scale(1)}
+#cinemaCurtain .cinema-kicker{font-size:.72rem;letter-spacing:.24em;color:#d7c18a}
+#cinemaCurtain h2{margin:12px 0;color:#f3dfad;font-size:clamp(1.35rem,5vw,2rem);letter-spacing:.08em}
+#cinemaCurtain p{color:#e0dfdf;line-height:1.9;margin:8px 0}
+#cinemaCurtain .cinema-mark{font-size:2rem;margin-bottom:8px;filter:drop-shadow(0 0 14px #d9bd77)}
+#cinemaCurtain.birth .cinema-card{border-color:#d9c28d;background:linear-gradient(145deg,#3a3028f5,#191d2af5)}
+#cinemaCurtain.romance .cinema-card{border-color:#d99aa9;background:linear-gradient(145deg,#3b2836f5,#1c1d2bf5)}
+#cinemaCurtain.baroque .cinema-card{border-color:#bd718d;background:linear-gradient(145deg,#3b202ff5,#151725f5);box-shadow:0 20px 90px #7b254b55}
+#cinemaCurtain.history .cinema-card{border-color:#8ca9bd;background:linear-gradient(145deg,#243746f5,#171b29f5)}
+#cinemaCurtain.title .cinema-card{border-color:#e3c36e;background:linear-gradient(145deg,#453921f5,#1c1d28f5)}
+#cinemaCurtain.death .cinema-card{border-color:#9a8b91;background:linear-gradient(145deg,#302a32f5,#12141ef5)}
+#cinemaCurtain .cinema-close{pointer-events:auto;margin-top:16px;border:1px solid #a99569;border-radius:9px;background:#282a35;color:#f5e7c5;padding:9px 22px;font:inherit}
+#modal.cinematic-death{border:1px solid #a99569;box-shadow:0 0 0 1px #a9956940,0 24px 90px #000b}
+#modal.cinematic-death .dead>.sub:first-child{letter-spacing:.22em;color:#d7c18a}
+@media(prefers-reduced-motion:reduce){#cinemaCurtain,#cinemaCurtain .cinema-card{transition:none!important}}
+</style>
+<script>
+// v8.37 CINEMATIC LIFE UPDATE — non-blocking story presentation
+(function(){
+ 'use strict';
+ const PREF='bakeCinematicSettingsV1';
+ const read=()=>{try{return JSON.parse(localStorage.getItem(PREF)||'{"enabled":true,"intensity":"full"}')}catch(e){return {enabled:true,intensity:'full'}}};
+ const write=v=>{try{localStorage.setItem(PREF,JSON.stringify(v))}catch(e){}};
+ let cfg=read(),hideTimer=null,lastKey='',lastAt=0;
+ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const ensure=()=>{let el=document.getElementById('cinemaCurtain');if(el)return el;el=document.createElement('div');el.id='cinemaCurtain';el.setAttribute('role','status');el.setAttribute('aria-live','polite');el.innerHTML='<div class="cinema-card"><div class="cinema-mark" id="cinemaMark">✦</div><div class="cinema-kicker" id="cinemaKicker">A MOMENT IN LIFE</div><h2 id="cinemaHeading"></h2><p id="cinemaBody"></p><button class="cinema-close" type="button" id="cinemaClose">記録へ戻る</button></div>';document.body.appendChild(el);el.querySelector('#cinemaClose').addEventListener('click',()=>{el.classList.remove('show');clearTimeout(hideTimer)});return el};
+ const classify=t=>{
+  if(/誕生|生まれた|人生が始ま|新しい人生が始/.test(t))return ['birth','✧','A NEW LIFE','生まれた日'];
+  if(/結婚|婚姻|夫婦|伴侶とな|交際を始め|告白.*受け入れ/.test(t))return ['romance','♡','A SHARED LIFE','二人の関係が変わった'];
+  if(/バロック|精神崩壊|理性を失|変異が進行|暴走/.test(t))return ['baroque','◈','BAROQUE INCIDENT','日常に異変が入り込んだ'];
+  if(/歴史的事件|大規模災害|境界点|世界規模|地域復興|時代が変わ/.test(t))return ['history','⌖','WORLD CHRONICLE','世界の記録に刻まれた出来事'];
+  if(/称号を獲得|称号「|称号：/.test(t))return ['title','✦','ACHIEVEMENT','新たな称号を獲得した'];
+  return null;
+ };
+ function present(kind,mark,kicker,heading,body){
+  if(!cfg.enabled||cfg.intensity==='off')return;
+  const key=[kind,heading,body].join('|'),now=Date.now();if(key===lastKey&&now-lastAt<1800)return;lastKey=key;lastAt=now;
+  const el=ensure();el.className=kind;el.querySelector('#cinemaMark').textContent=mark;el.querySelector('#cinemaKicker').textContent=kicker;el.querySelector('#cinemaHeading').textContent=heading;el.querySelector('#cinemaBody').textContent=body;
+  clearTimeout(hideTimer);requestAnimationFrame(()=>el.classList.add('show'));
+  if(cfg.intensity==='simple'){hideTimer=setTimeout(()=>el.classList.remove('show'),1800)}else{hideTimer=setTimeout(()=>el.classList.remove('show'),4200)}
+ }
+ if(typeof addLog==='function'){
+  const oldAddLog=addLog;
+  addLog=function(message,type){oldAddLog.apply(this,arguments);const found=classify(String(message));if(found){const [kind,mark,kicker,heading]=found;present(kind,mark,kicker,heading,String(message).slice(0,180));}};
+ }
+ if(typeof showModal==='function'){
+  const oldShowModal=showModal;
+  showModal=function(title,desc,labels,fns,timed){oldShowModal.apply(this,arguments);if(String(title)==='誕生')present('birth','✧','A NEW LIFE','生まれた日',String(desc||'新しい人生が始まる。').slice(0,180));};
+ }
+ if(typeof die==='function'){
+  const oldDie=die;
+  die=function(cause){oldDie.apply(this,arguments);const modal=document.getElementById('modal');if(modal&&modal.querySelector('.dead')){modal.classList.add('cinematic-death');const label=modal.querySelector('.dead>.sub');if(label)label.textContent='THE END OF A LIFE / 人生の終幕';if(cfg.enabled&&cfg.intensity==='full')present('death','✧','LIFE COMPLETE','ひとつの人生が幕を閉じた',`${p?.name||'このクッキー'}は${p?.age??'?'}歳で生涯を終えた。記録は世界に残される。`);}}
+ }
+ window.showCinematicSettings=function(){cfg=read();$('overlay').style.display='grid';$('modal').innerHTML=`<button class="modal-close" onclick="closeV8Modal()">×</button><h2>CINEMATIC / 演出設定</h2><p class="sub">人生の節目や重大事件を専用演出で表示します。選択肢や時間進行を妨げない通知型の演出です。</p><label style="display:flex;gap:9px;align-items:center;margin:12px 0"><input id="cinemaEnabled" type="checkbox" ${cfg.enabled?'checked':''}> 専用演出を有効にする</label><label>演出量 <select id="cinemaIntensity"><option value="full">通常（約4秒）</option><option value="simple">簡略（約2秒）</option><option value="off">表示しない</option></select></label><div class="choices"><button class="primary" onclick="saveCinematicSettings()">設定を保存</button><button onclick="previewCinematic()">演出を試す</button></div>`;$('cinemaIntensity').value=cfg.intensity||'full'};
+ window.saveCinematicSettings=function(){cfg={enabled:!!$('cinemaEnabled')?.checked,intensity:$('cinemaIntensity')?.value||'full'};write(cfg);closeV8Modal();};
+ window.previewCinematic=function(){cfg=read();present('history','✦','CINEMATIC PREVIEW','人生の記録','何気ない一日も、いつか振り返れば大切な一頁になる。')};
+ const oldMore=showMoreMenu;showMoreMenu=function(){oldMore();const modal=$('modal');if(!modal||modal.querySelector('[data-cinematic-menu]'))return;const box=document.createElement('section');box.className='entry';box.setAttribute('data-cinematic-menu','1');box.innerHTML='<b>CINEMATIC LIFE / 演出</b><div class="controls" style="margin-top:8px"><button onclick="showCinematicSettings()">演出設定・プレビュー</button></div>';modal.appendChild(box)};
+ const oldSummary=showLifeSummary; if(typeof oldSummary==='function'){showLifeSummary=function(){oldSummary.apply(this,arguments);const modal=$('modal');if(modal){const h=modal.querySelector('h2');if(h)h.insertAdjacentHTML('afterend','<p class="sub" style="text-align:center;letter-spacing:.12em;color:#d7c18a">A LIFE WRITTEN IN THE CHRONICLE</p>')}}}
+ document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.37';const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.37 — CINEMATIC LIFE UPDATE';
+})();
+</script>
+
 </body>
 </html>

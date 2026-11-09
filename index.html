@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>PANIS ET CALAMITAS — ベイク大陸ライフ v8.34</title>
+<title>PANIS ET CALAMITAS — ベイク大陸ライフ v8.35</title>
 <style>
 :root{--bg:#171923;--panel:#222635;--panel2:#2b3042;--ink:#f4f0e8;--muted:#aeb4c5;--gold:#e6c477;--green:#76c9a2;--red:#e58b8b;--line:#3b4257}
 *{box-sizing:border-box}body{margin:0;padding-bottom:env(safe-area-inset-bottom);background:radial-gradient(circle at top,#30364b,#171923 60%);color:var(--ink);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;line-height:1.55}
@@ -246,7 +246,7 @@ main{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 24px)}
  <div class="sub" style="margin-top:9px">※ゲームはこのブラウザ内で動作します。人生の記録と称号は自動保存されます。</div>
 </section>
 </main>
-<footer>BAKE LIFE v8.34 — WORLD CHRONICLE / TITLE UPDATE</footer>
+<footer>BAKE LIFE v8.35 — WORLD CHRONICLE / BUGFIX</footer>
 <button id="pauseQuickBtn" class="pause-quick" onclick="togglePause()" aria-label="一時停止または再開">Ⅱ 一時停止</button>
 <nav id="v8Nav" aria-label="メインメニュー"><button onclick="scrollToPanel(0)"><span>🍪</span><span>人生</span></button><button onclick="scrollToLog()"><span>📖</span><span>記録</span></button><button onclick="showCollection()"><span>🏅</span><span>称号</span></button><button onclick="showRegionInfo()"><span>🗺️</span><span>地域</span></button><button onclick="showMoreMenu()"><span>☰</span><span>その他</span></button></nav>
 <div class="overlay" id="overlay"><div class="modal" id="modal"></div></div><input id="importSaveFile" type="file" accept="application/json,.json" hidden>
@@ -412,7 +412,7 @@ titleDefs.push(
  ["時代の目撃者","一つの人生で世界史の出来事を3件以上記録する","special",s=>(s.worldHistory||[]).length>=3],
  ["歴史の転換点","世界史の大事件を5件以上経験する","special",s=>(s.worldHistory||[]).filter(x=>x.kind==='world').length>=5],
  ["技術革新の目撃者","新技術の発表を経験し、知識を70以上にする","special",s=>(s.worldHistory||[]).some(x=>x.title==='新技術の発表')&&s.knowledge>=70],
- ["地域復興の功労者","地域や厄災の復興に3回以上協力する","special",s=>(s.calamityRebuilds||0)>=3||(s.regionHistory||[]).filter(x=>/復興|再建/.test(x.event||"")).length>=3],
+ ["地域復興の功労者","地域や厄災の復興に3回以上協力する","special",s=>((s.calamityRebuilds||0)+(s.regionalRebuilds||0))>=3],
  ["趣味人","趣味を持って10年以上過ごす","social",s=>!!s.hobby&&(s.hobbyYears||0)>=10],
  ["熟達した趣味人","趣味のイベントで15回以上取り組む","social",s=>(s.hobbyPractice||0)>=15],
  ["趣味仲間の輪","趣味を通じた交流を5回以上経験する","social",s=>(s.hobbyConnections||0)>=5],
@@ -421,14 +421,14 @@ titleDefs.push(
  ["三世代の記録","孫が1人以上生まれる","social",s=>(s.grandchildCount||0)>=1],
  ["遺志を託した者","人生の終わりまで有効な遺言を残す","life",s=>!!s.willRecipient],
  ["生涯現役","同じ職業を40年以上続ける","work",s=>s.jobYears>=40],
- ["境界の封じ手","境界点の連続事件を最後まで生き延びる","special",s=>s.boundaryArcComplete===true]
+ ["境界の封じ手","境界点の調査を5回以上行い、3回以上生還し、記録改変を受けずに帰還する","special",s=>(s.boundaryResearch||0)>=5&&(s.boundaryEscapes||0)>=3&&s.boundarySurvived===true&&(s.boundaryRewriteCount||0)===0]
 );
 function getTitleRarity(name){
  const def=titleDefs.find(x=>x[0]===name);const cat=def?def[2]:"special";
- const secret=["ヴォイドの囁きを退けた者","運命の改竄者","境界の封じ手"];
+ const secret=["ヴォイドの囁きを退けた者","運命の改竄者"];
  const legendary=["三度退けた者","三度敗れた者","理性の帰還","六厄災の記録者","五つの影","千年の観測者","長命の純天使","長命なる観察者","悠久の記録","歴史の転換点","三世代の記録"];
- const epic=["精神の断絶","暴走の始まり","境界点踏破者","境界点の帰還者","長き観測の果て","反逆の天使","指名手配の天使","もうひとつの可能性","時代の目撃者","家系の礎","熟達した趣味人","地域復興の功労者","生涯現役"];
- const rare=["時代の目撃者","存在を上書きされた者","三界の旅人","境界点の生還者","厄災を目撃した者","異形の英雄","研究対象","病と共に","奇跡の回復","研究者の良心","見捨てなかった者","境界を越える者","原因不明","境界の観測者","境界点踏破者","便利屋の看板","交渉上手","異端審問官の理解者","記録塔の協力者","水禍を越えて","戦禍の生存者","病禍の証人","地殻の記憶","飢餓を拒む者","人災の目撃者","厄災の救援者","厄災の交渉人","反逆の天使","翼を失った者","追跡を振り切った者","老いたる旅人","災害の後に立つ者","傷痕を抱えて","腐食樹林の観測者","怪王との邂逅","裏の秩序を知る者","怪物の庇護","五つの影","規則の内側","身内の証","創造の代償","見られている","災害の余波","復興の担い手","境界点の帰還者","人工の生","義体と共に","異形と暮らす","裏社会の仲介人","五大の均衡","精神の断絶","暴走の始まり","三度退けた者","三度敗れた者","ヴォイドの囁きを退けた者","理性の帰還","歴史の転換点","地域復興の功労者","再会を重ねた者","遺志を託した者","技術革新の目撃者"];
+ const epic=["精神の断絶","暴走の始まり","境界点踏破者","境界点の帰還者","長き観測の果て","反逆の天使","指名手配の天使","もうひとつの可能性","生涯現役","境界の封じ手"];
+ const rare=["時代の目撃者","存在を上書きされた者","三界の旅人","境界点の生還者","厄災を目撃した者","異形の英雄","研究対象","病と共に","奇跡の回復","研究者の良心","見捨てなかった者","境界を越える者","原因不明","境界の観測者","境界点踏破者","便利屋の看板","交渉上手","異端審問官の理解者","記録塔の協力者","水禍を越えて","戦禍の生存者","病禍の証人","地殻の記憶","飢餓を拒む者","人災の目撃者","厄災の救援者","厄災の交渉人","反逆の天使","翼を失った者","追跡を振り切った者","老いたる旅人","災害の後に立つ者","傷痕を抱えて","腐食樹林の観測者","怪王との邂逅","裏の秩序を知る者","怪物の庇護","五つの影","規則の内側","身内の証","創造の代償","見られている","災害の余波","復興の担い手","境界点の帰還者","人工の生","義体と共に","異形と暮らす","裏社会の仲介人","五大の均衡","精神の断絶","暴走の始まり","三度退けた者","三度敗れた者","ヴォイドの囁きを退けた者","理性の帰還","歴史の転換点","地域復興の功労者","再会を重ねた者","遺志を託した者","技術革新の目撃者","家系の礎","熟達した趣味人"];
  if(secret.includes(name)||cat==="secret")return "secret";
  if(legendary.includes(name))return "legendary";
  if(epic.includes(name))return "epic";
@@ -1498,7 +1498,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
 })();
 
 
-// v8.34 migration: retire four removed pre-made individuals and all of their dedicated records.
+// v8.35 migration: retire four removed pre-made individuals and all of their dedicated records.
 (function cleanupRemovedIndividuals(){
  const removedIds=new Set(['fruitcheese','fizzcrack','shadowqueen','tunkaron']);
  const removedNames=new Set(['翻訳者のいない空間','義体の維持費','帳簿に載らない損失','騒動の後始末']);
@@ -1614,7 +1614,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
   if(p.npcRelations?.some(n=>n.alive!==false)&&roll<.30){let n=rand(p.npcRelations.filter(x=>x.alive!==false));relation(n);if(Math.random()<.14){choose('訃報',`${n.name}が亡くなったという知らせが届いた。最後に会ったのは、もう何年も前のことだった。`,['葬儀に参列する','遺族へ手紙を送る','知らせを胸にしまう'],[()=>{n.alive=false;n.status='故人';p.stress=clamp(p.stress+5);p.happiness=clamp(p.happiness-3);npcHistory(n,'死亡。葬儀に参列した')},()=>{n.alive=false;n.status='故人';p.social=clamp(p.social+2);npcHistory(n,'死亡。遺族へ手紙を送った')},()=>{n.alive=false;n.status='故人';p.mind=clamp(p.mind+1);npcHistory(n,'死亡を知った')}],'npc_funeral',`${n.name}の訃報`,true);return true}}
   if(p.baroqueStage>=1&&roll<.46){const id=Math.random()<.5?'baroque_mirror':'baroque_memory';const isMirror=id==='baroque_mirror';choose(isMirror?'鏡の中の遅延':'知らない記憶',isMirror?'鏡に映った自分の動きが、ほんの一瞬だけ遅れている。目を離すと、鏡の中の自分だけがこちらを見続けていた。':'自分が経験していない記憶が、確かな実感を伴って浮かび上がる。誰かの人生の断片なのか、それとも自分の記憶なのか。',['記録して専門家に見せる','誰にも話さず観察する','気を紛らわせる'],[()=>{p.knowledge=clamp(p.knowledge+6);p.baroqueHistory=ensure(p,'baroqueHistory',[]);p.baroqueHistory.push({age:p.age,event:isMirror?'鏡の中の遅延':'知らない記憶'});p.stress=clamp(p.stress+2)},()=>{p.mind=clamp(p.mind+2);p.stress=clamp(p.stress+4)},()=>{p.happiness=clamp(p.happiness+1);p.stress=clamp(p.stress-3)}],id,'バロック症状の個体記録');return true}
   if(p.layer==='境界点'||(p.boundaryResearch||0)>=1){if(roll<.55){choose('ここには街があった','調査の途中、地図にない街が現れた。住民たちはあなたを知っているようで、街の記録にはあなたが何十年も前から暮らしていることになっている。',['住民と話す','記録を持ち帰る','街から離れる'],[()=>{p.knowledge=clamp(p.knowledge+10);p.stress=clamp(p.stress+7);p.boundaryResearch=(p.boundaryResearch||0)+1},()=>{p.boundaryResearch=(p.boundaryResearch||0)+1;p.boundarySurvived=true;p.money+=10},()=>{p.health=clamp(p.health-3);p.boundaryEscapes=(p.boundaryEscapes||0)+1}], 'boundary_city','存在しない街との遭遇',true);return true}}
-  if((p.calamityRebuilds||0)>=1&&roll<.70){choose('地域の再建','以前の災害で傷ついた地域に、復興の兆しが見えている。まだ足りないものは多いが、住民たちは少しずつ生活を取り戻している。',['復興活動を手伝う','資金を寄付する','自分の生活を優先する'],[()=>{p.calamityRebuilds=(p.calamityRebuilds||0)+1;p.localAid=(p.localAid||0)+1;p.fame=(p.fame||0)+2;recordRegion('地域の再建',{prosperity:4,security:2})},()=>{p.money=Math.max(0,p.money-20);recordRegion('復興への寄付',{prosperity:3})},()=>{p.stress=clamp(p.stress-2)}],'region_recovery','復興に関わった');return true}
+  if((p.calamityRebuilds||0)>=1&&roll<.70){choose('地域の再建','以前の災害で傷ついた地域に、復興の兆しが見えている。まだ足りないものは多いが、住民たちは少しずつ生活を取り戻している。',['復興活動を手伝う','資金を寄付する','自分の生活を優先する'],[()=>{p.calamityRebuilds=(p.calamityRebuilds||0)+1;p.regionalRebuilds=(p.regionalRebuilds||0)+1;p.localAid=(p.localAid||0)+1;p.fame=(p.fame||0)+2;recordRegion('地域の再建',{prosperity:4,security:2})},()=>{if(p.money>=20){p.money-=20;p.regionalRebuilds=(p.regionalRebuilds||0)+1}else{p.money=0;addLog('寄付をする余裕はなかった。','bad')}recordRegion('復興への寄付',{prosperity:3})},()=>{p.stress=clamp(p.stress-2)}],'region_recovery','復興に関わった');return true}
   if((p.regionState?.technology||0)>65&&(p.regionState?.economy||0)<45&&roll<.78){choose('広がる技術格差','地域の技術水準は上がっている。しかし、その恩恵を受けられる者は限られている。義体や医療設備の価格が、生活を圧迫し始めていた。',['支援活動に参加する','技術を学ぶ','距離を置く'],[()=>{p.localAid=(p.localAid||0)+1;p.social=clamp(p.social+3);recordRegion('技術格差への支援',{prosperity:2,healthcare:1})},()=>{p.knowledge=clamp(p.knowledge+7);p.skill=clamp(p.skill+3)},()=>{p.stress=clamp(p.stress-2)}],'region_gap','技術格差を目撃した');return true}
   // 後世の遺物：過去人生の記録を次の人生で参照する。名前や内容は実在する保存記録だけを使う。
   const legacy=read(LEGACY_KEY,[]);if(legacy.length&&roll<.88){const item=rand(legacy);choose('遺された研究資料',`${item.name||'ある人物'}が残した資料が、古い保管庫から見つかった。記録には${item.place||'ある地域'}での出来事と、${item.legacy||'後世に残された研究'}について書かれている。`,['資料を読み解く','保管施設へ寄贈する','閲覧をやめる'],[()=>{p.knowledge=clamp(p.knowledge+8);p.fame=(p.fame||0)+1;p.legacyDiscoveries=ensure(p,'legacyDiscoveries',[]);p.legacyDiscoveries.push(item.id)},()=>{p.social=clamp(p.social+3);p.legacyDiscoveries=ensure(p,'legacyDiscoveries',[]);p.legacyDiscoveries.push(item.id)},()=>{p.stress=clamp(p.stress-1)}],'legacy_relic','過去の人生の記録を発見した');return true}
@@ -1933,7 +1933,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  ];
  for(const def of newTitles)if(!titleDefs.some(x=>x[0]===def[0]))titleDefs.push(def);
  // Version marker for exports and visible footer.
- const foot=document.querySelector('footer');if(foot)foot.textContent='BAKE LIFE v8.34 — WORLD CHRONICLE / TITLE UPDATE';
+ const foot=document.querySelector('footer');if(foot)foot.textContent='BAKE LIFE v8.35 — WORLD CHRONICLE / BUGFIX';
  const originalExport=exportSave;
  exportSave=function(){const data={version:8.28,current:p,deathCauses:JSON.parse(storage.get('bakeDeathCauses','[]')),titles:JSON.parse(storage.get('bakeTitles','[]')),lives:JSON.parse(storage.get('bakeLives','[]')),ascendedLives:JSON.parse(storage.get('bakeAscendedLives','[]')),secretMeta:JSON.parse(storage.get('bakeSecretMeta','{}')),relationshipSchema:VERSION};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.28.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)};
 })();
@@ -2056,12 +2056,12 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
   }
  }
  const oldTick=seasonTick;
- seasonTick=function(){oldTick();if(!p||p.dead)return;try{initWork();if(!decision)familyDeepTick();if(!decision)workTick();}catch(e){console.error('v8.34 extension',e)}};
+ seasonTick=function(){oldTick();if(!p||p.dead)return;try{initWork();if(!decision)familyDeepTick();if(!decision)workTick();}catch(e){console.error('v8.35 extension',e)}};
  const oldWorkInfo=showWorkInfo;
- showWorkInfo=function(){if(!p)return oldWorkInfo();initWork();oldWorkInfo();const modal=$('modal');if(!modal)return;const extra=document.createElement('section');extra.className='entry';extra.innerHTML=`<h3>業務記録・v8.34</h3><p>便利屋任務の受注：${p.missionsAccepted}件 / 完了：${p.missionsCompleted}件 / 失敗：${p.missionsFailed}件</p><p>便利屋への発注：${p.clientRequests}件 / 異端審問官の間引き任務：${p.inquisitorCulls}回 / 悪魔連戦突破：${p.demonWavesCleared}回</p><p class="sub">便利屋以外の職業では任務を受注できません。その他の職業では便利屋を雇う依頼イベントが発生します。異端審問官は専用の連続戦闘任務を受けます。</p>${(p.missionHistory||[]).slice(0,8).map(m=>`<div class="sub">${m.year||p.year}年 / ${m.age??p.age}歳 — ${String(m.title).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}：${m.success?'成功':'失敗・辞退'}</div>`).join('')}`;modal.appendChild(extra)};
- document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.34';
- const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.34 — WORLD CHRONICLE / TITLE UPDATE';
- if(typeof exportSave==='function'){const prevExport=exportSave;exportSave=function(){const oldCreate=URL.createObjectURL;const oldClick=HTMLAnchorElement.prototype.click;try{const data={version:8.34,current:p,deathCauses:JSON.parse(storage.get('bakeDeathCauses','[]')),titles:JSON.parse(storage.get('bakeTitles','[]')),lives:JSON.parse(storage.get('bakeLives','[]')),ascendedLives:JSON.parse(storage.get('bakeAscendedLives','[]')),secretMeta:JSON.parse(storage.get('bakeSecretMeta','{}')),workSchema:1,relationshipSchema:2};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.34.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}catch(e){prevExport()}}}
+ showWorkInfo=function(){if(!p)return oldWorkInfo();initWork();oldWorkInfo();const modal=$('modal');if(!modal)return;const extra=document.createElement('section');extra.className='entry';extra.innerHTML=`<h3>業務記録・v8.35</h3><p>便利屋任務の受注：${p.missionsAccepted}件 / 完了：${p.missionsCompleted}件 / 失敗：${p.missionsFailed}件</p><p>便利屋への発注：${p.clientRequests}件 / 異端審問官の間引き任務：${p.inquisitorCulls}回 / 悪魔連戦突破：${p.demonWavesCleared}回</p><p class="sub">便利屋以外の職業では任務を受注できません。その他の職業では便利屋を雇う依頼イベントが発生します。異端審問官は専用の連続戦闘任務を受けます。</p>${(p.missionHistory||[]).slice(0,8).map(m=>`<div class="sub">${m.year||p.year}年 / ${m.age??p.age}歳 — ${String(m.title).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}：${m.success?'成功':'失敗・辞退'}</div>`).join('')}`;modal.appendChild(extra)};
+ document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.35';
+ const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.35 — WORLD CHRONICLE / BUGFIX';
+ if(typeof exportSave==='function'){const prevExport=exportSave;exportSave=function(){const oldCreate=URL.createObjectURL;const oldClick=HTMLAnchorElement.prototype.click;try{const data={version:8.35,current:p,deathCauses:JSON.parse(storage.get('bakeDeathCauses','[]')),titles:JSON.parse(storage.get('bakeTitles','[]')),lives:JSON.parse(storage.get('bakeLives','[]')),ascendedLives:JSON.parse(storage.get('bakeAscendedLives','[]')),secretMeta:JSON.parse(storage.get('bakeSecretMeta','{}')),workSchema:1,relationshipSchema:2};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.35.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}catch(e){prevExport()}}}
 })();
 
 </script>
@@ -2101,7 +2101,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
   const pool=[
    {title:'新技術の発表',detail:'研究機関から、生活や産業を変える新技術が発表された。',metric:'technology',delta:4,local:'technology',ld:5,opts:['新技術を学ぶ','慎重に様子を見る','距離を置く'],fx:[()=>{p.knowledge=cap(p.knowledge+5);p.skill=cap(p.skill+2);p.stress=cap(p.stress+2)},()=>{p.mind=cap(p.mind+2)},()=>{p.happiness=cap(p.happiness-1)}]},
    {title:'景気後退',detail:'市場が冷え込み、商店や工房の閉鎖が相次いでいる。',metric:'economy',delta:-5,local:'economy',ld:-7,opts:['支出を切り詰める','地域の商店を支援する（10G）','新しい仕事を探す'],fx:[()=>{p.money=Math.max(0,p.money-5);p.stress=cap(p.stress+3)},()=>{if(p.money>=10){p.money-=10;p.helped=(p.helped||0)+1;r.prosperity=cap(r.prosperity+2)}else{p.stress=cap(p.stress+2);log('支援する余裕はなかった。','bad')}},()=>{p.skill=cap(p.skill+2);p.stress=cap(p.stress+2)}]},
-   {title:'地域の復興',detail:'住民や職人たちの協力で、荒れていた地域の復興が進み始めた。',metric:'economy',delta:3,local:'prosperity',ld:6,opts:['復興作業に参加する','寄付をする（15G）','見守る'],fx:[()=>{p.helped=(p.helped||0)+2;p.skill=cap(p.skill+2);p.stress=cap(p.stress+2)},()=>{if(p.money>=15){p.money-=15;p.fame=(p.fame||0)+1;p.happiness=cap(p.happiness+2)}else{p.happiness=cap(p.happiness-1);log('寄付をするには所持金が足りなかった。','bad')}},()=>{p.knowledge=cap(p.knowledge+1)}]},
+   {title:'地域の復興',detail:'住民や職人たちの協力で、荒れていた地域の復興が進み始めた。',metric:'economy',delta:3,local:'prosperity',ld:6,opts:['復興作業に参加する','寄付をする（15G）','見守る'],fx:[()=>{p.helped=(p.helped||0)+2;p.regionalRebuilds=(p.regionalRebuilds||0)+1;p.skill=cap(p.skill+2);p.stress=cap(p.stress+2)},()=>{if(p.money>=15){p.money-=15;p.regionalRebuilds=(p.regionalRebuilds||0)+1;p.fame=(p.fame||0)+1;p.happiness=cap(p.happiness+2)}else{p.happiness=cap(p.happiness-1);log('寄付をするには所持金が足りなかった。','bad')}},()=>{p.knowledge=cap(p.knowledge+1)}]},
    {title:'治安の悪化',detail:'犯罪組織や武装集団の活動が目立ち、夜間の外出を控える住民が増えた。',metric:'security',delta:-6,local:'security',ld:-8,opts:['自衛手段を整える','地域の見回りに協力する','しばらく外出を控える'],fx:[()=>{p.skill=cap(p.skill+2);p.money=Math.max(0,p.money-5)},()=>{p.helped=(p.helped||0)+1;p.social=cap(p.social+2);p.health=cap(p.health-2)},()=>{p.stress=cap(p.stress-2);p.social=cap(p.social-1)}]},
    {title:'信仰の隆盛',detail:'グロリア聖糖信仰を中心に、巡礼や地域の祭礼が盛んになっている。',metric:'faith',delta:5,local:'prosperity',ld:2,opts:['祭礼に参加する','信仰について学ぶ','距離を置く'],fx:[()=>{p.happiness=cap(p.happiness+4);p.social=cap(p.social+2)},()=>{p.knowledge=cap(p.knowledge+4);p.faith=p.faith||{level:0};p.faith.level=cap((p.faith.level||0)+4)},()=>{p.mind=cap(p.mind+1)}]},
    {title:'境界点の異常拡大',detail:'地図にない道や建物が現れ、住民の記憶と公的記録に食い違いが生じている。',metric:'boundary',delta:8,local:'disaster',ld:8,opts:['調査に協力する','避難する','関わらない'],fx:[()=>{p.boundaryResearch=(p.boundaryResearch||0)+1;p.knowledge=cap(p.knowledge+5);p.stress=cap(p.stress+5)},()=>{p.boundaryEscapes=(p.boundaryEscapes||0)+1;p.money=Math.max(0,p.money-8);p.health=cap(p.health+2)},()=>{p.stress=cap(p.stress+2)}]},
@@ -2153,14 +2153,74 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  // Record the legacy/will outcome at death without changing the existing death mechanics.
  const oldDie=die;die=function(cause){if(p&&!p.dead&&p.willRecipient){p.inheritanceRecord={recipient:p.willRecipient,recipientId:p.willRecipientId||null,year:p.year,age:p.age,amount:p.money||0};addWorldRecord('遺言が残された',`${p.name}は${p.willRecipient}に財産や形見を託す意思を記録していた。対象額：${p.money||0}G。`,'family')}return oldDie(cause)};
  // Export the persistent world timeline alongside the normal save; old import remains compatible.
- const oldExport=exportSave;exportSave=function(){try{const data={version:8.34,current:p,deathCauses:safeParse(storage.get('bakeDeathCauses','[]'),[]),titles:safeParse(storage.get('bakeTitles','[]'),[]),lives:safeParse(storage.get('bakeLives','[]'),[]),ascendedLives:safeParse(storage.get('bakeAscendedLives','[]'),[]),secretMeta:safeParse(storage.get('bakeSecretMeta','{}'),{}),eventDex:safeParse(storage.get('bakeEventDex','{}'),{}),legacyLedger:safeParse(storage.get('bakeLegacyLedger','[]'),[]),regionalChronicle:safeParse(storage.get('bakeRegionalChronicle','{}'),{}),worldChronicle:world()};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.34.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}catch(e){oldExport()}};
+ const oldExport=exportSave;exportSave=function(){try{const data={version:8.35,current:p,deathCauses:safeParse(storage.get('bakeDeathCauses','[]'),[]),titles:safeParse(storage.get('bakeTitles','[]'),[]),lives:safeParse(storage.get('bakeLives','[]'),[]),ascendedLives:safeParse(storage.get('bakeAscendedLives','[]'),[]),secretMeta:safeParse(storage.get('bakeSecretMeta','{}'),{}),eventDex:safeParse(storage.get('bakeEventDex','{}'),{}),legacyLedger:safeParse(storage.get('bakeLegacyLedger','[]'),[]),regionalChronicle:safeParse(storage.get('bakeRegionalChronicle','{}'),{}),worldChronicle:world()};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.35.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}catch(e){oldExport()}};
  $('importSaveFile')?.addEventListener('change',async ev=>{const file=ev.target.files?.[0];if(!file)return;try{const data=JSON.parse(await file.text());if(data.worldChronicle&&typeof data.worldChronicle==='object'){const incoming=data.worldChronicle;incoming.history=Array.isArray(incoming.history)?incoming.history.slice(0,240):[];incoming.metrics={technology:50,economy:50,faith:50,security:50,boundary:10,...(incoming.metrics||{})};storage.set(WORLD_KEY,JSON.stringify(incoming))}}catch(e){console.warn('world chronicle import skipped',e)}});
  // Keep the existing current-life state intact when loading a legacy file.
  const oldMigrate=migrateV8State;migrateV8State=function(state){const s=oldMigrate(state);s.hobbySeasonCounter=Number(s.hobbySeasonCounter)||0;s.worldHistory=Array.isArray(s.worldHistory)?s.worldHistory:[];s.worldChronicleProcessedYear=Number.isFinite(Number(s.worldChronicleProcessedYear))?Number(s.worldChronicleProcessedYear):Number(s.year)||0;s.relationshipProcessedYear=Number.isFinite(Number(s.relationshipProcessedYear))?Number(s.relationshipProcessedYear):Number(s.year)||0;return s};
  // Version labels.
- document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.34';const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.34 — WORLD CHRONICLE / TITLE UPDATE';
+ document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.35';const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.35 — WORLD CHRONICLE / BUGFIX';
 })();
 
 </script>
+
+<script>
+// v8.35 hotfix: repair WORLD CHRONICLE / title migration edge cases.
+(function(){
+ 'use strict';
+ const removedIds=new Set(['fruitcheese','fizzcrack','shadowqueen','tunkaron']);
+ const removedEventIds=new Set(['special_fruitcheese','special_fizzcrack','special_shadowqueen','special_tunkaron']);
+ const removedTitleNames=new Set(['翻訳者のいない空間','義体の維持費','帳簿に載らない損失','騒動の後始末']);
+ const parse=(key,fallback)=>{try{const v=JSON.parse(storage.get(key,JSON.stringify(fallback)));return v??fallback}catch(e){return fallback}};
+ const cleanState=s=>{
+  if(!s||typeof s!=='object')return s;
+  if(removedIds.has(s.specialLifeId)){
+   s.specialLife=false;s.specialLifeId='';s.specialLifeCompleted=false;
+   s.specialLifeMilestones=[];s.specialLifeEventsDone=[];s.specialLifeStoryDone=[];
+   s.specialChronicles=[];s.specialLifePlayed=false;s.specialLifeOrigin='';
+   s.birthType='旧登録個体からの継続人生';s.birthTypeId='retired_special_migration';
+   s.birthTypeDescription='削除された既存個体の専用設定を解除し、現在の能力値を引き継いだ人生。';
+  }
+  for(const k of ['titles','afterlifeTitles'])if(Array.isArray(s[k]))s[k]=s[k].filter(x=>!removedTitleNames.has(x));
+  return s;
+ };
+ const cleanArchives=()=>{
+  for(const key of ['bakeLives','bakeAscendedLives']){
+   const a=parse(key,[]);if(!Array.isArray(a))continue;
+   a.forEach(cleanState);storage.set(key,JSON.stringify(a));
+  }
+  const titles=parse('bakeTitles',[]);if(Array.isArray(titles))storage.set('bakeTitles',JSON.stringify(titles.filter(x=>!removedTitleNames.has(x))));
+  const dex=parse('bakeEventDex',{});if(dex&&dex.found){removedEventIds.forEach(id=>delete dex.found[id]);dex.seen=Object.keys(dex.found).length;storage.set('bakeEventDex',JSON.stringify(dex));}
+ };
+ cleanArchives();
+ if(typeof p!=='undefined'&&p){cleanState(p);storage.set('bakeCurrent',JSON.stringify(p));}
+ if(typeof migrateV8State==='function'){
+  const old=migrateV8State;
+  migrateV8State=function(state){return cleanState(old(state));};
+ }
+ // The base import listener runs first; this listener sanitizes the imported active life and archives.
+ const importEl=document.getElementById('importSaveFile');
+ if(importEl)importEl.addEventListener('change',async ev=>{
+  const file=ev.target.files&&ev.target.files[0];if(!file)return;
+  try{
+   const data=JSON.parse(await file.text());
+   if(typeof p!=='undefined'&&p){cleanState(p);storage.set('bakeCurrent',JSON.stringify(p));}
+   cleanArchives();
+   if(data.eventDex){const dex=data.eventDex; if(dex.found){removedEventIds.forEach(id=>delete dex.found[id]);dex.seen=Object.keys(dex.found).length;}storage.set('bakeEventDex',JSON.stringify(dex));}
+  }catch(e){console.warn('v8.35 migration repair skipped',e)}
+ });
+ // Complete the boundary exploration arc only after repeated research and safe returns.
+ const updateBoundaryArc=()=>{
+  if(!p||p.dead)return;
+  if((p.boundaryResearch||0)>=3&&(p.boundaryEscapes||0)>=3&&p.boundarySurvived===true)p.boundaryArcComplete=true;
+ };
+ if(typeof seasonTick==='function'){
+  const oldTick=seasonTick;
+  seasonTick=function(){oldTick();updateBoundaryArc();};
+ }
+ document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.35';
+ const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.35 — WORLD CHRONICLE / BUGFIX';
+})();
+</script>
+
 </body>
 </html>

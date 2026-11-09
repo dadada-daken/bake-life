@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>PANIS ET CALAMITAS — ベイク大陸ライフ v8.28</title>
+<title>PANIS ET CALAMITAS — ベイク大陸ライフ v8.29</title>
 <style>
 :root{--bg:#171923;--panel:#222635;--panel2:#2b3042;--ink:#f4f0e8;--muted:#aeb4c5;--gold:#e6c477;--green:#76c9a2;--red:#e58b8b;--line:#3b4257}
 *{box-sizing:border-box}body{margin:0;padding-bottom:env(safe-area-inset-bottom);background:radial-gradient(circle at top,#30364b,#171923 60%);color:var(--ink);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;line-height:1.55}
@@ -246,7 +246,7 @@ main{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 24px)}
  <div class="sub" style="margin-top:9px">※ゲームはこのブラウザ内で動作します。人生の記録と称号は自動保存されます。</div>
 </section>
 </main>
-<footer>BAKE LIFE v8.28 — BONDS & GENERATIONS</footer>
+<footer>BAKE LIFE v8.29 — FAMILY, CONTRACTS & INQUISITION</footer>
 <button id="pauseQuickBtn" class="pause-quick" onclick="togglePause()" aria-label="一時停止または再開">Ⅱ 一時停止</button>
 <nav id="v8Nav" aria-label="メインメニュー"><button onclick="scrollToPanel(0)"><span>🍪</span><span>人生</span></button><button onclick="scrollToLog()"><span>📖</span><span>記録</span></button><button onclick="showCollection()"><span>🏅</span><span>称号</span></button><button onclick="showRegionInfo()"><span>🗺️</span><span>地域</span></button><button onclick="showMoreMenu()"><span>☰</span><span>その他</span></button></nav>
 <div class="overlay" id="overlay"><div class="modal" id="modal"></div></div><input id="importSaveFile" type="file" accept="application/json,.json" hidden>
@@ -1874,11 +1874,136 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  ];
  for(const def of newTitles)if(!titleDefs.some(x=>x[0]===def[0]))titleDefs.push(def);
  // Version marker for exports and visible footer.
- const foot=document.querySelector('footer');if(foot)foot.textContent='BAKE LIFE v8.28 — BONDS & GENERATIONS';
+ const foot=document.querySelector('footer');if(foot)foot.textContent='BAKE LIFE v8.29 — FAMILY, CONTRACTS & INQUISITION';
  const originalExport=exportSave;
  exportSave=function(){const data={version:8.28,current:p,deathCauses:JSON.parse(storage.get('bakeDeathCauses','[]')),titles:JSON.parse(storage.get('bakeTitles','[]')),lives:JSON.parse(storage.get('bakeLives','[]')),ascendedLives:JSON.parse(storage.get('bakeAscendedLives','[]')),secretMeta:JSON.parse(storage.get('bakeSecretMeta','{}')),relationshipSchema:VERSION};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.28.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)};
 })();
 </script>
 
+<script>
+(function(){
+ 'use strict';
+ const clampN=(v)=>Math.max(0,Math.min(100,Number(v)||0));
+ const rint=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+ const log=(s,t='event')=>{if(typeof addLog==='function')addLog(s,t)};
+ const decide=(title,desc,labels,actions)=>{if(typeof smallDecision==='function'&&!decision)smallDecision(title,desc,labels,actions)};
+ const isHandy=()=>!!p&&p.job==='便利屋';
+ const isInquisitor=()=>!!p&&p.job==='異端審問官';
+ function initWork(){
+  if(!p)return;
+  p.missionHistory=Array.isArray(p.missionHistory)?p.missionHistory:[];
+  p.missionsAccepted=Number(p.missionsAccepted)||0;p.missionsCompleted=Number(p.missionsCompleted)||0;p.missionsFailed=Number(p.missionsFailed)||0;
+  p.clientRequests=Number(p.clientRequests)||0;p.inquisitorCulls=Number(p.inquisitorCulls)||0;p.demonWavesCleared=Number(p.demonWavesCleared)||0;p.demonWavesFailed=Number(p.demonWavesFailed)||0;
+  p.lastWorkEventSeason=Number.isFinite(p.lastWorkEventSeason)?p.lastWorkEventSeason:-99;
+  p.workSeasonCounter=Number(p.workSeasonCounter)||0;
+ }
+ function finishMission(m,success,reason){
+  if(success){p.missionsCompleted++;p.contractsCompleted=(p.contractsCompleted||0)+1;p.money+=m.reward;p.skill=clampN(p.skill+2);p.fame=(p.fame||0)+m.fame;log(`任務完了：「${m.title}」。${m.reward}Gを受け取り、依頼人から評価された。`,'good');}
+  else{p.missionsFailed++;p.contractsFailed=(p.contractsFailed||0)+1;p.stress=clampN(p.stress+7);p.fame=Math.max(0,(p.fame||0)-1);log(`任務失敗：「${m.title}」。${reason||'状況が悪化し、撤退した。'}`,'bad');}
+  p.missionHistory.unshift({age:p.age,year:p.year,title:m.title,success,reward:success?m.reward:0,reason:reason||''});p.missionHistory=p.missionHistory.slice(0,80);
+ }
+ const missionPool=[
+  {title:'行方不明者の捜索',desc:'都市部の住民が数日前から帰宅していない。最後に目撃されたのは旧市場付近だ。',risk:1,reward:24,fame:1,kind:'search'},
+  {title:'境界点付近の護衛',desc:'境界点の調査班を危険区域の手前まで護衛してほしいという依頼だ。',risk:3,reward:58,fame:2,kind:'guard'},
+  {title:'野良バロックの保護',desc:'発症者が集落の外れで確認された。排除ではなく、安全な隔離と保護を求められている。',risk:3,reward:52,fame:2,kind:'baroque'},
+  {title:'違法義体部品の回収',desc:'廃工場に残された義体部品を回収する仕事。競合する回収屋もいるらしい。',risk:2,reward:39,fame:1,kind:'retrieve'},
+  {title:'代理警備の長期契約',desc:'商隊の護衛を数日間担当する。報酬は良いが、道中の危険は読めない。',risk:2,reward:45,fame:2,kind:'guard'},
+  {title:'犯罪組織の動向調査',desc:'五大反社組織の末端が動いている。依頼人は証拠を求めているが、深入りは危険だ。',risk:4,reward:82,fame:3,kind:'investigate'}
+ ];
+ function handyOffer(){
+  const m={...missionPool[rint(0,missionPool.length-1)]};
+  const fee=Math.max(5,Math.round(m.reward*.22));
+  decide('便利屋への新規依頼',`${m.title}\n${m.desc}\n危険度：${m.risk}/5　報酬：${m.reward}G　前金・準備費：${fee}G`,['条件を確認して引き受ける','報酬を交渉する','今回は断る'],[
+   ()=>{if(p.money<fee){log(`準備費${fee}Gが足りず、依頼を受けられなかった。`,'bad');return;}p.money-=fee;p.missionsAccepted++;const power=(p.skill||0)*.42+(p.knowledge||0)*.18+(p.health||0)*.12+(p.mind||0)*.12+(p.social||0)*.08+rint(0,25);const threshold=34+m.risk*12;
+    if(m.kind==='search'&&p.knowledge>=55||m.kind==='baroque'&&p.social>=65){};
+    if(power>=threshold){finishMission(m,true);if(m.kind==='baroque'){p.helped=(p.helped||0)+1;p.baroqueRisk=Math.max(0,(p.baroqueRisk||0)-2)}if(m.kind==='search')p.friends=(p.friends||0)+1;}
+    else if(power>=threshold-13){p.health=clampN(p.health-5);p.stress=clampN(p.stress+4);finishMission(m,true,'');log('任務は完了したが、負傷と疲労が残った。','event');}
+    else{p.health=clampN(p.health-(m.risk*3));finishMission(m,false,'危険を察知して撤退した。');}
+   },
+   ()=>{if(p.money<fee){log(`交渉前の準備費${fee}Gが足りなかった。`,'bad');return;}p.money-=fee;p.contractNegotiations=(p.contractNegotiations||0)+1;const roll=(p.social||0)+(p.skill||0)+rint(0,40);if(roll>=100){m.reward=Math.round(m.reward*1.35);log(`交渉成立。報酬が${m.reward}Gに増額された。`,'good');}else{m.reward=Math.round(m.reward*.85);log('交渉は一部のみ成立。報酬は下がったが、依頼内容は維持された。','event');}p.missionsAccepted++;const power=(p.skill||0)*.42+(p.knowledge||0)*.18+(p.health||0)*.12+(p.mind||0)*.12+(p.social||0)*.08+rint(0,25);if(power>=34+m.risk*12)finishMission(m,true);else{p.health=clampN(p.health-m.risk*2);finishMission(m,false,'交渉後の条件でも遂行できなかった。');}},
+   ()=>{p.stress=clampN(p.stress-2);p.missionHistory.unshift({age:p.age,year:p.year,title:m.title,success:false,reason:'辞退'});p.missionHistory=p.missionHistory.slice(0,80);log(`依頼「${m.title}」を辞退した。`,'event');}
+  ]);
+ }
+ function clientOffer(){
+  const service=['行方不明の家族を探したい','危険地域を通る商隊を護衛してほしい','バロック発症者を安全な施設へ搬送してほしい','盗まれた義体部品を取り戻してほしい','地域の警備を数日間任せたい'][rint(0,4)];
+  const cost=rint(18,65);
+  decide('便利屋を雇う',`あなたの仕事や暮らしに関係する問題が発生した。専門家へ依頼すれば解決できるかもしれない。\n依頼内容：${service}\n見積額：${cost}G`,['便利屋へ正式に依頼する','自分で対処する','今回は諦める'],[
+   ()=>{p.clientRequests++;if(p.money<cost){log('費用が足りず、便利屋との契約は成立しなかった。','bad');p.stress=clampN(p.stress+3);return;}p.money-=cost;const success=Math.random()<.62+(p.knowledge||0)/500;if(success){p.happiness=clampN(p.happiness+5);p.stress=clampN(p.stress-7);p.helped=(p.helped||0)+1;log(`便利屋に依頼した「${service}」は無事に解決した。`,'good')}else{p.stress=clampN(p.stress+3);log(`便利屋は対応したが、「${service}」は完全には解決しなかった。`,'event')}},
+   ()=>{const power=(p.skill||0)*.35+(p.knowledge||0)*.3+(p.health||0)*.15+rint(0,30);if(power>75){p.skill=clampN(p.skill+2);p.happiness=clampN(p.happiness+2);log('自分の力で問題を解決した。','good')}else{p.health=clampN(p.health-5);p.stress=clampN(p.stress+6);log('自力での対処は難航し、余計な負担がかかった。','bad')}},
+   ()=>{p.stress=clampN(p.stress+2);log('問題を抱えたまま、今回は何もしないことにした。','event');}
+  ]);
+ }
+ function demonCulling(){
+  const total=rint(3,5),state={round:1,total,score:0,wounds:0,retreated:false};p.inquisitorCulls++;
+  function next(){
+   if(state.round>state.total){p.demonWavesCleared++;p.contractsCompleted=(p.contractsCompleted||0)+1;p.professionRank=Math.min(5,(p.professionRank||0)+1);p.holyFavor=(p.holyFavor||0)+4;p.fame=(p.fame||0)+2;log(`間引き任務完了。${state.total}連戦を制し、悪魔の群れを掃討した。`,'good');p.missionHistory.unshift({age:p.age,year:p.year,title:`悪魔の間引き任務（${state.total}連戦）`,success:true,rounds:state.total});p.missionHistory=p.missionHistory.slice(0,80);return;}
+   const enemy=['下級悪魔','飢餓の悪魔','堕落した眷属','境界から漏れた悪魔'][rint(0,3)];const base=(p.skill||0)*.45+(p.knowledge||0)*.2+(p.health||0)*.12+(p.holyFavor||0)*.18+rint(0,24);const difficulty=38+state.round*9;
+   decide(`間引き任務：連戦 ${state.round}/${state.total}`,`出現した敵：${enemy}\n後方に逃げ道はあるが、ここで取り逃がせば周辺地域に被害が出る。\n現在の負傷：${state.wounds}`,['正面から制圧する','術式・聖具で弱点を突く','仲間と連携して包囲する','一時撤退する'],[
+    ()=>{const v=base+(p.skill||0)*.18;if(v>=difficulty){state.score++;p.holyFavor=(p.holyFavor||0)+1;log(`${enemy}を正面から制圧した。`,'good')}else{state.wounds++;p.health=clampN(p.health-7);p.stress=clampN(p.stress+3);log(`${enemy}の反撃を受けた。`,'bad')}state.round++;next()},
+    ()=>{const v=base+(p.knowledge||0)*.3+(p.holyFavor||0)*.12;if(v>=difficulty-4){state.score++;p.holyFavor=(p.holyFavor||0)+2;log(`${enemy}の弱点を突き、効率よく撃破した。`,'good')}else{state.wounds++;p.health=clampN(p.health-5);p.stress=clampN(p.stress+4);log(`術式が乱れ、${enemy}に接近を許した。`,'bad')}state.round++;next()},
+    ()=>{const v=base+(p.social||0)*.22+(p.professionRank||0)*5;if(v>=difficulty-2){state.score++;p.stress=clampN(p.stress-2);log(`連携が噛み合い、${enemy}を包囲した。`,'good')}else{state.wounds++;p.health=clampN(p.health-4);log('連携が崩れ、隊列に損害が出た。','bad')}state.round++;next()},
+    ()=>{state.retreated=true;p.demonWavesFailed++;p.contractsFailed=(p.contractsFailed||0)+1;p.stress=clampN(p.stress+5);p.inquisitorAlert=clampN((p.inquisitorAlert||0)+2);p.missionHistory.unshift({age:p.age,year:p.year,title:`悪魔の間引き任務（${state.round-1}/${state.total}戦）`,success:false,rounds:state.round-1});p.missionHistory=p.missionHistory.slice(0,80);log(`異端審問官は被害拡大を防ぐため撤退した。撃破数：${state.score}/${state.total}`,'event');}
+   ]);
+  }
+  log(`異端審問官の間引き任務が始まった。今回は悪魔${total}体との連続戦闘となる。`,'event');next();
+ }
+ function workTick(){
+  if(!p||p.dead||decision)return;
+  // Inquisitors can work in the Bakedome/afterlife phase; ordinary jobs begin at working age.
+  if(!isInquisitor()&&(p.afterlife||p.age<16))return;
+  initWork();p.workSeasonCounter++;
+  if(p.lastWorkEventSeason===p.workSeasonCounter)return;
+  if(isHandy()){
+   // Increased frequency: roughly one offer every 2–4 seasons, with a hard cooldown.
+   if(p.workSeasonCounter-p.lastWorkEventSeason>=2&&Math.random()<.34){p.lastWorkEventSeason=p.workSeasonCounter;handyOffer();return;}
+  }else if(isInquisitor()){
+   if(p.workSeasonCounter-p.lastWorkEventSeason>=2&&Math.random()<.19){p.lastWorkEventSeason=p.workSeasonCounter;demonCulling();return;}
+  }else{
+   // Other occupations cannot accept or complete handy contracts; they can only hire a handy.
+   if(p.workSeasonCounter-p.lastWorkEventSeason>=3&&Math.random()<.11){p.lastWorkEventSeason=p.workSeasonCounter;clientOffer();return;}
+  }
+ }
+ function familyDeepTick(){
+  if(!p||p.dead||p.afterlife||decision||p.specialLife)return;
+  p.familyEventSeason=Number(p.familyEventSeason)||0;p.familyEventSeason++;
+  const children=Array.isArray(p.childrenRecords)?p.childrenRecords:[];
+  const partnerId=p.partnerId||p.romancePartnerId;
+  const partner=(p.npcRelations||[]).find(n=>n.npcId===partnerId&&n.alive!==false);
+  if(children.length&&Math.random()<.075){
+   const child=children.filter(c=>c.alive!==false).sort(()=>Math.random()-.5)[0];if(!child)return;
+   const age=Number(child.age)||0;
+   if(age<=12){
+    decide('親子の時間',`${child.name}が最近、あなたに話したいことがあるようだ。どう向き合おう？`,['話を聞き、気持ちを受け止める','一緒に遊び、楽しい時間を作る','自分で考えるよう促す'],[
+     ()=>{child.relationship=clampN((child.relationship??55)+7);child.trust=clampN((child.trust??50)+6);p.familySupport=(p.familySupport||0)+1;child.history.push({age,year:p.year,event:'親に話を聞いてもらった'});log(`${child.name}の話を聞き、安心させることができた。`,'good')},
+     ()=>{child.relationship=clampN((child.relationship??55)+5);p.happiness=clampN(p.happiness+3);p.money=Math.max(0,p.money-2);child.history.push({age,year:p.year,event:'親と一緒に遊んだ'});log(`${child.name}と一緒に遊び、楽しい時間を過ごした。`,'good')},
+     ()=>{child.independence=clampN((child.independence??40)+6);child.relationship=clampN((child.relationship??55)-2);child.history.push({age,year:p.year,event:'自分で考えるよう促された'});log(`${child.name}に自分で考える機会を与えた。`,'event')}
+    ]);return;
+   }
+   if(age>=13&&age<18){
+    decide('思春期の子ども',`${child.name}が進路や友人関係について、あなたと意見を違えている。`,['本人の意思を尊重する','経験から助言する','厳しくルールを決める'],[
+     ()=>{child.relationship=clampN((child.relationship??55)+5);child.independence=clampN((child.independence??40)+7);child.history.push({age,year:p.year,event:'進路について親に尊重された'});p.familySupport=(p.familySupport||0)+1;log(`${child.name}の意思を尊重した。`,'good')},
+     ()=>{child.trust=clampN((child.trust??50)+4);child.relationship=clampN((child.relationship??55)+2);child.history.push({age,year:p.year,event:'親から進路の助言を受けた'});log(`${child.name}に経験をもとに助言した。`,'event')},
+     ()=>{child.relationship=clampN((child.relationship??55)-8);child.conflict=clampN((child.conflict??0)+7);child.history.push({age,year:p.year,event:'親と進路を巡って衝突した'});p.stress=clampN(p.stress+4);log(`${child.name}と衝突した。しばらく気まずさが残りそうだ。`,'bad')}
+    ]);return;
+   }
+  }
+  if(partner&&p.relationshipStatus==='dating'&&Math.random()<.045){
+   decide('交際相手との時間',`${partner.name}と過ごす時間を作れそうだ。`,['二人で出かける','将来について話す','相手の仕事や生活を手伝う'],[
+    ()=>{partner.affection=clampN((partner.affection||0)+5);partner.closeness=clampN((partner.closeness||0)+6);p.money=Math.max(0,p.money-4);p.happiness=clampN(p.happiness+4);log(`${partner.name}とデートをした。`,'good')},
+    ()=>{partner.trust=clampN((partner.trust||0)+6);partner.conflict=clampN((partner.conflict||0)-2);log(`${partner.name}と将来について率直に話し合った。`,'good')},
+    ()=>{partner.closeness=clampN((partner.closeness||0)+5);p.stress=clampN(p.stress-3);log(`${partner.name}の仕事や生活を手伝った。`,'event')}
+   ]);
+  }
+ }
+ const oldTick=seasonTick;
+ seasonTick=function(){oldTick();if(!p||p.dead)return;try{initWork();if(!decision)familyDeepTick();if(!decision)workTick();}catch(e){console.error('v8.29 extension',e)}};
+ const oldWorkInfo=showWorkInfo;
+ showWorkInfo=function(){if(!p)return oldWorkInfo();initWork();oldWorkInfo();const modal=$('modal');if(!modal)return;const extra=document.createElement('section');extra.className='entry';extra.innerHTML=`<h3>業務記録・v8.29</h3><p>便利屋任務の受注：${p.missionsAccepted}件 / 完了：${p.missionsCompleted}件 / 失敗：${p.missionsFailed}件</p><p>便利屋への発注：${p.clientRequests}件 / 異端審問官の間引き任務：${p.inquisitorCulls}回 / 悪魔連戦突破：${p.demonWavesCleared}回</p><p class="sub">便利屋以外の職業では任務を受注できません。その他の職業では便利屋を雇う依頼イベントが発生します。異端審問官は専用の連続戦闘任務を受けます。</p>${(p.missionHistory||[]).slice(0,8).map(m=>`<div class="sub">${m.year||p.year}年 / ${m.age??p.age}歳 — ${String(m.title).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}：${m.success?'成功':'失敗・辞退'}</div>`).join('')}`;modal.appendChild(extra)};
+ document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.29';
+ const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.29 — FAMILY, CONTRACTS & INQUISITION';
+ if(typeof exportSave==='function'){const prevExport=exportSave;exportSave=function(){const oldCreate=URL.createObjectURL;const oldClick=HTMLAnchorElement.prototype.click;try{const data={version:8.29,current:p,deathCauses:JSON.parse(storage.get('bakeDeathCauses','[]')),titles:JSON.parse(storage.get('bakeTitles','[]')),lives:JSON.parse(storage.get('bakeLives','[]')),ascendedLives:JSON.parse(storage.get('bakeAscendedLives','[]')),secretMeta:JSON.parse(storage.get('bakeSecretMeta','{}')),workSchema:1};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.29.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}catch(e){prevExport()}}}
+})();
+
+</script>
 </body>
 </html>

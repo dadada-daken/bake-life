@@ -2560,7 +2560,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  const KEY='bakeTogemaruStoryV1', META='bakeTogemaruMetaV1';
  const $=id=>document.getElementById(id);
  document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.46';
- const setFooter=()=>{const f=document.querySelector('footer');if(f)f.textContent='BAKE LIFE v8.48 — TOGEMARU ISOLATION & UI FIX';};
+ const setFooter=()=>{const f=document.querySelector('footer');if(f)f.textContent='BAKE LIFE v8.49 — TOGEMARU ISOLATION & UI FIX';};
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setFooter);else setFooter();
  const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){return {}}};
  const metaRead=()=>{try{return JSON.parse(localStorage.getItem(META)||'{}')}catch(e){return {}}};
@@ -2573,10 +2573,11 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
   {id:'calm',name:'のんびり過ごそう',desc:'疲労を20以下にして満足度70以上',test:s=>(s.stats?.fatigue||0)<=20&&(s.stats?.satisfaction||0)>=70,progress:s=>(s.stats?.fatigue||0)<=20?70:Math.max(0,70-(s.stats?.fatigue||0)),max:70}
  ];
  function currentGoal(s,m){let idx=Number.isInteger(m.goalIndex)?m.goalIndex:0;let g=goals[idx%goals.length];if(g.test(s)){m.completed=m.completed||[];if(!m.completed.includes(g.id))m.completed.push(g.id);m.points=(m.points||0)+1;m.goalIndex=(idx+1)%goals.length;g=goals[m.goalIndex];metaSave(m)}return g}
- function inject(){const root=$('togeModal');if(!root||root.dataset.v844)return;root.dataset.v844='1';
-  // Idempotency guard: one objective panel and one handbook note per rendered screen.
-  root.querySelectorAll('.toge-quest').forEach(x=>x.remove());
-  root.querySelectorAll('.toge-handbook-note').forEach(x=>x.remove());
+ function inject(){const root=$('togeModal');if(!root)return;
+  // Clean duplicate remnants before checking the render marker. Keep at most one panel/note.
+  const quests=[...root.querySelectorAll('.toge-quest')];quests.slice(1).forEach(x=>x.remove());
+  const notes=[...root.querySelectorAll('.toge-handbook-note')];notes.slice(1).forEach(x=>x.remove());
+  if(root.dataset.v844)return;root.dataset.v844='1';
   const s=read(),m=metaRead(),g=currentGoal(s,m),v=Math.min(g.max,g.progress(s));
   const hero=root.querySelector('.toge-hero');
   if(hero){const stats=hero.querySelector('div:last-child');if(stats){const small=document.createElement('div');small.className='toge-muted toge-handbook-note';small.textContent=`探索手帳ポイント ${m.points||0} pt ・ 訪問 ${Math.max(0,(s.visited||[]).length)}か所`;stats.appendChild(small)}}
@@ -2698,7 +2699,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
 
 
 <style id="toge-v846-ui">
-/* v8.48: readable status gauges and thumb-friendly two-column controls */
+/* v8.49: readable status gauges and thumb-friendly two-column controls */
 #togeModal .toge-statgrid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important}
 #togeModal .toge-stat{position:relative;display:grid!important;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:6px;row-gap:7px;min-width:0;padding:8px 9px!important;background:#252d3c!important;border:1px solid #465064!important;border-radius:8px!important;font-size:.76rem!important;line-height:1.2!important;overflow:hidden}
 #togeModal .toge-stat>span{min-width:0;overflow-wrap:anywhere}
@@ -2721,7 +2722,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
 }
 </style>
 <script>
-// v8.48 TOGEMARU ISOLATION + UI FIX
+// v8.49 TOGEMARU ISOLATION + UI FIX
 (function(){
  'use strict';
  const $=id=>document.getElementById(id);
@@ -2790,24 +2791,27 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
 
 
 <script>
-// v8.48: preserve Togemaru modal/page scroll after actions; keep objective panel single-instance.
+// v8.49: restore the actual scrolling element after Togemaru re-renders.
 (function(){
  'use strict';
  const names=['togeAct','togeMove','togeSelectPerson','togeSetAutonomy','togeSetForm'];
  function keepScroll(fn){return function(){
-   const modal=document.getElementById('modal');
-   const modalTop=modal?modal.scrollTop:0;
+   // #togeModal is the element with overflow-y:auto; #modal itself is not the scroller.
+   const inner=document.getElementById('togeModal');
+   const innerTop=inner?inner.scrollTop:0;
    const pageTop=window.scrollY||document.documentElement.scrollTop||0;
    const result=fn.apply(this,arguments);
    const restore=()=>{
-     const m=document.getElementById('modal');
-     if(m)m.scrollTop=modalTop;
+     const next=document.getElementById('togeModal');
+     if(next){next.style.scrollBehavior='auto';next.scrollTop=innerTop;}
      window.scrollTo(0,pageTop);
    };
+   // present() replaces #togeModal itself; restore after its replacement and after observers finish.
    setTimeout(restore,0);
-   setTimeout(restore,40);
+   setTimeout(restore,50);
+   setTimeout(restore,180);
    return result;
  };}
- names.forEach(name=>{const fn=window[name];if(typeof fn==='function'&&!fn.__v848Scroll){const wrapped=keepScroll(fn);wrapped.__v848Scroll=true;window[name]=wrapped;}});
+ names.forEach(name=>{const fn=window[name];if(typeof fn==='function'&&!fn.__v849Scroll){const wrapped=keepScroll(fn);wrapped.__v849Scroll=true;window[name]=wrapped;}});
 })();
 </script>

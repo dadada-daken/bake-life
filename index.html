@@ -2318,7 +2318,41 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  window.previewCinematic=function(){cfg=read();present('history','✦','CINEMATIC PREVIEW','人生の記録','何気ない一日も、いつか振り返れば大切な一頁になる。')};
  const oldMore=showMoreMenu;showMoreMenu=function(){oldMore();const modal=$('modal');if(!modal||modal.querySelector('[data-cinematic-menu]'))return;const box=document.createElement('section');box.className='entry';box.setAttribute('data-cinematic-menu','1');box.innerHTML='<b>CINEMATIC LIFE / 演出</b><div class="controls" style="margin-top:8px"><button onclick="showCinematicSettings()">演出設定・プレビュー</button></div>';modal.appendChild(box)};
  const oldSummary=showLifeSummary; if(typeof oldSummary==='function'){showLifeSummary=function(){oldSummary.apply(this,arguments);const modal=$('modal');if(modal){const h=modal.querySelector('h2');if(h)h.insertAdjacentHTML('afterend','<p class="sub" style="text-align:center;letter-spacing:.12em;color:#d7c18a">A LIFE WRITTEN IN THE CHRONICLE</p>')}}}
- document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.37';const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.37 — CINEMATIC LIFE UPDATE';
+ document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.37';const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.38 — CHRONICLE IMMERSION UPDATE';
+})();
+</script>
+
+
+<style>
+#chronicleTravel{position:fixed;inset:0;z-index:10040;display:grid;place-items:center;background:radial-gradient(ellipse at center,#263d50f2,#080d16f7);opacity:0;pointer-events:none;transition:opacity .35s ease}
+#chronicleTravel.show{opacity:1}#chronicleTravel .travel-card{width:min(90vw,460px);padding:28px 20px;text-align:center;border:1px solid #9eb6c5;border-radius:16px;background:linear-gradient(145deg,#243b4b,#151b29);box-shadow:0 20px 70px #0009;color:#f3ead5}#chronicleTravel .travel-kicker{font-size:11px;letter-spacing:.22em;color:#a9c7d7}#chronicleTravel h2{margin:12px 0;font-size:25px}#chronicleTravel p{margin:7px 0;color:#d7dce0}
+.chronicle-memory{border-left:3px solid #b89c62;padding:9px 12px;margin:8px 0;background:#b89c6212}.chronicle-album{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:9px}.chronicle-album .entry{margin:0;min-height:84px}
+</style>
+<script>
+// v8.38 CHRONICLE IMMERSION UPDATE — travel, memories, life album, legacy
+(function(){
+ 'use strict';
+ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const safe=(a)=>Array.isArray(a)?a:[];
+ function travelCard(from,to,layer,reason){
+  let el=document.getElementById('chronicleTravel');if(!el){el=document.createElement('div');el.id='chronicleTravel';el.innerHTML='<div class="travel-card"><div class="travel-kicker">A JOURNEY THROUGH BAKE</div><h2 id="ctTo"></h2><p id="ctFrom"></p><p id="ctLayer"></p><p id="ctReason"></p></div>';document.body.appendChild(el)}
+  el.querySelector('#ctTo').textContent=to;el.querySelector('#ctFrom').textContent=from?`FROM  ${from}`:'新しい土地へ';el.querySelector('#ctLayer').textContent=layer||'';el.querySelector('#ctReason').textContent=reason||'地域を移動した';
+  const cfg=(()=>{try{return JSON.parse(localStorage.getItem('bakeCinematicSettingsV1')||'{}')}catch(e){return {}}})();if(cfg.enabled===false||cfg.intensity==='off')return;
+  el.classList.add('show');clearTimeout(travelCard.timer);travelCard.timer=setTimeout(()=>el.classList.remove('show'),cfg.intensity==='simple'?1200:2300);
+ }
+ if(typeof setLayerLocation==='function'){
+  const old=setLayerLocation;setLayerLocation=function(target,reason){const from=p?.place||'';const result=old.apply(this,arguments);if(p&&from!==p.place)travelCard(from,p.place,p.layer,reason);return result};
+ }
+ // Preserve a compact album of meaningful moments within the current life save.
+ if(typeof addLog==='function'){
+  const old=addLog;addLog=function(message,type){const result=old.apply(this,arguments);try{if(p&&message){const t=String(message);if(/誕生|生まれ|結婚|伴侶|子ども|再会|称号|バロック|境界点|災害|歴史|昇天|死亡|亡くな/.test(t)){p.lifeAlbum=safe(p.lifeAlbum);const key=`${p.age||0}|${p.year||0}|${t}`;if(!p.lifeAlbum.some(x=>x.key===key)){p.lifeAlbum.unshift({key,age:p.age||0,year:p.year||0,place:p.place||'',text:t,type:type||'event'});p.lifeAlbum=p.lifeAlbum.slice(0,80)}}}}catch(e){console.warn('life album capture',e)}return result};
+ }
+ window.showLifeAlbum=function(){if(!p)return;const items=safe(p.lifeAlbum);$('overlay').style.display='grid';$('modal').innerHTML=`<button class="modal-close" onclick="closeV8Modal()">×</button><div class="sub">CHRONICLE / PERSONAL ALBUM</div><h2>人生アルバム</h2><p class="sub">この人生で記録された印象的な出来事 ${items.length}件</p><div class="chronicle-album">${items.map(x=>`<div class="entry"><small>${esc(x.year)}年・${esc(x.age)}歳 / ${esc(x.place)}</small><div>${esc(x.text)}</div></div>`).join('')||'<p class="sub">まだアルバムに記録はありません。大切な出来事がここに残ります。</p>'}</div><div class="choices"><button onclick="closeV8Modal()">閉じる</button></div>`};
+ window.showReunionMemories=function(){if(!p)return;const ns=safe(p.npcRelations).filter(n=>safe(n.history).length||n.reunionCount);$('overlay').style.display='grid';$('modal').innerHTML=`<button class="modal-close" onclick="closeV8Modal()">×</button><div class="sub">CHRONICLE / PEOPLE & MEMORIES</div><h2>再会と思い出</h2>${ns.map(n=>`<section class="chronicle-memory"><b>${esc(n.name||'名前のない知人')}</b><div class="sub">${esc(n.role||'知人')} / 再会 ${n.reunionCount||0}回 / ${esc(n.location||'居住地不明')}</div>${safe(n.history).slice(-6).reverse().map(h=>`<div class="sub">${esc(h.year??'')}年・${esc(h.age??'')}歳 — ${esc(h.event||'交流した')}</div>`).join('')||'<div class="sub">詳細な交流履歴はありません。</div>'}</section>`).join('')||'<p class="sub">まだ人物との思い出は記録されていません。</p>'}<button onclick="closeV8Modal()">閉じる</button>`};
+ window.showLegacyChronicle=function(){if(!p)return;const wh=safe(p.worldHistory),album=safe(p.lifeAlbum);const region=safe(p.regionHistory);const highlights=[...wh.map(x=>({year:x.year,age:x.age,title:x.title,detail:x.detail})),...region.map(x=>({year:x.year,age:x.age,title:x.event,detail:x.place}))].sort((a,b)=>(a.year||0)-(b.year||0));$('overlay').style.display='grid';$('modal').innerHTML=`<button class="modal-close" onclick="closeV8Modal()">×</button><div class="sub">AFTERLIFE / LEGACY RECORD</div><h2>${esc(p.name)}が残したもの</h2><div class="info-grid"><div class="info-card"><small>世界史の記録</small><b>${wh.length}件</b></div><div class="info-card"><small>人生アルバム</small><b>${album.length}件</b></div><div class="info-card"><small>地域の記録</small><b>${region.length}件</b></div><div class="info-card"><small>称号</small><b>${safe(p.titles).length}個</b></div></div><p>このクッキーが生きた時代と、世界や地域に残した足跡です。</p>${highlights.slice(-30).reverse().map(x=>`<div class="entry"><b>${esc(x.year??'—')}年・${esc(x.age??'—')}歳 — ${esc(x.title||'記録')}</b><div class="sub">${esc(x.detail||'')}</div></div>`).join('')||'<p class="sub">歴史に残る記録はありません。名もない日々も、確かに生きた証です。</p>'}<button onclick="closeV8Modal()">閉じる</button>`};
+ const priorMore=showMoreMenu;showMoreMenu=function(){priorMore.apply(this,arguments);const modal=$('modal');if(!modal||modal.querySelector('[data-chronicle-immersion]'))return;const box=document.createElement('section');box.className='entry';box.dataset.chronicleImmersion='1';box.innerHTML='<b>CHRONICLE IMMERSION / 人生の追体験</b><div class="controls" style="margin-top:8px"><button onclick="showLifeAlbum()">人生アルバム</button><button onclick="showReunionMemories()">再会と思い出</button><button onclick="showLegacyChronicle()">死後の歴史的影響</button></div>';modal.appendChild(box)};
+ // Capture memories from pre-existing NPC histories when opening the album.
+ document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.38';const foot=document.querySelector('footer');if(foot)foot.textContent='BAKE LIFE v8.38 — CHRONICLE IMMERSION UPDATE';
 })();
 </script>
 

@@ -1742,7 +1742,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
 
 
 
-<!-- BAKE LIFE v8.28 : BONDS & GENERATIONS -->
+<!-- BAKE LIFE v8.30 : RELATIONSHIP EVENT SCHEDULER FIX -->
 <script>
 (function installBondsAndGenerationsV828(){
  'use strict';
@@ -1820,6 +1820,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  function relationshipTick(){
   if(!p||p.dead||p.afterlife||p.specialLife||p.age<18)return;
   migrateBonds();
+  p.romanceSeasonCounter=(Number(p.romanceSeasonCounter)||0)+1;
   const spouse=p.partnerId?p.npcRelations.find(n=>n.npcId===p.partnerId):null;
   if(p.married&&spouse&&spouse.alive===false){p.married=false;p.partner=false;p.relationshipStatus='widowed';p.partnerId=null;p.romancePartnerId=null;p.lastRelationshipEnded='widowed';p.honoredDeceasedPartner=false;familyLog(`${spouse.name}が亡くなった。共に過ごした時間は、これからもあなたの人生に残り続ける。`);p.relationshipHistory.unshift({age:p.age,year:p.year,stage:'widowed',partner:spouse.name});}
   if(p.married&&spouse&&spouse.alive!==false){
@@ -1830,9 +1831,9 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
   }
   if(!p.married){
    let n=candidate();
-   if(!n&&p.age>=20&&p.npcRelations.length<40&&Math.random()<.12){n=addBondNpc(typeof randomCookieName==='function'?randomCookieName():'旅先で出会ったクッキー','新しい知人',{trust:ri(35,65),closeness:ri(30,60),affection:ri(15,35),romanceKind:randKind()});}
+   if(!n&&p.age>=20&&p.npcRelations.length<40&&p.romanceSeasonCounter%4===0&&Math.random()<.30){n=addBondNpc(typeof randomCookieName==='function'?randomCookieName():'旅先で出会ったクッキー','新しい知人',{trust:ri(40,65),closeness:ri(38,62),affection:ri(20,38),romanceKind:randKind()});}
    if(n&&specialRomance(n))return;
-   if(n&&n.lastRomanceEventAge!==p.age&&Math.random()<.18){n.lastRomanceEventAge=p.age;
+   if(n&&n.lastRomanceEventSeason!==p.romanceSeasonCounter&&Math.random()<.22){n.lastRomanceEventSeason=p.romanceSeasonCounter;n.lastRomanceEventAge=p.age;
     const readiness=n.trust>=45&&n.closeness>=45&&n.affection>=25&&n.conflict<45&&n.compatibility>=30;
     if(n.relationshipStatus==='dating'&&readiness&&p.age>=20&&Math.random()<.23){smallDecision('将来についての話',`${n.name}と、これからの関係について話す機会が訪れた。`,['結婚を前提に交際を続けたい','もう少し時間をかけたい','今は結婚を考えられない'],[()=>{n.relationshipStatus='engaged';p.relationshipStatus='engaged';history(n,'婚約した');p.relationshipHistory.unshift({age:p.age,year:p.year,stage:'engaged',partner:n.name});familyLog(`${n.name}と婚約した。`)},()=>{n.affection=clamp100(n.affection+4);n.closeness=clamp100(n.closeness+4);history(n,'将来について話し合った')},()=>{n.conflict=clamp100(n.conflict+5);n.affection=clamp100(n.affection-3);history(n,'結婚観の違いが明らかになった')}]);return;}
     if(n.relationshipStatus==='engaged'){smallDecision('結婚の申し込み',`${n.name}との婚約を経て、二人で結婚する日を決めることになった。`,['結婚する','婚約を続ける','婚約を解消する'],[()=>{p.married=true;p.partner=true;p.partnerId=n.npcId;p.romancePartnerId=null;p.relationshipStatus='married';n.isSpouse=true;n.relationshipStatus='married';history(n,'結婚した');p.relationshipHistory.unshift({age:p.age,year:p.year,stage:'married',partner:n.name});familyLog(`${n.name}と結婚した。`);p.happiness=clamp(p.happiness+10)},()=>{n.affection=clamp100(n.affection+2);history(n,'婚約を続けることにした')},()=>{n.relationshipStatus='separated';p.relationshipStatus='single';p.romancePartnerId=null;n.conflict=clamp100(n.conflict+10);history(n,'婚約を解消した');p.relationshipHistory.unshift({age:p.age,year:p.year,stage:'separated',partner:n.name});familyLog(`${n.name}との婚約を解消した。`)}]);return;}
@@ -1855,7 +1856,22 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  die=function(cause){if(p&&!p.dead){migrateBonds();p.childrenCountAtDeath=p.children||0;p.relationshipArchive={status:p.relationshipStatus,partnerId:p.partnerId||null,history:(p.relationshipHistory||[]).slice(-80),familyHistory:(p.familyHistory||[]).slice(-100),children:(p.childrenRecords||[]).map(c=>({...c,history:(c.history||[]).slice(-30)})),npcRelations:(p.npcRelations||[]).map(n=>({...n,history:(n.history||[]).slice(-30),relationshipHistory:(n.relationshipHistory||[]).slice(-30)}))};checkRelationshipTitles();}const result=previousDie(cause);try{const lives=JSON.parse(storage.get('bakeLives','[]'));const idx=p?.lifeId?lives.findIndex(x=>x&&x.lifeId===p.lifeId):-1;if(idx>=0){lives[idx].relationshipArchive=p.relationshipArchive;lives[idx].children=p.children||0;lives[idx].married=!!p.married;storage.set('bakeLives',JSON.stringify(lives.slice(0,100)))}}catch(e){}return result};
  // Yearly wrapper: base tick advances NPCs once; this adds child growth and family events.
  const previousSeason=seasonTick;
- seasonTick=function(){if(!p||p.dead)return;const beforeYear=p.year;previousSeason();if(!p||p.dead||p.afterlife||p.year===beforeYear)return;migrateBonds();if(p.isAngel){for(const n of p.npcRelations){if(n.alive!==false){n.age=(n.age||0)+1;n.years=(n.years||0)+1;if(n.age>=ri(75,96)&&Math.random()<.08){n.alive=false;n.status='故人';n.history.push({age:n.age,year:p.year,event:'死亡'});}}}}if(!p.specialLife){yearlyChildTick();if(!decision)relationshipTick();}checkRelationshipTitles();try{storage.set('bakeCurrent',JSON.stringify(p))}catch(e){}};
+ // v8.30: relationship events are season-based; child growth and annual aging remain year-based.
+ seasonTick=function(){
+  if(!p||p.dead)return;
+  const beforeYear=p.year;
+  previousSeason();
+  if(!p||p.dead||p.afterlife)return;
+  migrateBonds();
+  const newYear=p.year!==beforeYear;
+  if(newYear){
+   if(p.isAngel){for(const n of p.npcRelations){if(n.alive!==false){n.age=(n.age||0)+1;n.years=(n.years||0)+1;if(n.age>=ri(75,96)&&Math.random()<.08){n.alive=false;n.status='故人';n.history.push({age:n.age,year:p.year,event:'死亡'});}}}}
+   if(!p.specialLife)yearlyChildTick();
+  }
+  if(!p.specialLife&&!decision)relationshipTick();
+  checkRelationshipTitles();
+  try{storage.set('bakeCurrent',JSON.stringify(p))}catch(e){}
+ };
  // Preserve the original people view's navigation point while exposing the richer archive.
  window.showPeopleInfo=renderPeople;
  // Extend migration used by existing saves; never synthesize spouse identity or child identities.
@@ -1999,9 +2015,9 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  seasonTick=function(){oldTick();if(!p||p.dead)return;try{initWork();if(!decision)familyDeepTick();if(!decision)workTick();}catch(e){console.error('v8.29 extension',e)}};
  const oldWorkInfo=showWorkInfo;
  showWorkInfo=function(){if(!p)return oldWorkInfo();initWork();oldWorkInfo();const modal=$('modal');if(!modal)return;const extra=document.createElement('section');extra.className='entry';extra.innerHTML=`<h3>業務記録・v8.29</h3><p>便利屋任務の受注：${p.missionsAccepted}件 / 完了：${p.missionsCompleted}件 / 失敗：${p.missionsFailed}件</p><p>便利屋への発注：${p.clientRequests}件 / 異端審問官の間引き任務：${p.inquisitorCulls}回 / 悪魔連戦突破：${p.demonWavesCleared}回</p><p class="sub">便利屋以外の職業では任務を受注できません。その他の職業では便利屋を雇う依頼イベントが発生します。異端審問官は専用の連続戦闘任務を受けます。</p>${(p.missionHistory||[]).slice(0,8).map(m=>`<div class="sub">${m.year||p.year}年 / ${m.age??p.age}歳 — ${String(m.title).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}：${m.success?'成功':'失敗・辞退'}</div>`).join('')}`;modal.appendChild(extra)};
- document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.29';
- const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.29 — FAMILY, CONTRACTS & INQUISITION';
- if(typeof exportSave==='function'){const prevExport=exportSave;exportSave=function(){const oldCreate=URL.createObjectURL;const oldClick=HTMLAnchorElement.prototype.click;try{const data={version:8.29,current:p,deathCauses:JSON.parse(storage.get('bakeDeathCauses','[]')),titles:JSON.parse(storage.get('bakeTitles','[]')),lives:JSON.parse(storage.get('bakeLives','[]')),ascendedLives:JSON.parse(storage.get('bakeAscendedLives','[]')),secretMeta:JSON.parse(storage.get('bakeSecretMeta','{}')),workSchema:1};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.29.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}catch(e){prevExport()}}}
+ document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.30';
+ const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.30 — RELATIONSHIP EVENT FIX';
+ if(typeof exportSave==='function'){const prevExport=exportSave;exportSave=function(){const oldCreate=URL.createObjectURL;const oldClick=HTMLAnchorElement.prototype.click;try{const data={version:8.30,current:p,deathCauses:JSON.parse(storage.get('bakeDeathCauses','[]')),titles:JSON.parse(storage.get('bakeTitles','[]')),lives:JSON.parse(storage.get('bakeLives','[]')),ascendedLives:JSON.parse(storage.get('bakeAscendedLives','[]')),secretMeta:JSON.parse(storage.get('bakeSecretMeta','{}')),workSchema:1,relationshipSchema:2};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.30.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}catch(e){prevExport()}}}
 })();
 
 </script>

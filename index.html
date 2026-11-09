@@ -2559,6 +2559,9 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  'use strict';
  const KEY='bakeTogemaruStoryV1', META='bakeTogemaruMetaV1';
  const $=id=>document.getElementById(id);
+ document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.45';
+ const setFooter=()=>{const f=document.querySelector('footer');if(f)f.textContent='BAKE LIFE v8.45 — TOGEMARU ISOLATION & UI FIX';};
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setFooter);else setFooter();
  const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){return {}}};
  const metaRead=()=>{try{return JSON.parse(localStorage.getItem(META)||'{}')}catch(e){return {}}};
  const metaSave=x=>{try{localStorage.setItem(META,JSON.stringify(x))}catch(e){}};
@@ -2641,3 +2644,91 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  #togeModal .toge-log{max-height:12vh}
 }
 </style>
+
+
+<style id="toge-v845-ui">
+/* v8.45: main-game-like status bars and compact command controls */
+#togeModal .toge-statgrid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:5px!important}
+#togeModal .toge-stat{position:relative;min-width:0;padding:6px 8px 10px!important;background:#252d3c;border:1px solid #465064;border-radius:7px;font-size:.72rem!important;line-height:1.2}
+#togeModal .toge-stat b{display:inline!important;float:right;font-size:.78rem!important;color:#f0d99d;white-space:nowrap}
+#togeModal .toge-stat:after{content:"";display:block;clear:both}
+#togeModal .toge-stat:before{content:"";position:absolute;left:7px;right:7px;bottom:5px;height:3px;border-radius:9px;background:#111a28}
+#togeModal .toge-stat b:after{content:""}
+#togeModal .toge-actions{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:4px!important}
+#togeModal .toge-actions button{min-height:34px!important;padding:5px 4px!important;font-size:.69rem!important;text-align:center!important;line-height:1.15!important;border-radius:7px!important}
+#togeModal .toge-card{padding:7px!important;margin:4px 0!important}
+#togeModal .toge-hero{padding:7px!important}
+#togeModal .toge-compact-command{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+#togeModal .toge-compact-command button{min-height:32px!important;padding:4px!important;font-size:.68rem!important}
+#togeModal .toge-stat-meter{height:3px;margin-top:5px;background:#111a28;border-radius:8px;overflow:hidden}
+#togeModal .toge-stat-meter i{display:block;height:100%;background:linear-gradient(90deg,#8f9fbd,#e0c27e);border-radius:8px}
+@media(max-width:380px){#togeModal .toge-statgrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}#togeModal .toge-actions{grid-template-columns:repeat(3,minmax(0,1fr))!important}#togeModal .toge-actions button{font-size:.64rem!important;min-height:31px!important}}
+</style>
+<script>
+// v8.45 TOGEMARU ISOLATION + UI FIX
+(function(){
+ 'use strict';
+ const $=id=>document.getElementById(id);
+ const read=()=>{try{return JSON.parse(localStorage.getItem('bakeTogemaruStoryV1')||'{}')}catch(e){return {}}};
+ let active=false,wasPaused=false;
+ function decorate(){
+  const root=$('togeModal'); if(!root)return;
+  // Replace the old six numeric tiles with the same label/value/bar language as the main status panel.
+  const keys=[['curiosity','好奇心'],['affection','懐き度'],['wariness','警戒心'],['satisfaction','満足度'],['mischief','いたずら度'],['fatigue','疲労']];
+  const data=read(),stats=data.stats||{};
+  const grid=root.querySelector('.toge-statgrid');
+  if(grid){
+   grid.innerHTML=keys.map(([key,label])=>{const v=Math.max(0,Math.min(100,Number(stats[key])||0));const pct=key==='wariness'||key==='fatigue'?100-v:v;return `<div class="toge-stat"><span>${label}</span><b>${v}/100</b><div class="toge-stat-meter"><i style="width:${pct}%"></i></div></div>`}).join('');
+  }
+  // Compress action command labels and remove the duplicate talk command from the general command panel.
+  const cards=[...root.querySelectorAll('.toge-card')];
+  const actionCard=cards.find(c=>c.textContent.includes('何をする？'));
+  if(actionCard){
+   const btns=[...actionCard.querySelectorAll('.toge-actions button')];
+   const labels=['⌕ 探索','♡ 交流','♧ いたずら','◇ 遊ぶ','☾ 休む','✦ 気まぐれ'];
+   btns.forEach((b,i)=>{if(labels[i])b.textContent=labels[i]});
+   const talk=btns.find(b=>b.textContent.includes('交流'));
+   if(talk)talk.remove();
+  }
+  const social=cards.find(c=>c.textContent.includes('交流相手を選ぶ'));
+  if(social){const bs=social.querySelectorAll('.toge-actions button');if(bs[0])bs[0].textContent='♡ 交流';if(bs[1])bs[1].textContent='✧ 贈り物'}
+ }
+ const scheduleDecorate=()=>setTimeout(decorate,0);
+ // Stop the main simulation at its source while the extra story owns the shared modal.
+ const oldOpen=window.openTogemaruMode;
+ if(oldOpen)window.openTogemaruMode=function(){
+  if(!active){active=true;window.__togeModeActive=true;wasPaused=!!paused;paused=true;clearInterval(smallTimer);smallTimer=null;clearTimeout(autoTimer);}
+  oldOpen.apply(this,arguments);scheduleDecorate();
+ };
+ const oldClose=window.closeTogemaruMode;
+ if(oldClose)window.closeTogemaruMode=function(){
+  oldClose.apply(this,arguments);
+  active=false;window.__togeModeActive=false;
+  paused=wasPaused;
+  if(typeof startClock==='function')startClock();
+  if(typeof render==='function')render();
+ };
+ // Guard every central progression/redraw path, including calls from other extensions.
+ if(typeof seasonTick==='function'){
+  const old=seasonTick;
+  seasonTick=function(){if(active||window.__togeModeActive)return;return old.apply(this,arguments)};
+  window.seasonTick=seasonTick;
+ }
+ if(typeof advanceSeason==='function'){
+  const old=advanceSeason;
+  advanceSeason=function(){if(active||window.__togeModeActive)return;return old.apply(this,arguments)};
+  window.advanceSeason=advanceSeason;
+ }
+ if(typeof render==='function'){
+  const old=render;
+  render=function(){if(active||window.__togeModeActive)return;return old.apply(this,arguments)};
+  window.render=render;
+ }
+ // Re-decorate after any mini-story action or submenu transition.
+ for(const name of ['togeAct','togeMove','togeSelectPerson','togeSetAutonomy','togeSetForm']){
+  const old=window[name];if(typeof old==='function')window[name]=function(){const out=old.apply(this,arguments);scheduleDecorate();return out};
+ }
+ const modal=$('modal');
+ if(modal&&typeof MutationObserver!=='undefined')new MutationObserver(()=>{if(active)scheduleDecorate()}).observe(modal,{childList:true,subtree:true});
+})();
+</script>

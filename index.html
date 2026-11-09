@@ -6,11 +6,11 @@
 <meta name="theme-color" content="#f4f5f8">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="BAKE LIFE">
-<link rel="icon" type="image/png" sizes="1024x1024" href="./icon.png?v=853">
-<link rel="apple-touch-icon" sizes="1024x1024" href="./icon.png?v=853">
-<link rel="manifest" href="./manifest.webmanifest?v=853">
+<link rel="icon" type="image/png" sizes="1024x1024" href="./icon.png?v=855">
+<link rel="apple-touch-icon" sizes="1024x1024" href="./icon.png?v=855">
+<link rel="manifest" href="./manifest.webmanifest?v=855">
 <meta name="description" content="PANIS ET CALAMITAS — ベイク大陸ライフシミュレーション">
-<title>PANIS ET CALAMITAS — ベイク大陸ライフ v8.54</title>
+<title>PANIS ET CALAMITAS — ベイク大陸ライフ v8.55</title>
 <style>
 :root{--bg:#171923;--panel:#222635;--panel2:#2b3042;--ink:#f4f0e8;--muted:#aeb4c5;--gold:#e6c477;--green:#76c9a2;--red:#e58b8b;--line:#3b4257}
 *{box-sizing:border-box}body{margin:0;padding-bottom:env(safe-area-inset-bottom);background:radial-gradient(circle at top,#30364b,#171923 60%);color:var(--ink);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;line-height:1.55}
@@ -35,7 +35,7 @@ main{max-width:1400px;margin:auto;padding:10px 14px;display:grid;grid-template-c
 
 footer{text-align:center;color:var(--muted);font-size:.72rem;padding:10px 18px 28px}
 .overlay{position:fixed;inset:0;background:#090b12d9;display:none;place-items:center;padding:18px;z-index:50}.modal{max-width:520px;width:100%;background:#242938;border:1px solid #a88d51;border-radius:18px;padding:22px;box-shadow:0 20px 80px #0009}.modal h2{color:var(--gold);margin-top:0}.modal-close{position:sticky;top:0;float:right;margin:-10px -10px 4px 8px;min-width:34px;min-height:34px;padding:2px 8px;border-radius:50%;font-size:1.2rem;z-index:2}.modal p{color:#ddd6c8}.modal .choices button{background:#3a4052;border-color:#68718a}.timer{height:5px;background:#171b27;border-radius:9px;overflow:hidden;margin:10px 0}.timer i{display:block;height:100%;width:100%;background:var(--gold)}
-@keyframes calamityPulse{from{box-shadow:0 0 0 2px #b65c6844,0 20px 80px #000b}to{box-shadow:0 0 0 5px #b65c6822,0 20px 90px #000d}}.calamity-modal{animation:calamityPulse 1.8s ease-in-out infinite alternate;border:1px solid #b65c68!important;background:radial-gradient(circle at top,#49313b,#24202a 68%)!important;box-shadow:0 0 0 2px #b65c6844,0 20px 80px #000b!important}.calamity-modal h2{color:#f0a2a8!important;text-shadow:0 0 18px #e66b7755}.calamity-stamp{letter-spacing:.22em;color:#e98f9a;font-size:.72rem;margin-bottom:8px}.calamity-scene{display:flex;align-items:center;gap:12px;padding:12px;margin:8px 0 14px;border:1px solid #b65c6877;border-radius:12px;background:linear-gradient(110deg,#4a303c99,#171923cc);animation:sceneReveal .9s ease-out both}.calamity-scene .scene-mark{font-size:2rem;color:#f0a2a8;text-shadow:0 0 18px #e66b77aa;min-width:42px;text-align:center}.calamity-scene b{display:block;color:#f0d6d1;font-size:.9rem}.calamity-scene small{display:block;color:#d4aeb2;font-size:.68rem;letter-spacing:.06em}@keyframes sceneReveal{from{opacity:0;transform:translateY(8px);filter:blur(4px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}.calamity-scene{display:flex;align-items:center;gap:12px;padding:12px;margin:8px 0 14px;border:1px solid #b65c6877;border-radius:12px;background:linear-gradient(110deg,#4a303c99,#171923cc);animation:sceneReveal .9s ease-out both}.calamity-scene .scene-mark{font-size:2rem;color:#f0a2a8;text-shadow:0 0 18px #e66b77aa;min-width:42px;text-align:center}.calamity-scene b{display:block;color:#f0d6d1;font-size:.9rem}.calamity-scene small{display:block;color:#d4aeb2;font-size:.68rem;letter-spacing:.06em}@keyframes sceneReveal{from{opacity:0;transform:translateY(8px);filter:blur(4px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}.dead{border:1px solid #a88d51;background:#302b27;padding:18px;border-radius:14px;text-align:center}.dead h2{font-size:1.5rem}
+@keyframes calamityPulse{from{box-shadow:0 0 0 2px #b65c6844,0 20px 80px #000b}to{box-shadow:0 0 0 5px #b65c6822,0 20px 90px #000d}}.calamity-modal{animation:calamityPulse 1.8s ease-in-out infinite alternate;border:1px solid #b65c68!important;background:radial-gradient(circle at top,#49313b,#24202a 68%)!important;box-shadow:0 0 0 2px #b65c6844,0 20px 80px #000b!important}.calamity-modal h2{color:#f0a2a8!important;text-shadow:0 0 18px #e66b7755}.calamity-stamp{letter-spacing:.22em;color:#e98f9a;font-size:.72rem;margin-bottom:8px}.calamity-scene{display:flex;align-items:center;gap:12px;padding:12px;margin:8px 0 14px;border:1px solid #b65c6877;border-radius:12px;background:linear-gradient(110deg,#4a303c99,#171923cc);animation:sceneReveal .9s ease-out both}.calamity-scene .scene-mark{font-size:2rem;color:#f0a2a8;text-shadow:0 0 18px #e66b77aa;min-width:42px;text-align:center}.calamity-scene b{display:block;color:#f0d6d1;font-size:.9rem}.calamity-scene small{display:block;color:#d4aeb2;font-size:.68rem;letter-spacing:.06em}@keyframes sceneReveal{from{opacity:0;transform:translateY(8px);filter:blur(4px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}.dead{border:1px solid #a88d51;background:#302b27;padding:18px;border-radius:14px;text-align:center}.dead h2{font-size:1.5rem}
 @media(max-width:760px){
  header{padding:calc(7px + env(safe-area-inset-top)) 10px 7px}header p{font-size:.72rem}main{grid-template-columns:1fr 1fr;padding:5px;gap:5px}.panel{padding:8px;border-radius:10px;max-height:calc(100dvh - 92px);overflow:auto}.log{height:calc(100dvh - 350px);min-height:130px}.hero{align-items:flex-start}.avatar{width:46px;height:46px;font-size:1.7rem}.meta{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.meta div{padding:8px 6px}.meta b{font-size:.88rem}.stats{gap:5px}.stat{padding:6px}.panel h2{margin-bottom:8px;font-size:.9rem}.hero{gap:9px}.avatar{width:52px;height:52px;font-size:1.9rem}.meta div{padding:6px}.controls{gap:5px}.controls button{min-height:36px;padding:6px 5px;font-size:.78rem}.controls button{flex:1 1 42%;padding:6px 4px;font-size:.72rem;min-height:34px}.choices button{min-height:48px}.modal{max-height:90dvh;overflow:auto;padding:18px}.overlay{padding:10px}footer{display:none;padding-bottom:calc(20px + env(safe-area-inset-bottom))}
 }
@@ -2250,14 +2250,11 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  window.loadQualitySlot=function(i){const a=getSlots(),s=a[i];if(!s)return;if(!confirm(`「${s.name}」を読み込みます。現在の人生と記録は置き換わります。よろしいですか？`))return;try{restoreSnapshot(s.data);addLog(`セーブスロット「${s.name}」を読み込んだ。`,'good')}catch(e){alert('読み込みに失敗しました：'+e.message)}};
  window.renameQualitySlot=function(i){const a=getSlots(),s=a[i];if(!s)return;const n=prompt('新しい名前',s.name);if(n===null)return;s.name=n.trim()||s.name;setSlots(a);showSaveSlots()};
  window.deleteQualitySlot=function(i){const a=getSlots();if(!a[i]||!confirm(`セーブ枠${i+1}を削除しますか？`))return;a.splice(i,1);setSlots(a);showSaveSlots()};
- window.showLogSearch=function(){if(!p){showModal('記録検索','人生を開始すると検索できます。',['閉じる'],[()=>{}],false);return}$('overlay').style.display='grid';$('modal').innerHTML=`<button class="modal-close" onclick="closeV8Modal()">×</button><h2>LOG SEARCH / 記録検索</h2><input id="qualityLogQuery" placeholder="人物名・地域・出来事で検索" style="width:100%;margin:8px 0"><div class="controls"><button onclick="searchQualityLogs()">検索</button><button onclick="filterLogs('all');closeV8Modal();scrollToLog()">全記録へ戻る</button></div><div id="qualityLogResults" style="max-height:55vh;overflow:auto"><p class="sub">検索語を入力してください。</p></div>`;};
- window.searchQualityLogs=function(){const q=($('qualityLogQuery')?.value||'').trim().toLowerCase(),box=$('qualityLogResults');if(!box)return;const rows=(p?.logs||[]).filter(x=>!q||`${x.text||''} ${x.year||''} ${x.age||''}`.toLowerCase().includes(q)).slice(0,150);box.innerHTML=rows.map(x=>`<div class="entry"><small>${x.year||'?'}年 / ${x.age??'?'}歳</small>${escapeHtml(x.text||'')}</div>`).join('')||'<p class="sub">該当する記録はありません。</p>';};
  window.showPeopleManager=function(){if(!p){showPeopleInfo();return}const ns=p.npcRelations||[],fav=Array.isArray(p.favoriteNpcIds)?p.favoriteNpcIds:[];$('overlay').style.display='grid';$('modal').innerHTML=`<button class="modal-close" onclick="closeV8Modal()">×</button><h2>PEOPLE / 人物・お気に入り</h2><p class="sub">☆を押すとお気に入りに登録できます。検索・絞り込みにも対応。</p><input id="qualityNpcQuery" placeholder="名前・職業・居場所で検索" style="width:100%;margin:8px 0" oninput="filterQualityPeople()"><div class="controls"><button onclick="filterQualityPeople('all')">全員</button><button onclick="filterQualityPeople('fav')">お気に入り</button><button onclick="filterQualityPeople('alive')">存命</button><button onclick="filterQualityPeople('dead')">故人</button></div><div id="qualityPeopleResults" class="person-list" style="max-height:55vh;overflow:auto"></div>`;filterQualityPeople('all')};
  window.filterQualityPeople=function(mode){const ns=p?.npcRelations||[],fav=p.favoriteNpcIds||[],q=($('qualityNpcQuery')?.value||'').toLowerCase(),box=$('qualityPeopleResults');if(!box)return;const list=ns.filter(n=>{const text=`${n.name||''} ${n.job||''} ${n.location||''} ${n.role||''}`.toLowerCase();return(!q||text.includes(q))&&(mode==='fav'?fav.includes(String(n.npcId??n.name??'')):mode==='alive'?n.alive!==false:mode==='dead'?n.alive===false:true)});box.innerHTML=list.map(n=>`<section class="person-row"><div style="display:flex;align-items:center;gap:8px"><b style="flex:1">${escapeHtml(n.name||'名前不明')}</b><button onclick="toggleQualityFavoriteByIndex(${ns.indexOf(n)})">${fav.includes(String(n.npcId??n.name??''))?'★ お気に入り':'☆ お気に入り'}</button></div><div class="person-detail">${escapeHtml(n.role||'知人')} / ${escapeHtml(n.job||'職業不明')} / ${n.alive===false?'故人':'存命'}<br>${escapeHtml(n.location||'居場所不明')} / 信頼 ${n.trust??n.bond??'—'} / 親密さ ${n.closeness??'—'}</div></section>`).join('')||'<p class="sub">該当する人物はいません。</p>'};
  window.toggleQualityFavoriteByIndex=function(i){if(!p)return;const n=(p.npcRelations||[])[i];if(!n)return;const id=String(n.npcId??n.name??'');p.favoriteNpcIds=Array.isArray(p.favoriteNpcIds)?p.favoriteNpcIds:[];if(p.favoriteNpcIds.includes(id))p.favoriteNpcIds=p.favoriteNpcIds.filter(x=>x!==id);else p.favoriteNpcIds.push(id);storage.set('bakeCurrent',JSON.stringify(p));filterQualityPeople()};
  window.showDetailedStatus=function(){if(!p){showMoreMenu();return}const groups=[['身体', [['健康','health'],['体力','stamina'],['義体レベル','cyberneticLevel']]],['精神', [['精神','mind'],['幸福','happiness'],['ストレス','stress'],['自我安定度','egoStability']]],['社会', [['社交性','social'],['名声','fame'],['友人','friends'],['子ども','children']]],['技能', [['知識','knowledge'],['技術','skill'],['適応力','adaptability']]],['特殊', [['バロック段階','baroqueStage'],['能力制御','baroqueControl'],['境界調査','boundaryResearch'],['境界脱出','boundaryEscapes']]]];$('overlay').style.display='grid';$('modal').innerHTML=`<button class="modal-close" onclick="closeV8Modal()">×</button><h2>STATUS DETAIL / 詳細ステータス</h2><div class="info-grid">${groups.map(([g,items])=>`<section class="info-card" style="grid-column:1/-1"><b>${g}</b><div class="info-grid">${items.filter(([n,k])=>p[k]!==undefined).map(([n,k])=>`<div class="info-card"><small>${n}</small><b>${escapeHtml(String(p[k]))}</b></div>`).join('')||'<small>記録なし</small>'}</div></section>`).join('')}</div>`};
- window.jumpQualityAge=function(){if(!p||p.dead||decision)return;const target=Number(prompt('何歳まで進めますか？（最大50年先）',String(Math.min(100,(p.age||0)+5))));if(!Number.isFinite(target)||target<=p.age||target>p.age+50){alert('現在の年齢より先、かつ50年以内を指定してください。');return}const wasPaused=paused;clearInterval(timer);clearTimeout(autoTimer);paused=true;let guard=0;while(p&&!p.dead&&!decision&&p.age<target&&guard<200){seasonTick();guard++}render();syncPauseButtons?.();if(!p.dead&&!decision){paused=wasPaused;lastTick=Date.now();clockCarry=0;if(!paused)startClock()}else{paused=true;syncPauseButtons?.()}addLog(`年齢ジャンプを実行した。${target}歳を目標に進行し、${p.age}歳で停止した。`,'event')};
- const oldMore=showMoreMenu;showMoreMenu=function(){oldMore();const modal=$('modal');if(!modal)return;const box=document.createElement('section');box.className='entry';box.innerHTML='<b>LIFE QUALITY / 便利機能</b><div class="controls" style="margin-top:8px"><button onclick="showDetailedStatus()">詳細ステータス</button><button onclick="showLogSearch()">記録を検索</button><button onclick="showPeopleManager()">人物・お気に入り</button><button onclick="jumpQualityAge()">年齢ジャンプ</button><button onclick="showSaveSlots()">セーブスロット</button></div>';modal.appendChild(box)};
+ const oldMore=showMoreMenu;showMoreMenu=function(){oldMore();const modal=$('modal');if(!modal)return;const box=document.createElement('section');box.className='entry';box.innerHTML='<b>LIFE QUALITY / 便利機能</b><div class="controls" style="margin-top:8px"><button onclick="showDetailedStatus()">詳細ステータス</button><button onclick="showPeopleManager()">人物・お気に入り</button><button onclick="showSaveSlots()">セーブスロット</button></div>';modal.appendChild(box)};
  const oldSettings=showSettings;showSettings=function(){oldSettings();const m=$('modal');if(m&&!m.querySelector('[data-quality-slot]')){const b=document.createElement('button');b.textContent='セーブスロット管理';b.setAttribute('data-quality-slot','1');b.onclick=showSaveSlots;m.querySelector('.choices')?.appendChild(b)}};
  document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.43';const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.36 — LIFE QUALITY UPDATE';
 })();
@@ -2329,10 +2326,6 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
   const oldDie=die;
   die=function(cause){oldDie.apply(this,arguments);const modal=document.getElementById('modal');if(modal&&modal.querySelector('.dead')){modal.classList.add('cinematic-death');const label=modal.querySelector('.dead>.sub');if(label)label.textContent='THE END OF A LIFE / 人生の終幕';if(cfg.enabled&&cfg.intensity==='full')present('death','✧','LIFE COMPLETE','ひとつの人生が幕を閉じた',`${p?.name||'このクッキー'}は${p?.age??'?'}歳で生涯を終えた。記録は世界に残される。`);}}
  }
- window.showCinematicSettings=function(){cfg=read();$('overlay').style.display='grid';$('modal').innerHTML=`<button class="modal-close" onclick="closeV8Modal()">×</button><h2>CINEMATIC / 演出設定</h2><p class="sub">人生の節目や重大事件を専用演出で表示します。選択肢や時間進行を妨げない通知型の演出です。</p><label style="display:flex;gap:9px;align-items:center;margin:12px 0"><input id="cinemaEnabled" type="checkbox" ${cfg.enabled?'checked':''}> 専用演出を有効にする</label><label>演出量 <select id="cinemaIntensity"><option value="full">通常（約4秒）</option><option value="simple">簡略（約2秒）</option><option value="off">表示しない</option></select></label><div class="choices"><button class="primary" onclick="saveCinematicSettings()">設定を保存</button><button onclick="previewCinematic()">演出を試す</button></div>`;$('cinemaIntensity').value=cfg.intensity||'full'};
- window.saveCinematicSettings=function(){cfg={enabled:!!$('cinemaEnabled')?.checked,intensity:$('cinemaIntensity')?.value||'full'};write(cfg);closeV8Modal();};
- window.previewCinematic=function(){cfg=read();present('history','✦','CINEMATIC PREVIEW','人生の記録','何気ない一日も、いつか振り返れば大切な一頁になる。')};
- const oldMore=showMoreMenu;showMoreMenu=function(){oldMore();const modal=$('modal');if(!modal||modal.querySelector('[data-cinematic-menu]'))return;const box=document.createElement('section');box.className='entry';box.setAttribute('data-cinematic-menu','1');box.innerHTML='<b>CINEMATIC LIFE / 演出</b><div class="controls" style="margin-top:8px"><button onclick="showCinematicSettings()">演出設定・プレビュー</button></div>';modal.appendChild(box)};
  const oldSummary=showLifeSummary; if(typeof oldSummary==='function'){showLifeSummary=function(){oldSummary.apply(this,arguments);const modal=$('modal');if(modal){const h=modal.querySelector('h2');if(h)h.insertAdjacentHTML('afterend','<p class="sub" style="text-align:center;letter-spacing:.12em;color:#d7c18a">A LIFE WRITTEN IN THE CHRONICLE</p>')}}}
  document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.44';const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.44 — TOGEMARU EXTRA STORY+';
 })();
@@ -2461,16 +2454,16 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
 </script>
 
 <script>
-// v8.54 release metadata: normalize legacy version labels after all extensions load.
+// v8.55 release metadata: normalize legacy version labels after all extensions load.
 (function(){
-  document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.54';
+  document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.55';
   const footer=document.querySelector('footer');
-  if(footer) footer.textContent='BAKE LIFE v8.54 — PANIS ET CALAMITAS';
+  if(footer) footer.textContent='BAKE LIFE v8.55 — PANIS ET CALAMITAS';
 })();
 </script>
 
 <script>
-// v8.54 BAROQUE INTEGRATION: unify legacy onset/progression/rampage with expansion systems.
+// v8.55 BAROQUE INTEGRATION: unify legacy onset/progression/rampage with expansion systems.
 (function(){
  'use strict';
  const clampB=v=>Math.max(0,Math.min(100,Number(v)||0));
@@ -2495,7 +2488,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
   if(q.baroqueStage>=2){
    if(!typeData[q.baroqueType])q.baroqueType='感覚変質型';
    // Keep the legacy and new ability names in agreement; old generic ability labels are migrated.
-   if(!q.baroqueAbility||['感覚拡張','身体強化','再生能力','空間認識'].includes(q.baroqueAbility))q.baroqueAbility=typeData[q.baroqueType].ability;
+   if(q.baroqueAbility!==typeData[q.baroqueType].ability)q.baroqueAbility=typeData[q.baroqueType].ability;
    if(!q.baroqueControlInitialized){if(q.baroqueControl<1)q.baroqueControl=35;q.baroqueControlInitialized=true;}
    if(!Number.isFinite(q.baroqueOnsetAge))q.baroqueOnsetAge=q.age||0;
   }
@@ -2529,7 +2522,15 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  // Preserve the original season progression and collapse/rampage rules. This wrapper only adds
  // compatible symptom records and a non-competing stability/exposure calculation.
  const oldTick=window.seasonTick;
- if(typeof oldTick==='function')window.seasonTick=function(){const oldStage=p?.baroqueStage;oldTick.apply(this,arguments);try{if(!p||p.dead||p.afterlife||p.baroqueRampage||typeof decision!=='undefined'&&decision)return;ensure(p);
+ if(typeof oldTick==='function')window.seasonTick=function(){
+  const q=p,wasRemission=!!(q&&q.baroqueRemission&&q.baroqueStage>=1&&!q.baroqueRampage),savedStage=q?.baroqueStage;
+  // Legacy progression sees stage 0 during remission, preventing immediate relapse by old rules.
+  if(wasRemission)q.baroqueStage=0;
+  try{oldTick.apply(this,arguments)}finally{if(wasRemission&&p===q&&!q.dead&&!q.baroqueRampage)q.baroqueStage=1;}
+  try{if(!p||p.dead||p.afterlife||p.baroqueRampage||typeof decision!=='undefined'&&decision)return;ensure(p);
+   // Remission is stable unless severe pressure returns; relapse is possible but deliberately uncommon.
+   if(wasRemission&&p.baroqueRemission&&p.stress>=82&&p.mind<=15&&(p.baroqueRisk||0)>=70&&Math.random()<.035){p.baroqueRemission=false;p.baroqueStage=2;p.baroqueExposure=0;record(p,'強い負荷による再燃');log('強い負荷が重なり、寛解していたバロック症状が再燃した。','bad');}
+
   if(p.baroqueStage>=1&&p.baroqueStage<4){
    const pressure=(p.stress>=75?2:0)+(p.mind<=25?2:0)+(p.baroqueRisk>=55?1:0)+(p.calamityTrauma>0?1:0);
    const support=(p.happiness>=65?1:0)+(p.egoStability>=70?1:0)+(p.baroqueControl>=65?1:0)+(p.familySupport>=5?1:0);
@@ -2539,7 +2540,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
    if(p.baroqueStage>=3&&p.baroqueExposure>=12&&p.egoStability<30&&Math.random()<.10){p.baroqueStage=4;p.baroqueExposure=0;record(p,'重度変異への進行');log('バロックが重度変異へ進行した。自我の輪郭が薄れ、日常生活にも支障が出始めている。','bad')}
   }
   if(oldStage!==p.baroqueStage&&typeof window.render==='function')render();
- }catch(e){console.warn('v8.54 baroque integration',e)}};
+ }catch(e){console.warn('v8.55 baroque integration',e)}};
  const oldRender=window.render;
  if(typeof oldRender==='function')window.render=function(){oldRender.apply(this,arguments);try{if(!p)return;ensure(p);const el=document.getElementById('baroqueInfo');if(!el)return;
   if(p.baroqueRampage)return;
@@ -2550,7 +2551,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
    extra+=`<div class="controls" style="margin-top:8px"><button onclick="baroqueTreatment()">治療・抑制を試みる</button>${stage>=2?'<button onclick="baroqueUseAbility()">能力を使用する</button>':''}</div>`;
   }
   el.innerHTML=`<b>BAROQUE / ${stages[stage]}</b>${extra}<br><span class="sub">原因は未特定。寛解後も変異の痕跡が残る場合があります。</span>`;
- }catch(e){console.warn('v8.54 baroque render',e)}};
+ }catch(e){console.warn('v8.55 baroque render',e)}};
  try{if(p)ensure(p)}catch(e){}
 })();
 </script>

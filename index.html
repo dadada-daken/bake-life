@@ -230,6 +230,7 @@ main{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 24px)}
  <h2>PERSONAL RECORD / 人物記録</h2>
  <div class="hero"><div class="avatar" id="avatar">🍪</div><div><div class="name" id="name">未生成</div><div class="sub" id="identity">新しい人生を始めてください</div><div class="chips" id="traits"></div></div></div>
  <div class="restart-row"><button class="primary restart-shortcut" onclick="newLife()">↻ 新しい人生を始める</button><span class="sub">別の人生を始めたいときはここから</span></div>
+<div class="restart-row" style="margin-top:8px"><button class="togemaru-launch" onclick="openTogemaruMode()">✦ 番外編：トゲ丸編</button><span class="sub">通常人生とは独立した小さな冒険</span></div>
  <div style="height:7px"></div><div class="meta"><div><span>年齢</span><b id="age">—</b></div><div><span>所持金</span><b id="money">—</b></div><div><span>職業</span><b id="job">—</b></div></div>
  <div style="height:7px"></div><h2>STATUS / 状態</h2><div class="stats" id="stats"></div><div class="baroquePanel" id="baroquePanel"><h3>BAROQUE / バロック記録</h3><div id="baroqueInfo" class="sub">現在、確認されている異常はありません。</div></div>
  <div style="height:7px"></div>
@@ -2315,7 +2316,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  window.previewCinematic=function(){cfg=read();present('history','✦','CINEMATIC PREVIEW','人生の記録','何気ない一日も、いつか振り返れば大切な一頁になる。')};
  const oldMore=showMoreMenu;showMoreMenu=function(){oldMore();const modal=$('modal');if(!modal||modal.querySelector('[data-cinematic-menu]'))return;const box=document.createElement('section');box.className='entry';box.setAttribute('data-cinematic-menu','1');box.innerHTML='<b>CINEMATIC LIFE / 演出</b><div class="controls" style="margin-top:8px"><button onclick="showCinematicSettings()">演出設定・プレビュー</button></div>';modal.appendChild(box)};
  const oldSummary=showLifeSummary; if(typeof oldSummary==='function'){showLifeSummary=function(){oldSummary.apply(this,arguments);const modal=$('modal');if(modal){const h=modal.querySelector('h2');if(h)h.insertAdjacentHTML('afterend','<p class="sub" style="text-align:center;letter-spacing:.12em;color:#d7c18a">A LIFE WRITTEN IN THE CHRONICLE</p>')}}}
- document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.39';const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.39 — PRESENTATION & STABILITY FIX';
+ document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.40';const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.40 — TOGEMARU EXTRA STORY';
 })();
 </script>
 
@@ -2350,7 +2351,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  window.showLegacyChronicle=function(){if(!p)return;const wh=safe(p.worldHistory),album=safe(p.lifeAlbum);const region=safe(p.regionHistory);const highlights=[...wh.map(x=>({year:x.year,age:x.age,title:x.title,detail:x.detail})),...region.map(x=>({year:x.year,age:x.age,title:x.event,detail:x.place}))].sort((a,b)=>(a.year||0)-(b.year||0));$('overlay').style.display='grid';$('modal').innerHTML=`<button class="modal-close" onclick="closeV8Modal()">×</button><div class="sub">AFTERLIFE / LEGACY RECORD</div><h2>${esc(p.name)}が残したもの</h2><div class="info-grid"><div class="info-card"><small>世界史の記録</small><b>${wh.length}件</b></div><div class="info-card"><small>人生アルバム</small><b>${album.length}件</b></div><div class="info-card"><small>地域の記録</small><b>${region.length}件</b></div><div class="info-card"><small>称号</small><b>${safe(p.titles).length}個</b></div></div><p>このクッキーが生きた時代と、世界や地域に残した足跡です。</p>${highlights.slice(-30).reverse().map(x=>`<div class="entry"><b>${esc(x.year??'—')}年・${esc(x.age??'—')}歳 — ${esc(x.title||'記録')}</b><div class="sub">${esc(x.detail||'')}</div></div>`).join('')||'<p class="sub">歴史に残る記録はありません。名もない日々も、確かに生きた証です。</p>'}<button onclick="closeV8Modal()">閉じる</button>`};
  const priorMore=showMoreMenu;showMoreMenu=function(){priorMore.apply(this,arguments);const modal=$('modal');if(!modal||modal.querySelector('[data-chronicle-immersion]'))return;const box=document.createElement('section');box.className='entry';box.dataset.chronicleImmersion='1';box.innerHTML='<b>CHRONICLE IMMERSION / 人生の追体験</b><div class="controls" style="margin-top:8px"><button onclick="showLifeAlbum()">人生アルバム</button><button onclick="showReunionMemories()">再会と思い出</button><button onclick="showLegacyChronicle()">死後の歴史的影響</button></div>';modal.appendChild(box)};
  // Capture memories from pre-existing NPC histories when opening the album.
- document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.39';const foot=document.querySelector('footer');if(foot)foot.textContent='BAKE LIFE v8.39 — PRESENTATION & STABILITY FIX';
+ document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.40';const foot=document.querySelector('footer');if(foot)foot.textContent='BAKE LIFE v8.40 — TOGEMARU EXTRA STORY';
 })();
 </script>
 
@@ -2365,5 +2366,84 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')resetTransientLayers()});
 })();
 </script>
+
+<style>
+.togemaru-launch{background:linear-gradient(120deg,#44364b,#2e394e)!important;border-color:#b99b68!important;color:#f5dfb0!important;width:100%;font-weight:750}
+#togeModal .toge-hero{border:1px solid #806b4b;border-radius:13px;padding:12px;background:linear-gradient(135deg,#343044,#202838);display:flex;gap:12px;align-items:center}
+#togeModal .toge-mark{width:68px;height:68px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(145deg,#533c48,#252b3a);font-size:2.4rem;flex:none}
+#togeModal .toge-statgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+#togeModal .toge-stat{background:#303649;padding:8px;border-radius:9px;font-size:.75rem}
+#togeModal .toge-stat b{display:block;color:#f0d99d;font-size:1rem}
+#togeModal .toge-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+#togeModal .toge-actions button{text-align:left;min-height:48px}
+#togeModal .toge-card{background:#2b3040;border:1px solid #454d62;border-radius:10px;padding:10px;margin:7px 0}
+#togeModal .toge-log{max-height:24vh;overflow:auto}
+#togeModal .toge-muted{color:#b9bfd0;font-size:.76rem}
+#togeModal .toge-lock{opacity:.65;border-style:dashed!important}
+@media(max-width:520px){#togeModal .toge-statgrid{grid-template-columns:repeat(2,minmax(0,1fr))}#togeModal .toge-mark{width:56px;height:56px}}
+</style>
+<script>
+// v8.40 TOGEMARU EXTRA STORY — independent mini-simulation, stages 1–5
+(function(){
+ 'use strict';
+ const KEY='bakeTogemaruStoryV1';
+ const $id=id=>document.getElementById(id);
+ const escT=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const areas=[
+  {id:'dome',name:'グロリアスベイクドーム',desc:'天使たちが暮らす金色の都市。仕事中の天使を見つけられる。',unlocked:true},
+  {id:'lab',name:'天使たちの実験室',desc:'魔法陣や研究器具が並ぶ。トゲ丸の妙な反応が見られる。',unlocked:true},
+  {id:'city',name:'地上の都市部',desc:'一般クッキーたちの暮らしと、食べ物や遊びが待っている。',unlocked:true},
+  {id:'mangrove',name:'バターマングローブ地方',desc:'巨大な樹木と奇妙な生き物が暮らす森。',req:3},
+  {id:'marsh',name:'城塞跡地・天空都市マシュマリア',desc:'古い遺跡と空に浮かぶ都市。',req:5},
+  {id:'boundary',name:'境界点',desc:'世界の綻び。トゲ丸の存在に反応する場所。',req:7}
+ ];
+ const people=[
+  {id:'decru',name:'デクルシヴァ',role:'異端審問官',line:'「……おい。そこは書類の上だ。降りろ」'},
+  {id:'sen',name:'セネシオ',role:'副官・料理人',line:'「お腹は空いていませんか？ 少し休んでいきなさい」'},
+  {id:'maru',name:'マルメロ',role:'記録官',line:'「おやおや。今日は何を壊してくれるのかな？」'},
+  {id:'cel',name:'セレスティアル',role:'ベイクドームの主',line:'「ふふ。君は本当に面白いね。どこまで分かっているのかな？」'},
+  {id:'trop',name:'トロピカルブリーズ',role:'門番',line:'「そちらは門の外ですよ。お出かけは一緒に行きましょうね」'},
+  {id:'pul',name:'パルモンバルゴ',role:'外交局',line:'「今回の騒動も記録しておきましょう。……あとで報告書が増えますね」'},
+  {id:'teo',name:'テオナナカトル',role:'古き王',line:'「おや、小さきものよ。今宵は何を見つけた？」'}
+ ];
+ const initial=()=>({version:1,started:false,actions:0,discoveryCount:0,area:'dome',form:'normal',formUnlocked:false,stats:{curiosity:60,affection:35,wariness:25,satisfaction:65,mischief:45,fatigue:10},relations:{},discoveries:[],events:[],titles:[],log:[],ending:'',lastEvent:'',visited:['dome'],flags:{labReaction:false,celObserved:false,boundarySeen:false}});
+ let st;
+ function load(){try{const raw=localStorage.getItem(KEY);const q=raw?JSON.parse(raw):null;st=q&&q.version===1?Object.assign(initial(),q):initial();st.stats=Object.assign(initial().stats,st.stats||{});st.discoveryCount=Number.isFinite(st.discoveryCount)?st.discoveryCount:((st.discoveries||[]).length);st.relations=st.relations||{};st.flags=st.flags||initial().flags;st.log=Array.isArray(st.log)?st.log:[];st.discoveries=Array.isArray(st.discoveries)?st.discoveries:[];st.events=Array.isArray(st.events)?st.events:[];st.titles=Array.isArray(st.titles)?st.titles:[];st.visited=Array.isArray(st.visited)?st.visited:['dome'];}catch(e){st=initial()} }
+ function save(){try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}}
+ function log(t){st.log.unshift({n:st.actions,text:t,area:area().name});st.log=st.log.slice(0,60);}
+ function area(){return areas.find(x=>x.id===st.area)||areas[0]}
+ function stat(k,d){st.stats[k]=Math.max(0,Math.min(100,(st.stats[k]||0)+d))}
+ function unlockTitles(){const defs=[['初めてのおでかけ',st.actions>=1],['実験室の侵入者',st.discoveries.includes('lab')],['天使の天敵',(st.stats.mischief>=75)],['小さな観測者',st.flags.boundarySeen],['人ならざる姿',st.formUnlocked]];defs.forEach(([n,ok])=>{if(ok&&!st.titles.includes(n))st.titles.push(n)})}
+ function present(){const modal=$id('modal'),overlay=$id('overlay');if(!modal||!overlay)return;overlay.style.display='grid';modal.id='modal';modal.innerHTML=`<div id="togeModal"><button class="modal-close" onclick="closeTogemaruMode()">×</button><div class="sub">EXTRA STORY / INDEPENDENT SAVE</div><h2>TOGEMARU — 小さな気まぐれ</h2><div class="toge-hero"><div class="toge-mark">${st.form==='human'?'✦':'🦔'}</div><div><b style="font-size:1.1rem">トゲ丸</b><div class="toge-muted">${st.form==='human'?'人型形態':'通常形態'} ／ ${escT(area().name)}</div><div class="toge-muted">行動 ${st.actions}回 ・ 発見 ${st.discoveryCount}回</div></div></div>
+ <div class="toge-card"><b>トゲ丸の様子</b><div class="toge-statgrid" style="margin-top:8px">${[['好奇心','curiosity'],['懐き度','affection'],['警戒心','wariness'],['満足度','satisfaction'],['いたずら度','mischief'],['疲労','fatigue']].map(([n,k])=>`<div class="toge-stat">${n}<b>${st.stats[k]}/100</b></div>`).join('')}</div></div>
+ ${st.formUnlocked?`<div class="toge-card"><b>形態切替</b><div class="controls" style="margin-top:7px"><button onclick="togeSetForm('normal')" ${st.form==='normal'?'disabled':''}>通常形態</button><button onclick="togeSetForm('human')" ${st.form==='human'?'disabled':''}>人型形態</button></div></div>`:`<div class="toge-card toge-lock"><b>？？？ — 未解放</b><div class="toge-muted">実験室・人物交流・境界点の発見を重ねると、何かが起こるかもしれない。</div></div>`}
+ <div class="toge-card"><b>何をする？</b><div class="toge-actions" style="margin-top:8px"><button onclick="togeAct('explore')">⌕ 探索・調べる</button><button onclick="togeAct('talk')">♡ 誰かと交流する</button><button onclick="togeAct('mischief')">♧ いたずらする</button><button onclick="togeAct('play')">◇ 遊ぶ</button><button onclick="togeAct('rest')">☾ 休む</button><button onclick="togeAct('special')">✦ 気まぐれ行動</button></div></div>
+ <div class="toge-card"><b>移動できる場所</b><div class="choices" style="margin-top:7px">${areas.map(a=>{const ok=a.unlocked||st.discoveryCount>=(a.req||999);return `<button class="${ok?'':'toge-lock'}" ${ok?`onclick="togeMove('${a.id}')"`:'disabled'}>${ok?'→':'🔒'} ${a.name}<div class="toge-muted">${ok?a.desc:`探索 ${a.req}回で解放`}</div></button>`}).join('')}</div></div>
+ <div class="toge-card"><b>記録・コレクション</b><div class="controls" style="margin-top:7px"><button onclick="togeShowAlbum()">思い出 ${st.events.length}件</button><button onclick="togeShowTitles()">称号 ${st.titles.length}個</button><button onclick="togeShowPeople()">人物関係</button></div></div>
+ <div class="toge-card"><b>最近の出来事</b><div class="toge-log">${st.log.slice(0,8).map(x=>`<div class="entry"><small>${x.n}回目 / ${escT(x.area)}</small>${escT(x.text)}</div>`).join('')||'<p class="toge-muted">まだ思い出はありません。</p>'}</div></div>
+ <div class="controls"><button onclick="closeTogemaruMode()">通常モードへ戻る</button><button onclick="togeReset()">トゲ丸編を最初から</button></div><p class="toge-muted">このモードの進行・称号・記録は通常モードのセーブデータと完全に独立しています。</p></div>`;
+ }
+ window.openTogemaruMode=function(){load();st.started=true;save();present()};
+ window.closeTogemaruMode=function(){save();const o=$id('overlay');if(o)o.style.display='none'};
+ window.togeMove=function(id){const a=areas.find(x=>x.id===id);if(!a)return;const ok=a.unlocked||st.discoveryCount>=(a.req||999);if(!ok)return;const from=area().name;st.area=id;if(!st.visited.includes(id))st.visited.push(id);st.actions++;stat('curiosity',2);stat('fatigue',3);log(`${from}から${a.name}へ移動した。${a.desc}`);if(id==='boundary'){st.flags.boundarySeen=true;stat('wariness',5);log('境界点に足を踏み入れた瞬間、周囲の景色が一拍だけ遅れて動いた。');}save();unlockTitles();present()};
+ window.togeAct=function(kind){if(st.stats.fatigue>=95&&kind!=='rest'){log('疲れて動けない。少し休むことにした。');stat('satisfaction',-2);save();present();return}st.actions++;let msg='';
+  if(kind==='rest'){stat('fatigue',-24);stat('satisfaction',8);stat('wariness',-3);msg='丸くなってひと休みした。誰かが毛布をかけてくれた気がする。'}
+  if(kind==='play'){stat('satisfaction',12);stat('fatigue',7);stat('curiosity',3);msg=['床の上で小さなものを転がして遊んだ。','自分の影を追いかけていたら、いつの間にか時間が過ぎていた。','羽根を一枚見つけた。誰のものかは分からない。'][Math.floor(Math.random()*3)]}
+  if(kind==='mischief'){stat('mischief',10);stat('satisfaction',5);stat('fatigue',6);const target=people[Math.floor(Math.random()*people.length)];st.relations[target.id]=st.relations[target.id]||{affection:0,trust:0,wariness:0,meetings:0};st.relations[target.id].wariness+=1;msg=['書類の束を少しだけずらした。誰かが困っている。','物陰から飛び出して、通りかかった天使を驚かせた。','大事そうなペンを転がしてみた。追いかけっこが始まった。'][Math.floor(Math.random()*3)]}
+  if(kind==='talk'){const target=people[Math.floor(Math.random()*people.length)];const r=st.relations[target.id]||(st.relations[target.id]={affection:0,trust:0,wariness:0,meetings:0});r.meetings++;r.affection+=2;r.trust+=1;stat('affection',3);stat('satisfaction',5);msg=`${target.name}と一緒に過ごした。${target.line}`;if(target.id==='cel'){st.flags.celObserved=true;st.flags.celMeet=true}}
+  if(kind==='explore'){stat('curiosity',8);stat('fatigue',5);const key=st.area==='lab'?'lab':st.area==='boundary'?'boundary':st.area==='mangrove'?'mangrove':st.area==='marsh'?'marsh':st.area;const newFind=!st.discoveries.includes(key);if(newFind)st.discoveries.push(key);st.discoveryCount=(st.discoveryCount||0)+1;if(st.area==='lab'){st.flags.labReaction=true;msg=newFind?'魔法陣の中に入り込んだ。術式がトゲ丸の存在に反応し、見たことのない光を放った。':'魔法陣をもう一度調べた。今度は何も起きない。けれど、記録装置には小さな波形が残っていた。'}else if(st.area==='boundary'){st.flags.boundarySeen=true;msg='空間の継ぎ目に触れた。ほんの一瞬、知らない景色と自分の知らない姿が見えた。'}else msg=`${area().name}を調べた。${newFind?'新しい発見があった。':'以前にも見つけたものだ。'}小さな痕跡を記録した。`;}
+  if(kind==='special'){stat('curiosity',5);stat('wariness',4);stat('fatigue',4);if(st.flags.labReaction&&st.flags.celObserved&&st.flags.boundarySeen&&!st.formUnlocked){st.formUnlocked=true;msg='身体の輪郭が一瞬だけ揺らいだ。トゲ丸は見慣れない姿へと変化する。人型形態が解放された。';st.events.push({name:'輪郭の向こう側',text:msg,n:st.actions});}else{msg=['突然、何もない場所をじっと見つめた。','誰も呼んでいないのに、振り返った。','いつもと違う声で小さく鳴いた。'][Math.floor(Math.random()*3)];if(st.actions%5===0){st.events.push({name:'小さな違和感',text:msg,n:st.actions});}}}
+  if(kind!=='special'&&st.flags.labReaction&&st.flags.celObserved&&st.flags.boundarySeen&&!st.formUnlocked&&st.actions>=8){st.formUnlocked=true;msg+=' そのとき、身体の輪郭が変わりかけた。人型形態が解放された。'}
+  stat('fatigue',kind==='rest'?0:2);st.lastEvent=msg;st.events.push({name:kind,text:msg,n:st.actions,area:area().name});if(st.events.length>100)st.events=st.events.slice(-100);log(msg);unlockTitles();save();present();
+ };
+ window.togeSetForm=function(form){if(!st.formUnlocked)return;if(form!=='normal'&&form!=='human')return;st.form=form;log(form==='human'?'人型形態に変化した。':'通常形態に戻った。');save();present()};
+ window.togeShowAlbum=function(){const m=$id('modal');m.innerHTML=`<div id="togeModal"><button class="modal-close" onclick="openTogemaruMode()">×</button><div class="sub">MEMORY ALBUM</div><h2>トゲ丸の思い出</h2>${st.events.slice().reverse().map(e=>`<div class="toge-card"><b>${escT(e.name)}</b><div class="toge-muted">${e.n}回目 / ${escT(e.area||'')}</div>${escT(e.text)}</div>`).join('')||'<p>まだ記録はありません。</p>'}</div>`};
+ window.togeShowTitles=function(){const all=[['初めてのおでかけ','行動を1回行う'],['実験室の侵入者','実験室で初めて調査する'],['天使の天敵','いたずら度75以上'],['小さな観測者','境界点を発見する'],['人ならざる姿','人型形態を解放する']];$id('modal').innerHTML=`<div id="togeModal"><button class="modal-close" onclick="openTogemaruMode()">×</button><div class="sub">TOGEMARU TITLES</div><h2>トゲ丸の称号</h2>${all.map(([n,h])=>`<div class="toge-card"><b>${st.titles.includes(n)?'✦ '+n:'？？？'}</b><div class="toge-muted">${st.titles.includes(n)?h:'ヒント：'+h}</div></div>`).join('')}</div>`};
+ window.togeShowPeople=function(){$id('modal').innerHTML=`<div id="togeModal"><button class="modal-close" onclick="openTogemaruMode()">×</button><div class="sub">RELATIONSHIP RECORD</div><h2>人物との関係</h2>${people.map(x=>{const r=st.relations[x.id]||{};return `<div class="toge-card"><b>${x.name}</b><div class="toge-muted">${x.role} / 交流 ${r.meetings||0}回 / 親しみ ${r.affection||0} / 警戒 ${r.wariness||0}</div></div>`}).join('')}</div>`};
+ window.togeReset=function(){if(!confirm('トゲ丸編のセーブデータだけを初期化します。通常モードの人生データには影響しません。よろしいですか？'))return;st=initial();st.started=true;save();present()};
+ load();
+})();
+</script>
+
 </body>
 </html>

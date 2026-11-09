@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>PANIS ET CALAMITAS — ベイク大陸ライフ v8.32</title>
+<title>PANIS ET CALAMITAS — ベイク大陸ライフ v8.34</title>
 <style>
 :root{--bg:#171923;--panel:#222635;--panel2:#2b3042;--ink:#f4f0e8;--muted:#aeb4c5;--gold:#e6c477;--green:#76c9a2;--red:#e58b8b;--line:#3b4257}
 *{box-sizing:border-box}body{margin:0;padding-bottom:env(safe-area-inset-bottom);background:radial-gradient(circle at top,#30364b,#171923 60%);color:var(--ink);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;line-height:1.55}
@@ -246,7 +246,7 @@ main{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 24px)}
  <div class="sub" style="margin-top:9px">※ゲームはこのブラウザ内で動作します。人生の記録と称号は自動保存されます。</div>
 </section>
 </main>
-<footer>BAKE LIFE v8.33 — WORLD CHRONICLE</footer>
+<footer>BAKE LIFE v8.34 — WORLD CHRONICLE / TITLE UPDATE</footer>
 <button id="pauseQuickBtn" class="pause-quick" onclick="togglePause()" aria-label="一時停止または再開">Ⅱ 一時停止</button>
 <nav id="v8Nav" aria-label="メインメニュー"><button onclick="scrollToPanel(0)"><span>🍪</span><span>人生</span></button><button onclick="scrollToLog()"><span>📖</span><span>記録</span></button><button onclick="showCollection()"><span>🏅</span><span>称号</span></button><button onclick="showRegionInfo()"><span>🗺️</span><span>地域</span></button><button onclick="showMoreMenu()"><span>☰</span><span>その他</span></button></nav>
 <div class="overlay" id="overlay"><div class="modal" id="modal"></div></div><input id="importSaveFile" type="file" accept="application/json,.json" hidden>
@@ -408,16 +408,32 @@ titleDefs.push(
  ["記録への侵入者","既存個体の専用人生を初めて開始する","special",s=>s.specialLife===true],
  ["もうひとつの可能性","既存個体の専用人生で固有イベントの選択を経験する","special",s=>s.specialLife===true&&(s.specialLifeEventsDone||[]).length>=1],
  ["記録にない幸福","既存個体の専用人生で幸福度80以上に到達する","special",s=>s.specialLife===true&&s.happiness>=80],
- ["運命の改竄者","既存個体の専用人生を固有イベント後に完遂する","special",s=>s.specialLife===true&&s.specialLifeCompleted===true]
+ ["運命の改竄者","既存個体の専用人生を固有イベント後に完遂する","special",s=>s.specialLife===true&&s.specialLifeCompleted===true],
+ ["時代の目撃者","一つの人生で世界史の出来事を3件以上記録する","special",s=>(s.worldHistory||[]).length>=3],
+ ["歴史の転換点","世界史の大事件を5件以上経験する","special",s=>(s.worldHistory||[]).filter(x=>x.kind==='world').length>=5],
+ ["技術革新の目撃者","新技術の発表を経験し、知識を70以上にする","special",s=>(s.worldHistory||[]).some(x=>x.title==='新技術の発表')&&s.knowledge>=70],
+ ["地域復興の功労者","地域や厄災の復興に3回以上協力する","special",s=>(s.calamityRebuilds||0)>=3||(s.regionHistory||[]).filter(x=>/復興|再建/.test(x.event||"")).length>=3],
+ ["趣味人","趣味を持って10年以上過ごす","social",s=>!!s.hobby&&(s.hobbyYears||0)>=10],
+ ["熟達した趣味人","趣味のイベントで15回以上取り組む","social",s=>(s.hobbyPractice||0)>=15],
+ ["趣味仲間の輪","趣味を通じた交流を5回以上経験する","social",s=>(s.hobbyConnections||0)>=5],
+ ["再会を重ねた者","昔の知人と合計3回以上再会する","social",s=>(s.npcRelations||[]).some(n=>(n.reunionCount||0)>=3)],
+ ["家系の礎","結婚し、子どもを3人以上育てる","social",s=>s.married&&s.children>=3],
+ ["三世代の記録","孫が1人以上生まれる","social",s=>(s.grandchildCount||0)>=1],
+ ["遺志を託した者","人生の終わりまで有効な遺言を残す","life",s=>!!s.willRecipient],
+ ["生涯現役","同じ職業を40年以上続ける","work",s=>s.jobYears>=40],
+ ["境界の封じ手","境界点の連続事件を最後まで生き延びる","special",s=>s.boundaryArcComplete===true]
 );
 function getTitleRarity(name){
  const def=titleDefs.find(x=>x[0]===name);const cat=def?def[2]:"special";
- const secret=["ヴォイドの囁きを退けた者","運命の改竄者"];
- const legendary=["三度退けた者","三度敗れた者","理性の帰還","六厄災の記録者","五つの影","千年の観測者","長命の純天使"];
- const epic=["精神の断絶","暴走の始まり","境界点踏破者","境界点の帰還者","長き観測の果て","反逆の天使","指名手配の天使","もうひとつの可能性"];
- if(secret.includes(name)||cat==="secret")return "secret";if(legendary.includes(name))return "legendary";if(epic.includes(name))return "epic";
- if(["baroque","calamity","angel","terrace"].includes(cat))return "rare";
- if(["special"].includes(cat)||/長寿|大往生|歴史に名|熟練|転身|大家族/.test(name))return "uncommon";
+ const secret=["ヴォイドの囁きを退けた者","運命の改竄者","境界の封じ手"];
+ const legendary=["三度退けた者","三度敗れた者","理性の帰還","六厄災の記録者","五つの影","千年の観測者","長命の純天使","長命なる観察者","悠久の記録","歴史の転換点","三世代の記録"];
+ const epic=["精神の断絶","暴走の始まり","境界点踏破者","境界点の帰還者","長き観測の果て","反逆の天使","指名手配の天使","もうひとつの可能性","時代の目撃者","家系の礎","熟達した趣味人","地域復興の功労者","生涯現役"];
+ const rare=["時代の目撃者","存在を上書きされた者","三界の旅人","境界点の生還者","厄災を目撃した者","異形の英雄","研究対象","病と共に","奇跡の回復","研究者の良心","見捨てなかった者","境界を越える者","原因不明","境界の観測者","境界点踏破者","便利屋の看板","交渉上手","異端審問官の理解者","記録塔の協力者","水禍を越えて","戦禍の生存者","病禍の証人","地殻の記憶","飢餓を拒む者","人災の目撃者","厄災の救援者","厄災の交渉人","反逆の天使","翼を失った者","追跡を振り切った者","老いたる旅人","災害の後に立つ者","傷痕を抱えて","腐食樹林の観測者","怪王との邂逅","裏の秩序を知る者","怪物の庇護","五つの影","規則の内側","身内の証","創造の代償","見られている","災害の余波","復興の担い手","境界点の帰還者","人工の生","義体と共に","異形と暮らす","裏社会の仲介人","五大の均衡","精神の断絶","暴走の始まり","三度退けた者","三度敗れた者","ヴォイドの囁きを退けた者","理性の帰還","歴史の転換点","地域復興の功労者","再会を重ねた者","遺志を託した者","技術革新の目撃者"];
+ if(secret.includes(name)||cat==="secret")return "secret";
+ if(legendary.includes(name))return "legendary";
+ if(epic.includes(name))return "epic";
+ if(rare.includes(name)||["baroque","calamity","terrace"].includes(cat))return "rare";
+ if(["angel","special"].includes(cat)||/長寿|大往生|歴史に名|熟練|転身|大家族|時代|趣味|家系|再会/.test(name))return "uncommon";
  return "common";
 }
 const rarityNames={common:"一般",uncommon:"非凡",rare:"希少",epic:"極稀",legendary:"伝説",secret:"秘匿"};
@@ -498,14 +514,10 @@ const specialLifeProfiles={
  "gloriosa":{name:"グロリオサ味クッキー",aliases:["グロリオサ","Gloriosa"],place:"セイクレッドシュガー地方",job:"古代の王",trait:"威厳がある",family:"王族",health:100,mind:95,knowledge:90,social:75,skill:90,happiness:65,money:700,risk:2,longLived:true,milestones:[{age:1,title:"古き友との盟約",desc:"セレスティアルと共に、世界を脅かす水禍へ立ち向かうことになる。",opts:["盟友と共に封印へ向かう","民の避難と防衛を優先する"],effects:[()=>{p.characterBonds.push("セレスティアル");p.skill=100;addLog("セレスティアルとの盟約を結び、水禍に立ち向かった。","event")},()=>{p.helped+=5;p.localAid+=5;addLog("民の避難と防衛を優先した。","good")}]}]},
  "pulmonbargo":{name:"プルンバーゴ味クッキー",aliases:["プルンバーゴ","Pulmonbargo"],place:"グロリアスベイクドーム",job:"外交局",trait:"穏やか",family:"昇天使",health:100,mind:85,knowledge:90,social:80,skill:75,happiness:65,money:200,risk:1,angel:true,milestones:[{age:1,title:"外交局の調停",desc:"異端審問官と他勢力の間で問題が起きた。秩序を保ちながら、関係を壊さずに済むだろうか。",opts:["規則を根拠に調停する","相手の事情を聞いて妥協点を探す"],effects:[()=>{p.knowledge=clamp(p.knowledge+8);p.professionRank=3;addLog("規則と記録を根拠に調停を進めた。","event")},()=>{p.social=clamp(p.social+10);p.stress=clamp(p.stress-3);addLog("双方の事情を聞き、妥協点を探した。","good")}]}]},
  "edam":{name:"エダムチーズ味クッキー",aliases:["エダムチーズ","Edam Cheese"],place:"グロリアスベイクドーム",job:"伝令官",trait:"几帳面",family:"純天使",health:100,mind:90,knowledge:85,social:55,skill:80,happiness:60,money:100,risk:1,angel:true,pureAngel:true,milestones:[{age:1,title:"空欄の指令書",desc:"出所の分からない指令が届いた。大陸の意志か、パンドラの気まぐれか。",opts:["文面を忠実に伝える","意味を調べてから伝える"],effects:[()=>{p.directiveCount++;addLog("指令書の文面をそのまま伝えた。","event")},()=>{p.directiveCount++;p.knowledge=clamp(p.knowledge+8);addLog("指令の意味を調べてから伝えることにした。","event")}]}]},
- "fruitcheese":{name:"フルーツチーズ味クッキー",aliases:["フルーツチーズ","Fruit Cheese"],place:"グロリアスベイクドーム",job:"リライト",trait:"内省的",family:"堕天使",health:90,mind:75,knowledge:100,social:15,skill:90,happiness:45,money:80,risk:2,angel:true,fallen:true,milestones:[{age:1,title:"誰にも観測されない翻訳",desc:"誰にも観測されない空間で神託を受け取り、他の天使に理解できる指令へ翻訳する。後継者はいない。",opts:["曖昧さを残して伝える","自分の解釈で明確にする"],effects:[()=>{p.directiveCount++;p.stress=clamp(p.stress+3);addLog("神託の曖昧さを残したまま指令へ翻訳した。","event")},()=>{p.directiveCount++;p.knowledge=clamp(p.knowledge+5);p.stress=clamp(p.stress+8);addLog("自分の解釈を加えて指令を明確にした。","event")}]}]},
  "corpse":{name:"コープスリバイバー味クッキー",aliases:["コープスリバイバー","Corpse Reviver"],place:"グロリアスベイクドーム",job:"門番隊長",trait:"社交的",family:"昇天使",health:100,mind:85,knowledge:65,social:90,skill:80,happiness:75,money:160,risk:1,angel:true,milestones:[{age:1,title:"門の向こう側",desc:"グロリアスゲートの門番隊長として、訪れる者を迎え、危険な侵入者を見極める。",opts:["厳格に審査する","相手の事情を聞く"],effects:[()=>{p.skill=clamp(p.skill+8);p.professionRank=3;addLog("門の警備を厳格に行うことにした。","event")},()=>{p.social=clamp(p.social+8);p.knowledge=clamp(p.knowledge+4);addLog("訪問者の事情を聞き、柔軟に対応することにした。","good")}]}]},
  "tropical":{name:"トロピカルブリーズ味クッキー",aliases:["トロピカルブリーズ","Tropical Breeze"],place:"グロリアスベイクドーム",job:"門番",trait:"落ち着いている",family:"昇天使",health:100,mind:90,knowledge:70,social:65,skill:85,happiness:65,money:100,risk:1,angel:true,milestones:[{age:1,title:"右腕としての役目",desc:"長く仕えてきた主のそばを離れず、門とベイクドームを守る。",opts:["後進を育てる","自分が現場に立ち続ける"],effects:[()=>{p.social=clamp(p.social+8);p.professionRank=3;addLog("後進の育成に力を入れることにした。","good")},()=>{p.skill=clamp(p.skill+8);addLog("自分が現場に立ち続けることにした。","event")}]}]},
- "fizzcrack":{name:"フィズ＆クラック",aliases:["FIZZ&CRACK","Fizz&Crack","フィズアンドクラック"],place:"都市部",job:"便利屋",trait:"合理主義",family:"人工的な身体",health:85,mind:80,knowledge:65,social:20,skill:90,happiness:45,money:300,risk:3,milestones:[{age:1,title:"透明な頭部の秘密",desc:"透明な飴の頭部と魔導義体。身体の維持と利益の確保、どちらも欠かせない。",opts:["義体の性能を優先する","身体の安定性を優先する"],effects:[()=>{p.cyberneticLevel=3;p.skill=clamp(p.skill+10);p.money+=40;addLog("義体の性能を高めた。","event")},()=>{p.cyberneticLevel=2;p.health=clamp(p.health+8);p.stress=clamp(p.stress-3);addLog("身体の安定性を優先した。","good")}]}]},
- "shadowqueen":{name:"シャドウクイーン味クッキー",aliases:["シャドウクイーン","Shadow Queen"],place:"都市部",job:"会計管理",trait:"効率主義",family:"元アストラ",health:90,mind:85,knowledge:85,social:35,skill:90,happiness:50,money:500,risk:2,milestones:[{age:1,title:"数字で測れないもの",desc:"組織の効率を上げる一方で、数字だけでは測れない損失にも気づき始める。",opts:["効率を徹底する","人員の負担も評価に含める"],effects:[()=>{p.money+=50;p.skill=clamp(p.skill+8);addLog("効率化を徹底した。","event")},()=>{p.social=clamp(p.social+8);p.stress=clamp(p.stress-5);addLog("働く者の負担も管理指標に含めた。","good")}]}]}
 };
 Object.assign(specialLifeProfiles,{
- "tunkaron":{name:"トゥンカロン味クッキー",aliases:["トゥンカロン","トゥンカロン味","Tunka-ron","Tunkaron"],place:"都市部",job:"便利屋",trait:"トラブルメーカー",family:"不明",health:88,mind:65,knowledge:35,social:55,skill:60,happiness:72,money:35,stress:15,risk:3,milestones:[{age:1,title:"騒動の火種",desc:"面白そうなことを見つけると、後先を考えず首を突っ込みたくなる。",opts:["騒ぎに飛び込む","今回は様子を見る"],effects:[()=>{p.skill=clamp(p.skill+5);p.stress=clamp(p.stress+5);addLog("騒動に飛び込み、またひとつ面倒事を増やした。","event")},()=>{p.mind=clamp(p.mind+3);addLog("珍しく様子を見ることにした。","good")}]}]},
  "kadaif":{name:"カダイフタトゥルス味クッキー",aliases:["カダイフタトゥルス","Kadaif Taturus"],place:"グロリアスベイクドーム",job:"記録官",trait:"几帳面",family:"純天使",health:100,mind:90,knowledge:85,social:45,skill:80,happiness:60,money:120,risk:1,angel:true,pureAngel:true,milestones:[{age:1,title:"記録官としての選択",desc:"記録の正確さと、記録される者の事情。その両方をどう扱うか。",opts:["記録の正確性を優先する","記録の背景も残す"],effects:[()=>{p.knowledge=clamp(p.knowledge+8);p.professionRank=2;addLog("正確な記録を最優先にした。","event")},()=>{p.knowledge=clamp(p.knowledge+5);p.social=clamp(p.social+5);addLog("記録の背景や当事者の声も残すことにした。","good")}]}]},
  "nitrocellulose":{name:"ニトロセルロース味クッキー",aliases:["ニトロセルロース","Nitrocellulose"],place:"グロリアスベイクドーム",job:"技術官",trait:"研究熱心",family:"純天使",health:100,mind:80,knowledge:90,social:30,skill:95,happiness:55,money:150,risk:1,angel:true,pureAngel:true,milestones:[{age:1,title:"危険な技術の管理",desc:"技術を発展させることと、安全性を確保すること。両立は簡単ではない。",opts:["開発速度を優先する","安全基準を優先する"],effects:[()=>{p.skill=clamp(p.skill+10);p.stress=clamp(p.stress+8);addLog("開発速度を優先した。","event")},()=>{p.knowledge=clamp(p.knowledge+7);p.stress=clamp(p.stress-4);addLog("安全基準を整えてから開発を進めることにした。","good")}]}]},
  "akamatsuri":{name:"アカマツリ味クッキー",aliases:["アカマツリ","Akamatsuri"],place:"グロリアスベイクドーム",job:"外交局長",trait:"内気",family:"昇天使",health:100,mind:75,knowledge:85,social:65,skill:75,happiness:55,money:160,risk:1,angel:true,milestones:[{age:1,title:"外交局長の二面性",desc:"普段は気弱でも、譲れない場面では激しい気性が顔を出す。どちらも自分の一部だ。",opts:["穏やかな交渉を貫く","必要なら強硬な態度を取る"],effects:[()=>{p.social=clamp(p.social+8);addLog("穏やかな交渉を心掛けた。","good")},()=>{p.skill=clamp(p.skill+8);p.stress=clamp(p.stress+5);addLog("必要な場面では強硬な態度を取ることにした。","event")}]}]},
@@ -645,10 +657,6 @@ const specialStorySupplement={
   {age:8,title:"大陸からの指令",desc:"出所の分からない指令が、またひとつ届いた。文面は短く、意図は読み取れない。",opts:["そのまま伝達する","背景を調べてから伝える"],effects:[()=>{p.directiveCount=(p.directiveCount||0)+1;addLog("指令を改変せずに伝達した。","event")},()=>{p.directiveCount=(p.directiveCount||0)+1;p.knowledge=clamp(p.knowledge+7);addLog("指令の背景を調べてから伝達した。","good")}]},
   {age:25,title:"伝令官長の責任",desc:"指令を受け取る者たちは、その意味をあなたに尋ねる。しかし、あなた自身にも答えは知らされていない。",opts:["分からないと正直に伝える","自分なりの解釈を添える"],effects:[()=>{p.social=clamp(p.social+5);p.stress=clamp(p.stress-2);addLog("分からないことを正直に伝え、受け手の判断を尊重した。","good")},()=>{p.knowledge=clamp(p.knowledge+5);p.stress=clamp(p.stress+4);addLog("自分の解釈を添えて指令を伝えた。","event")}]}
  ],
- fruitcheese:[
-  {age:8,title:"後継者のいない役目",desc:"リライトという役職には、あなた以外の担い手がいない。堕天した今も指令だけは届き続ける。",opts:["役目を続ける","指令を受け取らない方法を探す"],effects:[()=>{p.directiveCount=(p.directiveCount||0)+1;p.knowledge=clamp(p.knowledge+5);addLog("堕天後もリライトの役目を続けた。","event")},()=>{p.stress=clamp(p.stress-4);p.mind=clamp(p.mind+4);addLog("指令との距離を取る方法を探し始めた。","good")}]},
-  {age:25,title:"誰にも届かない翻訳",desc:"翻訳した指令が、誰にも知られないまま現実を変えていく。自分の仕事に意味はあるのだろうか。",opts:["記録に残らなくても続ける","自分の言葉で意味を与える"],effects:[()=>{p.egoStability=clamp(p.egoStability+6);p.stress=clamp(p.stress+2);addLog("誰にも知られなくても、役目を続けることにした。","event")},()=>{p.fame+=2;p.social=clamp(p.social+4);addLog("自分の解釈を記録に残し、役目の意味を示そうとした。","good")}]}
- ],
  corpse:[
   {age:8,title:"門番隊長の流儀",desc:"グロリアスゲートを訪れる者の中には、善意を装った危険な存在もいる。門を守るとは、何を守ることなのか。",opts:["規則を徹底する","相手の事情を見極める"],effects:[()=>{p.skill=clamp(p.skill+7);p.knowledge=clamp(p.knowledge+3);addLog("門の審査基準を整えた。","event")},()=>{p.social=clamp(p.social+6);p.knowledge=clamp(p.knowledge+4);addLog("相手の事情を聞き、危険性を個別に判断した。","good")}]},
   {age:25,title:"門の外の流行",desc:"地上の流行や文化が門の向こうから届く。門番隊長として、職務中もつい気になってしまう。",opts:["職務外の交流を楽しむ","門の警備に集中する"],effects:[()=>{p.happiness=clamp(p.happiness+7);p.social=clamp(p.social+5);addLog("地上の流行を取り入れ、門番たちとの交流を楽しんだ。","good")},()=>{p.skill=clamp(p.skill+6);addLog("職務に集中し、警備体制を強化した。","event")}]}
@@ -656,18 +664,6 @@ const specialStorySupplement={
  tropical:[
   {age:8,title:"古参の右腕",desc:"長く仕えてきた主のそばで、ベイクドームの変化を見続けてきた。忠誠と自分自身の意思をどう両立させる？",opts:["主の判断を支える","必要なら異を唱える"],effects:[()=>{p.holyFavor=(p.holyFavor||0)+4;p.social=clamp(p.social+4);addLog("主の判断を支え、右腕としての役目を果たした。","good")},()=>{p.knowledge=clamp(p.knowledge+5);p.egoStability=clamp(p.egoStability+5);addLog("必要な時には異を唱える覚悟を決めた。","event")}]},
   {age:25,title:"門を守る理由",desc:"門を守る日々の中で、誰を通し、誰を止めるのかという問いに何度も向き合う。",opts:["秩序を優先する","個々の事情を優先する"],effects:[()=>{p.skill=clamp(p.skill+7);addLog("秩序を守るため、審査を厳格にした。","event")},()=>{p.social=clamp(p.social+6);p.happiness=clamp(p.happiness+3);addLog("個々の事情を聞き、柔軟な対応を続けた。","good")}]}
- ],
- fizzcrack:[
-  {age:8,title:"義体の維持費",desc:"魔導義体の維持には金がかかる。性能を上げれば仕事は増えるが、故障時の損失も大きくなる。",opts:["高性能部品へ交換する","修理しやすさを優先する"],effects:[()=>{p.cyberneticLevel=(p.cyberneticLevel||0)+1;p.skill=clamp(p.skill+6);p.money=Math.max(0,p.money-25);addLog("高性能部品を導入した。維持費は増えたが仕事の幅が広がった。","event")},()=>{p.health=clamp(p.health+4);p.money=Math.max(0,p.money-10);addLog("修理しやすい部品を選び、安定性を優先した。","good")}]},
-  {age:25,title:"利益と信用",desc:"高額だが危険な依頼が舞い込んだ。合理的に考えれば受ける価値はあるが、信用を失う可能性もある。",opts:["報酬を優先する","長期的な信用を優先する"],effects:[()=>{p.money+=60;p.stress=clamp(p.stress+7);addLog("高額依頼を引き受けた。利益は出たが、後味は悪い。","event")},()=>{p.social=clamp(p.social+7);p.fame+=3;addLog("依頼を断り、信用を守った。","good")}]}
- ],
- shadowqueen:[
-  {age:8,title:"効率化の代償",desc:"数字の上では成功している改革が、現場の疲弊を生んでいる。効率と人員のどちらを優先する？",opts:["目標達成を優先する","現場の負担を見直す"],effects:[()=>{p.skill=clamp(p.skill+7);p.money+=30;p.stress=clamp(p.stress+6);addLog("目標達成を優先し、効率をさらに高めた。","event")},()=>{p.social=clamp(p.social+7);p.stress=clamp(p.stress-5);addLog("現場の負担を見直し、長期的な運用を選んだ。","good")}]},
-  {age:25,title:"アストラとの決別",desc:"かつて所属した組織との関係を整理する時が来た。過去のやり方を捨てるか、経験として残すか。",opts:["完全に距離を置く","使える知識だけ持ち帰る"],effects:[()=>{p.mind=clamp(p.mind+4);p.stress=clamp(p.stress-3);addLog("過去の組織と距離を置いた。","good")},()=>{p.knowledge=clamp(p.knowledge+8);p.money+=20;addLog("過去の経験を知識として活用することにした。","event")}]}
- ],
- tunkaron:[
-  {age:8,title:"トラブルメーカーの評判",desc:"行く先々で騒ぎを起こすあなたの名前が、便利屋たちの間でも知られ始めた。評判をどう使う？",opts:["面白そうな依頼に乗る","信用を取り戻す"],effects:[()=>{p.skill=clamp(p.skill+6);p.stress=clamp(p.stress+5);addLog("面白そうな依頼に飛びつき、また騒動を起こした。","event")},()=>{p.social=clamp(p.social+6);p.fame+=2;addLog("少しだけ真面目に働き、信用を取り戻そうとした。","good")}]},
-  {age:25,title:"騒ぎの後始末",desc:"自分が始めた騒動で、仲間や依頼人に迷惑がかかった。逃げることも、責任を取ることもできる。",opts:["責任を取る","別の騒ぎでうやむやにする"],effects:[()=>{p.helped+=2;p.social=clamp(p.social+5);p.stress=clamp(p.stress+3);addLog("騒動の後始末を引き受けた。","good")},()=>{p.happiness=clamp(p.happiness+3);p.fame+=2;addLog("別の騒ぎを起こして、話題を逸らした。","event")}]}
  ],
  kadaif:[
   {age:8,title:"記録官の見習い",desc:"記録塔で、膨大な人生の記録を整理する仕事を任された。事実だけでは伝わらないものもある。",opts:["事実を正確に記す","当事者の感情も残す"],effects:[()=>{p.knowledge=clamp(p.knowledge+8);addLog("記録の正確性を優先し、資料を整理した。","event")},()=>{p.social=clamp(p.social+5);p.knowledge=clamp(p.knowledge+4);addLog("当事者の感情や背景も記録に残した。","good")}]},
@@ -1501,6 +1497,19 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  const titles=read('bakeTitles',[]);const normalized=[...new Set(titles.filter(x=>typeof x==='string'))];if(normalized.length!==titles.length)storage.set('bakeTitles',JSON.stringify(normalized));
 })();
 
+
+// v8.34 migration: retire four removed pre-made individuals and all of their dedicated records.
+(function cleanupRemovedIndividuals(){
+ const removedIds=new Set(['fruitcheese','fizzcrack','shadowqueen','tunkaron']);
+ const removedNames=new Set(['翻訳者のいない空間','義体の維持費','帳簿に載らない損失','騒動の後始末']);
+ const removedEventIds=new Set(['special_fruitcheese','special_fizzcrack','special_shadowqueen','special_tunkaron']);
+ const parse=(key,fallback)=>{try{return JSON.parse(storage.get(key,JSON.stringify(fallback)))??fallback}catch(e){return fallback}};
+ const cleanTitles=a=>(Array.isArray(a)?a:[]).filter(x=>!removedNames.has(x));
+ storage.set('bakeTitles',JSON.stringify(cleanTitles(parse('bakeTitles',[]))));
+ if(p){p.titles=cleanTitles(p.titles);if(removedIds.has(p.specialLifeId)){p.specialLife=false;p.specialLifeId='';p.specialLifeCompleted=false;p.specialLifeMilestones=[];p.specialLifeEventsDone=[];p.birthType='旧登録個体からの継続人生';p.birthTypeId='retired_special_migration';p.birthTypeDescription='削除された既存個体の専用設定を解除し、現在の能力値を引き継いだ人生。';}}
+ for(const key of ['bakeLives','bakeAscendedLives']){const a=parse(key,[]);if(Array.isArray(a)){for(const x of a){if(!x||typeof x!=='object')continue;x.titles=cleanTitles(x.titles);x.afterlifeTitles=cleanTitles(x.afterlifeTitles);if(removedIds.has(x.specialLifeId)){x.specialLife=false;x.specialLifeId='';x.specialLifeEventsDone=[];}}storage.set(key,JSON.stringify(a));}}
+ const dex=parse('bakeEventDex',{});if(dex&&dex.found){for(const id of removedEventIds)delete dex.found[id];dex.seen=Object.keys(dex.found).length;storage.set('bakeEventDex',JSON.stringify(dex));}
+})();
 </script>
 
 
@@ -1547,12 +1556,8 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
   {id:'special_gloriosa',name:'盟友との古い誓い',cat:'既存個体専用',rarity:'希少',hint:'グロリオサとして古い盟約を守る',special:true},
   {id:'special_pulmonbargo',name:'外交局の火消し役',cat:'既存個体専用',rarity:'希少',hint:'プルンバーゴとして対立する者たちを調停する',special:true},
   {id:'special_edam',name:'指令の出所',cat:'既存個体専用',rarity:'希少',hint:'エダムチーズとして神託の由来を調べる',special:true},
-  {id:'special_fruitcheese',name:'翻訳者のいない空間',cat:'既存個体専用',rarity:'極稀',hint:'フルーツチーズとして曖昧な指令を扱う',special:true},
   {id:'special_corpse',name:'門の向こうの訪問者',cat:'既存個体専用',rarity:'希少',hint:'コープスリバイバーとして訪問者を迎える',special:true},
   {id:'special_tropical',name:'古参の門番',cat:'既存個体専用',rarity:'希少',hint:'トロピカルブリーズとして後進を見守る',special:true},
-  {id:'special_fizzcrack',name:'義体の維持費',cat:'既存個体専用',rarity:'希少',hint:'フィズ＆クラックとして身体と利益を両立する',special:true},
-  {id:'special_shadowqueen',name:'帳簿に載らない損失',cat:'既存個体専用',rarity:'希少',hint:'シャドウクイーンとして組織の効率と人員を考える',special:true},
-  {id:'special_tunkaron',name:'騒動の後始末',cat:'既存個体専用',rarity:'希少',hint:'トゥンカロンとして騒動に巻き込まれる',special:true},
   {id:'special_kadaif',name:'記録官の注釈',cat:'既存個体専用',rarity:'希少',hint:'カダイフタトゥルスとして記録の背景を残す',special:true},
   {id:'special_nitrocellulose',name:'安全基準の境界',cat:'既存個体専用',rarity:'希少',hint:'ニトロセルロースとして危険な技術を管理する',special:true},
   {id:'special_akamatsuri',name:'穏やかな外交、激しい本音',cat:'既存個体専用',rarity:'希少',hint:'アカマツリとして交渉の難題に向き合う',special:true},
@@ -1588,12 +1593,8 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
    gloriosa:['盟友との古い誓い','セレスティアルと共に水禍へ立ち向かった古い盟約が、再び問われている。王として何を守るべきか。',['盟約を守り共に動く','民の避難を優先する','次代へ判断を託す'],[()=>{p.characterBonds=ensure(p,'characterBonds',[]);if(!p.characterBonds.includes('セレスティアル'))p.characterBonds.push('セレスティアル');p.skill=clamp(p.skill+5)},()=>{p.helped=(p.helped||0)+3;p.localAid=(p.localAid||0)+3},()=>{p.knowledge=clamp(p.knowledge+6);p.social=clamp(p.social+2)}]],
    pulmonbargo:['外交局の火消し役','異端審問官と他勢力の間で、またしても揉め事が起きた。今回は誰の顔を立てるべきか。',['規則を根拠に仲裁する','双方の事情を聞く','強引に場を収める'],[()=>{p.knowledge=clamp(p.knowledge+5);p.professionRank=(p.professionRank||0)+1},()=>{p.social=clamp(p.social+6);p.stress=clamp(p.stress-3)},()=>{p.fame=(p.fame||0)+3;p.stress=clamp(p.stress+5)}]],
    edam:['指令の出所','新しい指令が届いた。文面は明確だが、その由来は分からない。大陸の意志か、誰かの気まぐれか。',['文面どおり伝える','出所を調べてから伝える','保留して確認を求める'],[()=>{p.directiveCount=(p.directiveCount||0)+1},()=>{p.directiveCount=(p.directiveCount||0)+1;p.knowledge=clamp(p.knowledge+7)},()=>{p.directiveCount=(p.directiveCount||0)+1;p.stress=clamp(p.stress+2);p.social=clamp(p.social+2)}]],
-   fruitcheese:['翻訳者のいない空間','誰にも観測されない空間で、曖昧な神託が届いた。翻訳する者が自分しかいない以上、解釈の責任も自分にある。',['曖昧さを残す','自分の解釈を明記する','指令にせず記録だけ残す'],[()=>{p.directiveCount=(p.directiveCount||0)+1;p.stress=clamp(p.stress+2)},()=>{p.directiveCount=(p.directiveCount||0)+1;p.knowledge=clamp(p.knowledge+6);p.stress=clamp(p.stress+5)},()=>{p.knowledge=clamp(p.knowledge+3);p.stress=clamp(p.stress-2)}]],
    corpse:['門の向こうの訪問者','グロリアスゲートに、規則上は通せない事情を抱えた訪問者が現れた。門番隊長として判断を迫られる。',['規則どおり審査する','事情を聞いて例外を検討する','上層部へ判断を仰ぐ'],[()=>{p.skill=clamp(p.skill+5);p.professionRank=(p.professionRank||0)+1},()=>{p.social=clamp(p.social+5);p.knowledge=clamp(p.knowledge+2)},()=>{p.stress=clamp(p.stress-2);p.holyFavor=(p.holyFavor||0)+1}]],
    tropical:['古参の門番','後進の門番が、あなたの昔の判断について意見を求めてきた。自分の経験をどう渡すべきだろう。',['経験をそのまま伝える','自分で考える余地を残す','一緒に現場へ立つ'],[()=>{p.knowledge=clamp(p.knowledge+4);p.professionRank=(p.professionRank||0)+1},()=>{p.social=clamp(p.social+5)},()=>{p.skill=clamp(p.skill+5);p.stress=clamp(p.stress+2)}]],
-   fizzcrack:['義体の維持費','義体の部品交換時期が来た。性能を上げれば仕事の幅は広がるが、維持費も増える。',['高性能部品へ交換する','安定性を優先する','費用を抑えて修理する'],[()=>{p.cyberneticLevel=clamp((p.cyberneticLevel||0)+1,0,5);p.skill=clamp(p.skill+5);p.money=Math.max(0,p.money-35)},()=>{p.health=clamp(p.health+4);p.stress=clamp(p.stress-2);p.money=Math.max(0,p.money-20)},()=>{p.money=Math.max(0,p.money-5);p.stress=clamp(p.stress+3)}]],
-   shadowqueen:['帳簿に載らない損失','数字上の効率は改善している。しかし、現場の負担は帳簿に表れない。管理者として何を優先するか。',['効率をさらに追求する','人員の負担を指標に加える','現場の声を聞く'],[()=>{p.money+=25;p.skill=clamp(p.skill+4)},()=>{p.social=clamp(p.social+5);p.stress=clamp(p.stress-3)},()=>{p.knowledge=clamp(p.knowledge+3);p.social=clamp(p.social+3)}]],
-   tunkaron:['騒動の後始末','面白半分で首を突っ込んだ騒動が、思ったより大きくなってしまった。どう収拾する？',['最後まで付き合う','誰かに助けを求める','隙を見て逃げる'],[()=>{p.skill=clamp(p.skill+5);p.health=clamp(p.health-4);p.fame=(p.fame||0)+2},()=>{p.social=clamp(p.social+5);p.stress=clamp(p.stress-2)},()=>{p.stress=clamp(p.stress+4);p.money=Math.max(0,p.money-5)}]],
    kadaif:['記録官の注釈','記録に残された出来事の背景が、本文から抜け落ちている。正確さを守りながら、何を補足するべきか。',['事実だけを追記する','当事者の証言も残す','欠落を欠落のまま記録する'],[()=>{p.knowledge=clamp(p.knowledge+5)},()=>{p.knowledge=clamp(p.knowledge+3);p.social=clamp(p.social+4)},()=>{p.stress=clamp(p.stress-2);p.knowledge=clamp(p.knowledge+2)}]],
    nitrocellulose:['安全基準の境界','新しい技術の試験で、安全基準をどこまで厳格に適用するかが問題になった。',['試験を延期する','限定条件で試験する','安全基準を見直す'],[()=>{p.stress=clamp(p.stress-3);p.knowledge=clamp(p.knowledge+2)},()=>{p.skill=clamp(p.skill+5);p.stress=clamp(p.stress+3)},()=>{p.knowledge=clamp(p.knowledge+6);p.skill=clamp(p.skill+2)}]],
    akamatsuri:['穏やかな外交、激しい本音','交渉相手が譲歩を拒み、普段の穏やかさだけでは話が進まなくなった。',['穏やかに説得を続ける','強い態度で要求を通す','双子の弟に相談する'],[()=>{p.social=clamp(p.social+5);p.stress=clamp(p.stress+2)},()=>{p.skill=clamp(p.skill+5);p.stress=clamp(p.stress+5)},()=>{p.characterBonds=ensure(p,'characterBonds',[]);p.characterBonds.push('プルンバーゴ');p.stress=clamp(p.stress-3)}]],
@@ -1932,7 +1933,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  ];
  for(const def of newTitles)if(!titleDefs.some(x=>x[0]===def[0]))titleDefs.push(def);
  // Version marker for exports and visible footer.
- const foot=document.querySelector('footer');if(foot)foot.textContent='BAKE LIFE v8.33 — WORLD CHRONICLE';
+ const foot=document.querySelector('footer');if(foot)foot.textContent='BAKE LIFE v8.34 — WORLD CHRONICLE / TITLE UPDATE';
  const originalExport=exportSave;
  exportSave=function(){const data={version:8.28,current:p,deathCauses:JSON.parse(storage.get('bakeDeathCauses','[]')),titles:JSON.parse(storage.get('bakeTitles','[]')),lives:JSON.parse(storage.get('bakeLives','[]')),ascendedLives:JSON.parse(storage.get('bakeAscendedLives','[]')),secretMeta:JSON.parse(storage.get('bakeSecretMeta','{}')),relationshipSchema:VERSION};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.28.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)};
 })();
@@ -2055,12 +2056,12 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
   }
  }
  const oldTick=seasonTick;
- seasonTick=function(){oldTick();if(!p||p.dead)return;try{initWork();if(!decision)familyDeepTick();if(!decision)workTick();}catch(e){console.error('v8.33 extension',e)}};
+ seasonTick=function(){oldTick();if(!p||p.dead)return;try{initWork();if(!decision)familyDeepTick();if(!decision)workTick();}catch(e){console.error('v8.34 extension',e)}};
  const oldWorkInfo=showWorkInfo;
- showWorkInfo=function(){if(!p)return oldWorkInfo();initWork();oldWorkInfo();const modal=$('modal');if(!modal)return;const extra=document.createElement('section');extra.className='entry';extra.innerHTML=`<h3>業務記録・v8.32</h3><p>便利屋任務の受注：${p.missionsAccepted}件 / 完了：${p.missionsCompleted}件 / 失敗：${p.missionsFailed}件</p><p>便利屋への発注：${p.clientRequests}件 / 異端審問官の間引き任務：${p.inquisitorCulls}回 / 悪魔連戦突破：${p.demonWavesCleared}回</p><p class="sub">便利屋以外の職業では任務を受注できません。その他の職業では便利屋を雇う依頼イベントが発生します。異端審問官は専用の連続戦闘任務を受けます。</p>${(p.missionHistory||[]).slice(0,8).map(m=>`<div class="sub">${m.year||p.year}年 / ${m.age??p.age}歳 — ${String(m.title).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}：${m.success?'成功':'失敗・辞退'}</div>`).join('')}`;modal.appendChild(extra)};
- document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.32';
- const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.33 — WORLD CHRONICLE';
- if(typeof exportSave==='function'){const prevExport=exportSave;exportSave=function(){const oldCreate=URL.createObjectURL;const oldClick=HTMLAnchorElement.prototype.click;try{const data={version:8.32,current:p,deathCauses:JSON.parse(storage.get('bakeDeathCauses','[]')),titles:JSON.parse(storage.get('bakeTitles','[]')),lives:JSON.parse(storage.get('bakeLives','[]')),ascendedLives:JSON.parse(storage.get('bakeAscendedLives','[]')),secretMeta:JSON.parse(storage.get('bakeSecretMeta','{}')),workSchema:1,relationshipSchema:2};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.32.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}catch(e){prevExport()}}}
+ showWorkInfo=function(){if(!p)return oldWorkInfo();initWork();oldWorkInfo();const modal=$('modal');if(!modal)return;const extra=document.createElement('section');extra.className='entry';extra.innerHTML=`<h3>業務記録・v8.34</h3><p>便利屋任務の受注：${p.missionsAccepted}件 / 完了：${p.missionsCompleted}件 / 失敗：${p.missionsFailed}件</p><p>便利屋への発注：${p.clientRequests}件 / 異端審問官の間引き任務：${p.inquisitorCulls}回 / 悪魔連戦突破：${p.demonWavesCleared}回</p><p class="sub">便利屋以外の職業では任務を受注できません。その他の職業では便利屋を雇う依頼イベントが発生します。異端審問官は専用の連続戦闘任務を受けます。</p>${(p.missionHistory||[]).slice(0,8).map(m=>`<div class="sub">${m.year||p.year}年 / ${m.age??p.age}歳 — ${String(m.title).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}：${m.success?'成功':'失敗・辞退'}</div>`).join('')}`;modal.appendChild(extra)};
+ document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.34';
+ const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.34 — WORLD CHRONICLE / TITLE UPDATE';
+ if(typeof exportSave==='function'){const prevExport=exportSave;exportSave=function(){const oldCreate=URL.createObjectURL;const oldClick=HTMLAnchorElement.prototype.click;try{const data={version:8.34,current:p,deathCauses:JSON.parse(storage.get('bakeDeathCauses','[]')),titles:JSON.parse(storage.get('bakeTitles','[]')),lives:JSON.parse(storage.get('bakeLives','[]')),ascendedLives:JSON.parse(storage.get('bakeAscendedLives','[]')),secretMeta:JSON.parse(storage.get('bakeSecretMeta','{}')),workSchema:1,relationshipSchema:2};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.34.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}catch(e){prevExport()}}}
 })();
 
 </script>
@@ -2152,12 +2153,12 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  // Record the legacy/will outcome at death without changing the existing death mechanics.
  const oldDie=die;die=function(cause){if(p&&!p.dead&&p.willRecipient){p.inheritanceRecord={recipient:p.willRecipient,recipientId:p.willRecipientId||null,year:p.year,age:p.age,amount:p.money||0};addWorldRecord('遺言が残された',`${p.name}は${p.willRecipient}に財産や形見を託す意思を記録していた。対象額：${p.money||0}G。`,'family')}return oldDie(cause)};
  // Export the persistent world timeline alongside the normal save; old import remains compatible.
- const oldExport=exportSave;exportSave=function(){try{const data={version:8.33,current:p,deathCauses:safeParse(storage.get('bakeDeathCauses','[]'),[]),titles:safeParse(storage.get('bakeTitles','[]'),[]),lives:safeParse(storage.get('bakeLives','[]'),[]),ascendedLives:safeParse(storage.get('bakeAscendedLives','[]'),[]),secretMeta:safeParse(storage.get('bakeSecretMeta','{}'),{}),eventDex:safeParse(storage.get('bakeEventDex','{}'),{}),legacyLedger:safeParse(storage.get('bakeLegacyLedger','[]'),[]),regionalChronicle:safeParse(storage.get('bakeRegionalChronicle','{}'),{}),worldChronicle:world()};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.33.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}catch(e){oldExport()}};
+ const oldExport=exportSave;exportSave=function(){try{const data={version:8.34,current:p,deathCauses:safeParse(storage.get('bakeDeathCauses','[]'),[]),titles:safeParse(storage.get('bakeTitles','[]'),[]),lives:safeParse(storage.get('bakeLives','[]'),[]),ascendedLives:safeParse(storage.get('bakeAscendedLives','[]'),[]),secretMeta:safeParse(storage.get('bakeSecretMeta','{}'),{}),eventDex:safeParse(storage.get('bakeEventDex','{}'),{}),legacyLedger:safeParse(storage.get('bakeLegacyLedger','[]'),[]),regionalChronicle:safeParse(storage.get('bakeRegionalChronicle','{}'),{}),worldChronicle:world()};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.34.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}catch(e){oldExport()}};
  $('importSaveFile')?.addEventListener('change',async ev=>{const file=ev.target.files?.[0];if(!file)return;try{const data=JSON.parse(await file.text());if(data.worldChronicle&&typeof data.worldChronicle==='object'){const incoming=data.worldChronicle;incoming.history=Array.isArray(incoming.history)?incoming.history.slice(0,240):[];incoming.metrics={technology:50,economy:50,faith:50,security:50,boundary:10,...(incoming.metrics||{})};storage.set(WORLD_KEY,JSON.stringify(incoming))}}catch(e){console.warn('world chronicle import skipped',e)}});
  // Keep the existing current-life state intact when loading a legacy file.
  const oldMigrate=migrateV8State;migrateV8State=function(state){const s=oldMigrate(state);s.hobbySeasonCounter=Number(s.hobbySeasonCounter)||0;s.worldHistory=Array.isArray(s.worldHistory)?s.worldHistory:[];s.worldChronicleProcessedYear=Number.isFinite(Number(s.worldChronicleProcessedYear))?Number(s.worldChronicleProcessedYear):Number(s.year)||0;s.relationshipProcessedYear=Number.isFinite(Number(s.relationshipProcessedYear))?Number(s.relationshipProcessedYear):Number(s.year)||0;return s};
  // Version labels.
- document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.33';const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.33 — WORLD CHRONICLE';
+ document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.34';const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.34 — WORLD CHRONICLE / TITLE UPDATE';
 })();
 
 </script>

@@ -6,11 +6,11 @@
 <meta name="theme-color" content="#f4f5f8">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="BAKE LIFE">
-<link rel="icon" type="image/png" sizes="1024x1024" href="./icon.png?v=852">
-<link rel="apple-touch-icon" sizes="1024x1024" href="./icon.png?v=852">
-<link rel="manifest" href="./manifest.webmanifest?v=852">
+<link rel="icon" type="image/png" sizes="1024x1024" href="./icon.png?v=853">
+<link rel="apple-touch-icon" sizes="1024x1024" href="./icon.png?v=853">
+<link rel="manifest" href="./manifest.webmanifest?v=853">
 <meta name="description" content="PANIS ET CALAMITAS — ベイク大陸ライフシミュレーション">
-<title>PANIS ET CALAMITAS — ベイク大陸ライフ v8.52</title>
+<title>PANIS ET CALAMITAS — ベイク大陸ライフ v8.53</title>
 <style>
 :root{--bg:#171923;--panel:#222635;--panel2:#2b3042;--ink:#f4f0e8;--muted:#aeb4c5;--gold:#e6c477;--green:#76c9a2;--red:#e58b8b;--line:#3b4257}
 *{box-sizing:border-box}body{margin:0;padding-bottom:env(safe-area-inset-bottom);background:radial-gradient(circle at top,#30364b,#171923 60%);color:var(--ink);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;line-height:1.55}
@@ -2461,13 +2461,86 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
 </script>
 
 <script>
-// v8.52 release metadata: normalize legacy version labels after all extensions load.
+// v8.53 release metadata: normalize legacy version labels after all extensions load.
 (function(){
-  document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.52';
+  document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.53';
   const footer=document.querySelector('footer');
-  if(footer) footer.textContent='BAKE LIFE v8.52 — PANIS ET CALAMITAS';
+  if(footer) footer.textContent='BAKE LIFE v8.53 — PANIS ET CALAMITAS';
 })();
 </script>
+
+<script>
+// v8.53 BAROQUE EXPANSION: treatment, controlled ability use, individualized symptoms, remission.
+(function(){
+ 'use strict';
+ const clampB=(v)=>Math.max(0,Math.min(100,Number(v)||0));
+ const types={
+  '結晶型':{ability:'結晶装甲',desc:'皮膚や生地の一部が硬質結晶へ変化する。防御に優れるが、動作と感情表現が鈍くなる。'},
+  '侵食型':{ability:'侵食触腕',desc:'身体の外側へ異質な組織が伸びる。遠隔作業に向くが、衝動の制御が難しい。'},
+  '感覚変質型':{ability:'異常感知',desc:'通常では知覚できない気配や歪みを感じ取る。情報過多で疲労しやすい。'},
+  '形態変化型':{ability:'可変身体',desc:'身体構造を一時的に変化させる。適応力は高いが、元の形を保つ負担がある。'},
+  '空間異常型':{ability:'空間認識',desc:'距離や位置関係を直感的に捉える。使用後に方向感覚が乱れることがある。'},
+  '複合型':{ability:'複合変異',desc:'複数の症状が同時に現れる。高い出力を得る一方、制御難度も高い。'}
+ };
+ function ensure(){if(typeof p==='undefined'||!p)return;const q=p;
+  q.baroqueHistory=Array.isArray(q.baroqueHistory)?q.baroqueHistory:[];
+  q.baroqueTreatmentCount=q.baroqueTreatmentCount||0;q.baroqueAbilityUses=q.baroqueAbilityUses||0;
+  q.baroqueStableSeasons=q.baroqueStableSeasons||0;q.baroqueRemission=!!q.baroqueRemission;
+  q.baroqueExposure=q.baroqueExposure||0;q.baroqueLastSymptom=q.baroqueLastSymptom||'';
+  if(q.baroqueStage>=2&&!q.baroqueType)q.baroqueType='感覚変質型';
+  if(q.baroqueType&&types[q.baroqueType]&&!q.baroqueAbility)q.baroqueAbility=types[q.baroqueType].ability;
+ }
+ function log(text,kind='event'){if(typeof window.addLog==='function')window.addLog(text,kind);}
+ window.baroqueUseAbility=function(){if(typeof p==='undefined'||!p||p.dead||p.baroqueStage<2||p.baroqueRampage)return;ensure();
+  const q=p;const t=types[q.baroqueType]||types['感覚変質型'];
+  if(q.baroqueControl<10){if(typeof window.showModal==='function')showModal('能力の暴発','能力制御が低く、意図した使用ができない。まずは休養や治療が必要だ。',['閉じる'],[()=>{}],false);return;}
+  const choices={
+   '結晶型':()=>{q.health=clampB(q.health+3);q.baroqueControl=clampB(q.baroqueControl-5);q.stress=clampB(q.stress+4);},
+   '侵食型':()=>{q.skill=clampB((q.skill||0)+5);q.baroqueControl=clampB(q.baroqueControl-7);q.egoStability=clampB(q.egoStability-3);},
+   '感覚変質型':()=>{q.knowledge=clampB((q.knowledge||0)+6);q.baroqueControl=clampB(q.baroqueControl-4);q.mind=clampB(q.mind-2);},
+   '形態変化型':()=>{q.health=clampB(q.health+2);q.skill=clampB((q.skill||0)+3);q.baroqueControl=clampB(q.baroqueControl-6);},
+   '空間異常型':()=>{q.knowledge=clampB((q.knowledge||0)+4);q.adaptability=clampB((q.adaptability||0)+4);q.baroqueControl=clampB(q.baroqueControl-6);},
+   '複合型':()=>{q.skill=clampB((q.skill||0)+5);q.knowledge=clampB((q.knowledge||0)+4);q.baroqueControl=clampB(q.baroqueControl-10);q.egoStability=clampB(q.egoStability-5);}
+  };
+  (choices[q.baroqueType]||choices['感覚変質型'])();q.baroqueAbilityUses++;q.baroqueRisk=clampB((q.baroqueRisk||0)+3);q.stress=clampB(q.stress+2);
+  q.baroqueHistory.push({age:q.age,year:q.year,event:'バロック能力を意図的に使用'});
+  log(`${t.ability}を使用した。異常な力は役に立ったが、制御に負担が残った。`,'bad');if(typeof window.render==='function')render();
+ };
+ window.baroqueTreatment=function(){if(typeof p==='undefined'||!p||p.dead||p.baroqueStage<1||p.baroqueRampage)return;ensure();const q=p;
+  const labels=['休養と信頼できる相手との生活','抑制薬を使用する（費用15G）','専門機関で治療する（費用45G）'];
+  const fns=[
+   ()=>{q.stress=clampB(q.stress-12);q.mind=clampB(q.mind+7);q.egoStability=clampB(q.egoStability+8);q.baroqueControl=clampB(q.baroqueControl+4);q.baroqueRisk=Math.max(0,(q.baroqueRisk||0)-5);q.baroqueStableSeasons=(q.baroqueStableSeasons||0)+1;log('休養と周囲の支えによって、症状が少し落ち着いた。','good')},
+   ()=>{if(q.money<15){log('抑制薬を購入する資金が足りなかった。','bad');return;}q.money-=15;q.stress=clampB(q.stress-5);q.egoStability=clampB(q.egoStability+5);q.baroqueControl=clampB(q.baroqueControl+8);q.baroqueRisk=Math.max(0,(q.baroqueRisk||0)-9);q.baroqueTreatmentCount++;log('抑制薬によって症状が一時的に落ち着いた。根本的な治療ではない。','good')},
+   ()=>{if(q.money<45){log('専門治療の費用を用意できなかった。','bad');return;}q.money-=45;q.stress=clampB(q.stress-10);q.mind=clampB(q.mind+8);q.egoStability=clampB(q.egoStability+13);q.baroqueControl=clampB(q.baroqueControl+12);q.baroqueRisk=Math.max(0,(q.baroqueRisk||0)-15);q.baroqueTreatmentCount++;q.baroqueStableSeasons=(q.baroqueStableSeasons||0)+2;q.baroqueHistory.push({age:q.age,year:q.year,event:'専門機関で治療'});if(q.baroqueStage>=2&&q.egoStability>=65&&q.baroqueControl>=55){q.baroqueRemission=true;q.baroqueStage=1;q.baroqueRecovered=true;log('症状は完全には消えなかったが、寛解と判断された。変異の痕跡を抱えながら、日常生活へ戻れるようになった。','good')}else log('専門治療を受けた。症状は軽減したが、継続的な経過観察が必要だ。','good')}
+  ];
+  if(typeof window.smallDecision==='function')smallDecision('バロックの治療','症状を抑える方法を選べる。どの方法にも費用や負担があり、完全な治癒が保証されるわけではない。',labels,fns);
+ };
+ const oldTick=window.seasonTick;
+ if(typeof oldTick==='function')window.seasonTick=function(){const before=p?.baroqueStage;oldTick.apply(this,arguments);try{if(!p||p.dead||p.baroqueRampage||typeof decision!=='undefined'&&decision)return;ensure();
+   if(p.baroqueStage>=1){
+    const pressure=(p.stress>=75?2:0)+(p.mind<=25?2:0)+(p.baroqueRisk>=55?1:0);
+    const support=(p.happiness>=65?1:0)+(p.egoStability>=70?1:0)+(p.baroqueControl>=65?1:0);
+    if(pressure>support&&Math.random()<.075){p.baroqueExposure=clampB(p.baroqueExposure+pressure-support+1);p.egoStability=clampB(p.egoStability-1);}
+    else if(support>=pressure&&Math.random()<.10){p.baroqueStableSeasons++;p.egoStability=clampB(p.egoStability+1);}
+    if(p.baroqueStage>=2&&p.baroqueStage<4&&p.baroqueExposure>=12&&p.egoStability<35&&Math.random()<.12){p.baroqueStage=3;p.baroqueExposure=0;p.baroqueHistory.push({age:p.age,year:p.year,event:'症状の進行・重度変異'});log('変異が重度へ進行した。自我の輪郭が薄れ、日常生活にも支障が出始めている。','bad');}
+    if(p.baroqueStage>=2&&!p.baroqueLastSymptom&&Math.random()<.10){p.baroqueLastSymptom=rand(['鏡の中の遅延','知らない記憶','音のない呼び声','皮膚の下の結晶感']);log(`症状記録：「${p.baroqueLastSymptom}」。異常は一時的に消えても、記憶に残り続ける。`,'event');}
+   }
+   if(before!==p.baroqueStage&&typeof window.render==='function')render();
+  }catch(e){console.warn('v8.53 baroque extension',e)}};
+ const oldRender=window.render;
+ if(typeof oldRender==='function')window.render=function(){oldRender.apply(this,arguments);try{if(!p)return;ensure();const el=document.getElementById('baroqueInfo');if(!el)return;
+  const stage=p.baroqueStage||0;const name=['正常','前兆','初期変異','進行・重度','理性喪失'][Math.min(4,stage)];
+  let extra='';if(stage>0&&!p.baroqueRampage){extra=`<br>状態：${name}${p.baroqueRemission?'（寛解中）':''}<br>変異：${String(p.baroqueType||'未確定')} / 能力：${String(p.baroqueAbility||'未発現')}<br>自我安定度：${Math.round(p.egoStability||0)}/100　能力制御：${Math.round(p.baroqueControl||0)}/100<br>能力使用：${p.baroqueAbilityUses||0}回　治療：${p.baroqueTreatmentCount||0}回`;
+   if(stage>=2)extra+=`<br><span style="color:#e6b2bd">症状傾向：</span>${String(p.baroqueLastSymptom||'まだ特定されていない')}`;
+   extra+=`<div class="controls" style="margin-top:8px"><button onclick="baroqueTreatment()">治療・抑制を試みる</button>${stage>=2?'<button onclick="baroqueUseAbility()">能力を使用する</button>':''}</div>`;
+  } else if(stage===0){extra='<br>発症確認なし。ストレス・精神状態・生活環境によって前兆が現れることがあります。';}
+  if(!p.baroqueRampage){el.innerHTML=`<b>BAROQUE / ${name}</b>${extra}<br><span class="sub">原因は未特定。治療は進行を抑える手段であり、完全な治癒を保証しません。</span>`;}
+ }catch(e){console.warn('v8.53 baroque render',e)}};
+ // Backward-compatible defaults for loaded and imported saves.
+ try{if(p)ensure()}catch(e){}
+})();
+</script>
+
 </body>
 </html>
 

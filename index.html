@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>PANIS ET CALAMITAS — ベイク大陸ライフ v8.35</title>
+<title>PANIS ET CALAMITAS — ベイク大陸ライフ v8.36</title>
 <style>
 :root{--bg:#171923;--panel:#222635;--panel2:#2b3042;--ink:#f4f0e8;--muted:#aeb4c5;--gold:#e6c477;--green:#76c9a2;--red:#e58b8b;--line:#3b4257}
 *{box-sizing:border-box}body{margin:0;padding-bottom:env(safe-area-inset-bottom);background:radial-gradient(circle at top,#30364b,#171923 60%);color:var(--ink);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;line-height:1.55}
@@ -246,7 +246,7 @@ main{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 24px)}
  <div class="sub" style="margin-top:9px">※ゲームはこのブラウザ内で動作します。人生の記録と称号は自動保存されます。</div>
 </section>
 </main>
-<footer>BAKE LIFE v8.35 — WORLD CHRONICLE / BUGFIX</footer>
+<footer>BAKE LIFE v8.36 — WORLD CHRONICLE / BUGFIX</footer>
 <button id="pauseQuickBtn" class="pause-quick" onclick="togglePause()" aria-label="一時停止または再開">Ⅱ 一時停止</button>
 <nav id="v8Nav" aria-label="メインメニュー"><button onclick="scrollToPanel(0)"><span>🍪</span><span>人生</span></button><button onclick="scrollToLog()"><span>📖</span><span>記録</span></button><button onclick="showCollection()"><span>🏅</span><span>称号</span></button><button onclick="showRegionInfo()"><span>🗺️</span><span>地域</span></button><button onclick="showMoreMenu()"><span>☰</span><span>その他</span></button></nav>
 <div class="overlay" id="overlay"><div class="modal" id="modal"></div></div><input id="importSaveFile" type="file" accept="application/json,.json" hidden>
@@ -1498,7 +1498,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
 })();
 
 
-// v8.35 migration: retire four removed pre-made individuals and all of their dedicated records.
+// v8.36 migration: retire four removed pre-made individuals and all of their dedicated records.
 (function cleanupRemovedIndividuals(){
  const removedIds=new Set(['fruitcheese','fizzcrack','shadowqueen','tunkaron']);
  const removedNames=new Set(['翻訳者のいない空間','義体の維持費','帳簿に載らない損失','騒動の後始末']);
@@ -1933,7 +1933,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  ];
  for(const def of newTitles)if(!titleDefs.some(x=>x[0]===def[0]))titleDefs.push(def);
  // Version marker for exports and visible footer.
- const foot=document.querySelector('footer');if(foot)foot.textContent='BAKE LIFE v8.35 — WORLD CHRONICLE / BUGFIX';
+ const foot=document.querySelector('footer');if(foot)foot.textContent='BAKE LIFE v8.36 — WORLD CHRONICLE / BUGFIX';
  const originalExport=exportSave;
  exportSave=function(){const data={version:8.28,current:p,deathCauses:JSON.parse(storage.get('bakeDeathCauses','[]')),titles:JSON.parse(storage.get('bakeTitles','[]')),lives:JSON.parse(storage.get('bakeLives','[]')),ascendedLives:JSON.parse(storage.get('bakeAscendedLives','[]')),secretMeta:JSON.parse(storage.get('bakeSecretMeta','{}')),relationshipSchema:VERSION};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.28.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)};
 })();
@@ -2056,12 +2056,12 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
   }
  }
  const oldTick=seasonTick;
- seasonTick=function(){oldTick();if(!p||p.dead)return;try{initWork();if(!decision)familyDeepTick();if(!decision)workTick();}catch(e){console.error('v8.35 extension',e)}};
+ seasonTick=function(){oldTick();if(!p||p.dead)return;try{initWork();if(!decision)familyDeepTick();if(!decision)workTick();}catch(e){console.error('v8.36 extension',e)}};
  const oldWorkInfo=showWorkInfo;
- showWorkInfo=function(){if(!p)return oldWorkInfo();initWork();oldWorkInfo();const modal=$('modal');if(!modal)return;const extra=document.createElement('section');extra.className='entry';extra.innerHTML=`<h3>業務記録・v8.35</h3><p>便利屋任務の受注：${p.missionsAccepted}件 / 完了：${p.missionsCompleted}件 / 失敗：${p.missionsFailed}件</p><p>便利屋への発注：${p.clientRequests}件 / 異端審問官の間引き任務：${p.inquisitorCulls}回 / 悪魔連戦突破：${p.demonWavesCleared}回</p><p class="sub">便利屋以外の職業では任務を受注できません。その他の職業では便利屋を雇う依頼イベントが発生します。異端審問官は専用の連続戦闘任務を受けます。</p>${(p.missionHistory||[]).slice(0,8).map(m=>`<div class="sub">${m.year||p.year}年 / ${m.age??p.age}歳 — ${String(m.title).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}：${m.success?'成功':'失敗・辞退'}</div>`).join('')}`;modal.appendChild(extra)};
- document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.35';
- const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.35 — WORLD CHRONICLE / BUGFIX';
- if(typeof exportSave==='function'){const prevExport=exportSave;exportSave=function(){const oldCreate=URL.createObjectURL;const oldClick=HTMLAnchorElement.prototype.click;try{const data={version:8.35,current:p,deathCauses:JSON.parse(storage.get('bakeDeathCauses','[]')),titles:JSON.parse(storage.get('bakeTitles','[]')),lives:JSON.parse(storage.get('bakeLives','[]')),ascendedLives:JSON.parse(storage.get('bakeAscendedLives','[]')),secretMeta:JSON.parse(storage.get('bakeSecretMeta','{}')),workSchema:1,relationshipSchema:2};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.35.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}catch(e){prevExport()}}}
+ showWorkInfo=function(){if(!p)return oldWorkInfo();initWork();oldWorkInfo();const modal=$('modal');if(!modal)return;const extra=document.createElement('section');extra.className='entry';extra.innerHTML=`<h3>業務記録・v8.36</h3><p>便利屋任務の受注：${p.missionsAccepted}件 / 完了：${p.missionsCompleted}件 / 失敗：${p.missionsFailed}件</p><p>便利屋への発注：${p.clientRequests}件 / 異端審問官の間引き任務：${p.inquisitorCulls}回 / 悪魔連戦突破：${p.demonWavesCleared}回</p><p class="sub">便利屋以外の職業では任務を受注できません。その他の職業では便利屋を雇う依頼イベントが発生します。異端審問官は専用の連続戦闘任務を受けます。</p>${(p.missionHistory||[]).slice(0,8).map(m=>`<div class="sub">${m.year||p.year}年 / ${m.age??p.age}歳 — ${String(m.title).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}：${m.success?'成功':'失敗・辞退'}</div>`).join('')}`;modal.appendChild(extra)};
+ document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.36';
+ const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.36 — WORLD CHRONICLE / BUGFIX';
+ if(typeof exportSave==='function'){const prevExport=exportSave;exportSave=function(){const oldCreate=URL.createObjectURL;const oldClick=HTMLAnchorElement.prototype.click;try{const data={version:8.35,current:p,deathCauses:JSON.parse(storage.get('bakeDeathCauses','[]')),titles:JSON.parse(storage.get('bakeTitles','[]')),lives:JSON.parse(storage.get('bakeLives','[]')),ascendedLives:JSON.parse(storage.get('bakeAscendedLives','[]')),secretMeta:JSON.parse(storage.get('bakeSecretMeta','{}')),workSchema:1,relationshipSchema:2};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.36.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}catch(e){prevExport()}}}
 })();
 
 </script>
@@ -2153,18 +2153,18 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  // Record the legacy/will outcome at death without changing the existing death mechanics.
  const oldDie=die;die=function(cause){if(p&&!p.dead&&p.willRecipient){p.inheritanceRecord={recipient:p.willRecipient,recipientId:p.willRecipientId||null,year:p.year,age:p.age,amount:p.money||0};addWorldRecord('遺言が残された',`${p.name}は${p.willRecipient}に財産や形見を託す意思を記録していた。対象額：${p.money||0}G。`,'family')}return oldDie(cause)};
  // Export the persistent world timeline alongside the normal save; old import remains compatible.
- const oldExport=exportSave;exportSave=function(){try{const data={version:8.35,current:p,deathCauses:safeParse(storage.get('bakeDeathCauses','[]'),[]),titles:safeParse(storage.get('bakeTitles','[]'),[]),lives:safeParse(storage.get('bakeLives','[]'),[]),ascendedLives:safeParse(storage.get('bakeAscendedLives','[]'),[]),secretMeta:safeParse(storage.get('bakeSecretMeta','{}'),{}),eventDex:safeParse(storage.get('bakeEventDex','{}'),{}),legacyLedger:safeParse(storage.get('bakeLegacyLedger','[]'),[]),regionalChronicle:safeParse(storage.get('bakeRegionalChronicle','{}'),{}),worldChronicle:world()};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.35.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}catch(e){oldExport()}};
+ const oldExport=exportSave;exportSave=function(){try{const data={version:8.35,current:p,deathCauses:safeParse(storage.get('bakeDeathCauses','[]'),[]),titles:safeParse(storage.get('bakeTitles','[]'),[]),lives:safeParse(storage.get('bakeLives','[]'),[]),ascendedLives:safeParse(storage.get('bakeAscendedLives','[]'),[]),secretMeta:safeParse(storage.get('bakeSecretMeta','{}'),{}),eventDex:safeParse(storage.get('bakeEventDex','{}'),{}),legacyLedger:safeParse(storage.get('bakeLegacyLedger','[]'),[]),regionalChronicle:safeParse(storage.get('bakeRegionalChronicle','{}'),{}),worldChronicle:world()};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.36.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}catch(e){oldExport()}};
  $('importSaveFile')?.addEventListener('change',async ev=>{const file=ev.target.files?.[0];if(!file)return;try{const data=JSON.parse(await file.text());if(data.worldChronicle&&typeof data.worldChronicle==='object'){const incoming=data.worldChronicle;incoming.history=Array.isArray(incoming.history)?incoming.history.slice(0,240):[];incoming.metrics={technology:50,economy:50,faith:50,security:50,boundary:10,...(incoming.metrics||{})};storage.set(WORLD_KEY,JSON.stringify(incoming))}}catch(e){console.warn('world chronicle import skipped',e)}});
  // Keep the existing current-life state intact when loading a legacy file.
  const oldMigrate=migrateV8State;migrateV8State=function(state){const s=oldMigrate(state);s.hobbySeasonCounter=Number(s.hobbySeasonCounter)||0;s.worldHistory=Array.isArray(s.worldHistory)?s.worldHistory:[];s.worldChronicleProcessedYear=Number.isFinite(Number(s.worldChronicleProcessedYear))?Number(s.worldChronicleProcessedYear):Number(s.year)||0;s.relationshipProcessedYear=Number.isFinite(Number(s.relationshipProcessedYear))?Number(s.relationshipProcessedYear):Number(s.year)||0;return s};
  // Version labels.
- document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.35';const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.35 — WORLD CHRONICLE / BUGFIX';
+ document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.36';const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.36 — WORLD CHRONICLE / BUGFIX';
 })();
 
 </script>
 
 <script>
-// v8.35 hotfix: repair WORLD CHRONICLE / title migration edge cases.
+// v8.36 hotfix: repair WORLD CHRONICLE / title migration edge cases.
 (function(){
  'use strict';
  const removedIds=new Set(['fruitcheese','fizzcrack','shadowqueen','tunkaron']);
@@ -2206,7 +2206,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
    if(typeof p!=='undefined'&&p){cleanState(p);storage.set('bakeCurrent',JSON.stringify(p));}
    cleanArchives();
    if(data.eventDex){const dex=data.eventDex; if(dex.found){removedEventIds.forEach(id=>delete dex.found[id]);dex.seen=Object.keys(dex.found).length;}storage.set('bakeEventDex',JSON.stringify(dex));}
-  }catch(e){console.warn('v8.35 migration repair skipped',e)}
+  }catch(e){console.warn('v8.36 migration repair skipped',e)}
  });
  // Complete the boundary exploration arc only after repeated research and safe returns.
  const updateBoundaryArc=()=>{
@@ -2217,10 +2217,43 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
   const oldTick=seasonTick;
   seasonTick=function(){oldTick();updateBoundaryArc();};
  }
- document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.35';
- const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.35 — WORLD CHRONICLE / BUGFIX';
+ document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.36';
+ const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.36 — WORLD CHRONICLE / BUGFIX';
 })();
 </script>
 
+<script>
+// v8.36 LIFE QUALITY UPDATE — usability tools
+(function(){
+ 'use strict';
+ const SLOT_KEY='bakeLifeQualitySlotsV1';
+ const SAVE_KEYS=['bakeCurrent','bakeDeathCauses','bakeTitles','bakeLives','bakeAscendedLives','bakeSecretMeta','bakeEventDex','bakeLegacyLedger','bakeRegionalChronicle','bakeWorldChronicleV1','bakeSettings','bakeSaveSlots'];
+ const parse=(s,f)=>{try{return JSON.parse(s??'')}catch(e){return f}};
+ const clone=x=>JSON.parse(JSON.stringify(x));
+ const getSlots=()=>{const a=parse(storage.get(SLOT_KEY,'[]'),[]);return Array.isArray(a)?a:[]};
+ const setSlots=a=>storage.set(SLOT_KEY,JSON.stringify(a));
+ function snapshot(){const out={};SAVE_KEYS.forEach(k=>{const v=storage.get(k,null);if(v!==null)out[k]=v});if(p)out.bakeCurrent=JSON.stringify(p);return out}
+ function restoreSnapshot(s){SAVE_KEYS.forEach(k=>{if(Object.prototype.hasOwnProperty.call(s,k))storage.set(k,s[k]);else if(k!=='bakeCurrent')try{localStorage.removeItem(k)}catch(e){}});const q=parse(s.bakeCurrent,null);if(!q)throw new Error('人生データが見つかりません');clearInterval(timer);clearInterval(smallTimer);clearTimeout(autoTimer);decision=null;p=typeof migrateV8State==='function'?migrateV8State(q):q;paused=true;clockCarry=0;const log=$('log');if(log){log.innerHTML='';(p.logs||[]).slice().reverse().forEach(x=>{const e=document.createElement('div');e.className='entry '+(x.type||'');e.innerHTML=`<small>${x.year||p.year}年 / ${x.age??p.age}歳</small>${escapeHtml(x.text||'')}`;log.append(e)})}$('overlay').style.display='none';render();startClock();if(typeof syncPauseButtons==='function')syncPauseButtons();}
+ window.showSaveSlots=function(){
+  const slots=getSlots();$('overlay').style.display='grid';
+  $('modal').innerHTML=`<button class="modal-close" onclick="closeV8Modal()">×</button><h2>SAVE SLOTS / セーブスロット</h2><p class="sub">現在の人生と世界史・称号・人物記録をまとめて保存します。最大5枠です。読み込みは現在のデータを置き換えます。</p><div class="choices"><button class="primary" onclick="saveQualitySlot()" ${p?'':'disabled'}>現在の人生を新規保存</button><button onclick="showSettings()">戻る</button></div><div style="max-height:55vh;overflow:auto">${slots.map((s,i)=>`<section class="entry"><b> SLOT ${i+1} — ${escapeHtml(s.name||'無題')}</b><div class="sub">${escapeHtml(s.place||'')} / ${s.age??'?'}歳 / ${escapeHtml(s.job||'')}<br>保存日時：${escapeHtml(s.savedAt||'不明')}</div><div class="controls"><button onclick="loadQualitySlot(${i})">読み込む</button><button onclick="renameQualitySlot(${i})">名前変更</button><button onclick="deleteQualitySlot(${i})">削除</button></div></section>`).join('')||'<p class="sub">保存枠はまだありません。</p>'}</div>`;
+ };
+ window.saveQualitySlot=function(){if(!p)return;const a=getSlots();if(a.length>=5){alert('保存枠がいっぱいです。既存の枠を削除してから保存してください。');return}const label=prompt('このセーブの名前を入力してください',`${p.name}・${p.age}歳`);if(label===null)return;a.push({name:label.trim()||p.name,age:p.age,job:p.job,place:p.place,savedAt:new Date().toLocaleString('ja-JP'),data:snapshot()});setSlots(a);showSaveSlots()};
+ window.loadQualitySlot=function(i){const a=getSlots(),s=a[i];if(!s)return;if(!confirm(`「${s.name}」を読み込みます。現在の人生と記録は置き換わります。よろしいですか？`))return;try{restoreSnapshot(s.data);addLog(`セーブスロット「${s.name}」を読み込んだ。`,'good')}catch(e){alert('読み込みに失敗しました：'+e.message)}};
+ window.renameQualitySlot=function(i){const a=getSlots(),s=a[i];if(!s)return;const n=prompt('新しい名前',s.name);if(n===null)return;s.name=n.trim()||s.name;setSlots(a);showSaveSlots()};
+ window.deleteQualitySlot=function(i){const a=getSlots();if(!a[i]||!confirm(`セーブ枠${i+1}を削除しますか？`))return;a.splice(i,1);setSlots(a);showSaveSlots()};
+ window.showLogSearch=function(){if(!p){showModal('記録検索','人生を開始すると検索できます。',['閉じる'],[()=>{}],false);return}$('overlay').style.display='grid';$('modal').innerHTML=`<button class="modal-close" onclick="closeV8Modal()">×</button><h2>LOG SEARCH / 記録検索</h2><input id="qualityLogQuery" placeholder="人物名・地域・出来事で検索" style="width:100%;margin:8px 0"><div class="controls"><button onclick="searchQualityLogs()">検索</button><button onclick="filterLogs('all');closeV8Modal();scrollToLog()">全記録へ戻る</button></div><div id="qualityLogResults" style="max-height:55vh;overflow:auto"><p class="sub">検索語を入力してください。</p></div>`;};
+ window.searchQualityLogs=function(){const q=($('qualityLogQuery')?.value||'').trim().toLowerCase(),box=$('qualityLogResults');if(!box)return;const rows=(p?.logs||[]).filter(x=>!q||`${x.text||''} ${x.year||''} ${x.age||''}`.toLowerCase().includes(q)).slice(0,150);box.innerHTML=rows.map(x=>`<div class="entry"><small>${x.year||'?'}年 / ${x.age??'?'}歳</small>${escapeHtml(x.text||'')}</div>`).join('')||'<p class="sub">該当する記録はありません。</p>';};
+ window.showPeopleManager=function(){if(!p){showPeopleInfo();return}const ns=p.npcRelations||[],fav=Array.isArray(p.favoriteNpcIds)?p.favoriteNpcIds:[];$('overlay').style.display='grid';$('modal').innerHTML=`<button class="modal-close" onclick="closeV8Modal()">×</button><h2>PEOPLE / 人物・お気に入り</h2><p class="sub">☆を押すとお気に入りに登録できます。検索・絞り込みにも対応。</p><input id="qualityNpcQuery" placeholder="名前・職業・居場所で検索" style="width:100%;margin:8px 0" oninput="filterQualityPeople()"><div class="controls"><button onclick="filterQualityPeople('all')">全員</button><button onclick="filterQualityPeople('fav')">お気に入り</button><button onclick="filterQualityPeople('alive')">存命</button><button onclick="filterQualityPeople('dead')">故人</button></div><div id="qualityPeopleResults" class="person-list" style="max-height:55vh;overflow:auto"></div>`;filterQualityPeople('all')};
+ window.filterQualityPeople=function(mode){const ns=p?.npcRelations||[],fav=p.favoriteNpcIds||[],q=($('qualityNpcQuery')?.value||'').toLowerCase(),box=$('qualityPeopleResults');if(!box)return;const list=ns.filter(n=>{const text=`${n.name||''} ${n.job||''} ${n.location||''} ${n.role||''}`.toLowerCase();return(!q||text.includes(q))&&(mode==='fav'?fav.includes(String(n.npcId??n.name??'')):mode==='alive'?n.alive!==false:mode==='dead'?n.alive===false:true)});box.innerHTML=list.map(n=>`<section class="person-row"><div style="display:flex;align-items:center;gap:8px"><b style="flex:1">${escapeHtml(n.name||'名前不明')}</b><button onclick="toggleQualityFavoriteByIndex(${ns.indexOf(n)})">${fav.includes(String(n.npcId??n.name??''))?'★ お気に入り':'☆ お気に入り'}</button></div><div class="person-detail">${escapeHtml(n.role||'知人')} / ${escapeHtml(n.job||'職業不明')} / ${n.alive===false?'故人':'存命'}<br>${escapeHtml(n.location||'居場所不明')} / 信頼 ${n.trust??n.bond??'—'} / 親密さ ${n.closeness??'—'}</div></section>`).join('')||'<p class="sub">該当する人物はいません。</p>'};
+ window.toggleQualityFavoriteByIndex=function(i){if(!p)return;const n=(p.npcRelations||[])[i];if(!n)return;const id=String(n.npcId??n.name??'');p.favoriteNpcIds=Array.isArray(p.favoriteNpcIds)?p.favoriteNpcIds:[];if(p.favoriteNpcIds.includes(id))p.favoriteNpcIds=p.favoriteNpcIds.filter(x=>x!==id);else p.favoriteNpcIds.push(id);storage.set('bakeCurrent',JSON.stringify(p));filterQualityPeople()};
+ window.showDetailedStatus=function(){if(!p){showMoreMenu();return}const groups=[['身体', [['健康','health'],['体力','stamina'],['義体レベル','cyberneticLevel']]],['精神', [['精神','mind'],['幸福','happiness'],['ストレス','stress'],['自我安定度','egoStability']]],['社会', [['社交性','social'],['名声','fame'],['友人','friends'],['子ども','children']]],['技能', [['知識','knowledge'],['技術','skill'],['適応力','adaptability']]],['特殊', [['バロック段階','baroqueStage'],['能力制御','baroqueControl'],['境界調査','boundaryResearch'],['境界脱出','boundaryEscapes']]]];$('overlay').style.display='grid';$('modal').innerHTML=`<button class="modal-close" onclick="closeV8Modal()">×</button><h2>STATUS DETAIL / 詳細ステータス</h2><div class="info-grid">${groups.map(([g,items])=>`<section class="info-card" style="grid-column:1/-1"><b>${g}</b><div class="info-grid">${items.filter(([n,k])=>p[k]!==undefined).map(([n,k])=>`<div class="info-card"><small>${n}</small><b>${escapeHtml(String(p[k]))}</b></div>`).join('')||'<small>記録なし</small>'}</div></section>`).join('')}</div>`};
+ window.jumpQualityAge=function(){if(!p||p.dead||decision)return;const target=Number(prompt('何歳まで進めますか？（最大50年先）',String(Math.min(100,(p.age||0)+5))));if(!Number.isFinite(target)||target<=p.age||target>p.age+50){alert('現在の年齢より先、かつ50年以内を指定してください。');return}const wasPaused=paused;clearInterval(timer);clearTimeout(autoTimer);paused=true;let guard=0;while(p&&!p.dead&&!decision&&p.age<target&&guard<200){seasonTick();guard++}render();syncPauseButtons?.();if(!p.dead&&!decision){paused=wasPaused;lastTick=Date.now();clockCarry=0;if(!paused)startClock()}else{paused=true;syncPauseButtons?.()}addLog(`年齢ジャンプを実行した。${target}歳を目標に進行し、${p.age}歳で停止した。`,'event')};
+ const oldMore=showMoreMenu;showMoreMenu=function(){oldMore();const modal=$('modal');if(!modal)return;const box=document.createElement('section');box.className='entry';box.innerHTML='<b>LIFE QUALITY / 便利機能</b><div class="controls" style="margin-top:8px"><button onclick="showDetailedStatus()">詳細ステータス</button><button onclick="showLogSearch()">記録を検索</button><button onclick="showPeopleManager()">人物・お気に入り</button><button onclick="jumpQualityAge()">年齢ジャンプ</button><button onclick="showSaveSlots()">セーブスロット</button></div>';modal.appendChild(box)};
+ const oldSettings=showSettings;showSettings=function(){oldSettings();const m=$('modal');if(m&&!m.querySelector('[data-quality-slot]')){const b=document.createElement('button');b.textContent='セーブスロット管理';b.setAttribute('data-quality-slot','1');b.onclick=showSaveSlots;m.querySelector('.choices')?.appendChild(b)}};
+ document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.36';const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.36 — LIFE QUALITY UPDATE';
+})();
+
+</script>
 </body>
 </html>

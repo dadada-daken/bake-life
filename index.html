@@ -254,7 +254,7 @@ main{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 24px)}
  <div class="sub" style="margin-top:9px">※ゲームはこのブラウザ内で動作します。人生の記録と称号は自動保存されます。</div>
 </section>
 </main>
-<footer>BAKE LIFE v8.36 — WORLD CHRONICLE / BUGFIX</footer>
+<footer>BAKE LIFE v8.59 — SPLIT SCREEN / LIFE SIMULATION</footer>
 <button id="pauseQuickBtn" class="pause-quick" onclick="togglePause()" aria-label="一時停止または再開">Ⅱ 一時停止</button>
 <nav id="v8Nav" aria-label="メインメニュー"><button onclick="scrollToPanel(0)"><span>🍪</span><span>人生</span></button><button onclick="scrollToLog()"><span>📖</span><span>記録</span></button><button onclick="showCollection()"><span>🏅</span><span>称号</span></button><button onclick="showRegionInfo()"><span>🗺️</span><span>地域</span></button><button onclick="showMoreMenu()"><span>☰</span><span>その他</span></button></nav>
 <div class="overlay" id="overlay"><div class="modal" id="modal"></div></div><input id="importSaveFile" type="file" accept="application/json,.json" hidden>
@@ -1941,7 +1941,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  ];
  for(const def of newTitles)if(!titleDefs.some(x=>x[0]===def[0]))titleDefs.push(def);
  // Version marker for exports and visible footer.
- const foot=document.querySelector('footer');if(foot)foot.textContent='BAKE LIFE v8.36 — WORLD CHRONICLE / BUGFIX';
+ const foot=document.querySelector('footer');if(foot)foot.textContent='BAKE LIFE v8.59 — SPLIT SCREEN / LIFE SIMULATION';
  const originalExport=exportSave;
  exportSave=function(){const data={version:8.28,current:p,deathCauses:JSON.parse(storage.get('bakeDeathCauses','[]')),titles:JSON.parse(storage.get('bakeTitles','[]')),lives:JSON.parse(storage.get('bakeLives','[]')),ascendedLives:JSON.parse(storage.get('bakeAscendedLives','[]')),secretMeta:JSON.parse(storage.get('bakeSecretMeta','{}')),relationshipSchema:VERSION};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.28.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)};
 })();
@@ -2068,7 +2068,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  const oldWorkInfo=showWorkInfo;
  showWorkInfo=function(){if(!p)return oldWorkInfo();initWork();oldWorkInfo();const modal=$('modal');if(!modal)return;const extra=document.createElement('section');extra.className='entry';extra.innerHTML=`<h3>業務記録・v8.36</h3><p>便利屋任務の受注：${p.missionsAccepted}件 / 完了：${p.missionsCompleted}件 / 失敗：${p.missionsFailed}件</p><p>便利屋への発注：${p.clientRequests}件 / 異端審問官の間引き任務：${p.inquisitorCulls}回 / 悪魔連戦突破：${p.demonWavesCleared}回</p><p class="sub">便利屋以外の職業では任務を受注できません。その他の職業では便利屋を雇う依頼イベントが発生します。異端審問官は専用の連続戦闘任務を受けます。</p>${(p.missionHistory||[]).slice(0,8).map(m=>`<div class="sub">${m.year||p.year}年 / ${m.age??p.age}歳 — ${String(m.title).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}：${m.success?'成功':'失敗・辞退'}</div>`).join('')}`;modal.appendChild(extra)};
  document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.43';
- const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.36 — WORLD CHRONICLE / BUGFIX';
+ const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.59 — SPLIT SCREEN / LIFE SIMULATION';
  if(typeof exportSave==='function'){const prevExport=exportSave;exportSave=function(){const oldCreate=URL.createObjectURL;const oldClick=HTMLAnchorElement.prototype.click;try{const data={version:8.35,current:p,deathCauses:JSON.parse(storage.get('bakeDeathCauses','[]')),titles:JSON.parse(storage.get('bakeTitles','[]')),lives:JSON.parse(storage.get('bakeLives','[]')),ascendedLives:JSON.parse(storage.get('bakeAscendedLives','[]')),secretMeta:JSON.parse(storage.get('bakeSecretMeta','{}')),workSchema:1,relationshipSchema:2};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bake-continent-life-record-v8.36.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}catch(e){prevExport()}}}
 })();
 
@@ -2166,7 +2166,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  // Keep the existing current-life state intact when loading a legacy file.
  const oldMigrate=migrateV8State;migrateV8State=function(state){const s=oldMigrate(state);s.hobbySeasonCounter=Number(s.hobbySeasonCounter)||0;s.worldHistory=Array.isArray(s.worldHistory)?s.worldHistory:[];s.worldChronicleProcessedYear=Number.isFinite(Number(s.worldChronicleProcessedYear))?Number(s.worldChronicleProcessedYear):Number(s.year)||0;s.relationshipProcessedYear=Number.isFinite(Number(s.relationshipProcessedYear))?Number(s.relationshipProcessedYear):Number(s.year)||0;return s};
  // Version labels.
- document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.43';const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.36 — WORLD CHRONICLE / BUGFIX';
+ document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.43';const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.59 — SPLIT SCREEN / LIFE SIMULATION';
 })();
 
 </script>
@@ -2226,7 +2226,7 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
   seasonTick=function(){oldTick();updateBoundaryArc();};
  }
  document.title='PANIS ET CALAMITAS — ベイク大陸ライフ v8.43';
- const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.36 — WORLD CHRONICLE / BUGFIX';
+ const footer=document.querySelector('footer');if(footer)footer.textContent='BAKE LIFE v8.59 — SPLIT SCREEN / LIFE SIMULATION';
 })();
 </script>
 
@@ -2760,6 +2760,79 @@ function showSecretCheat(){let m=initSecretMeta();secretDiscover('title_code','�
  }
  // If a save already reached the final threshold before this update, offer the finale on next season.
  try{if(p){p.boundaryFinaleResolved=!!p.boundaryFinaleResolved;p.boundaryFinalePending=false}}catch(e){}
+})();
+</script>
+
+
+<style id="v859-screen-style">
+#setupScreen{max-width:920px;margin:18px auto 40px;padding:18px 16px 30px;background:linear-gradient(145deg,#171923,#101116);border:1px solid #343746;border-radius:18px;box-shadow:0 16px 50px #0005}
+#setupScreen .setup-eyebrow{font-size:.68rem;letter-spacing:.22em;color:#c7a75d;text-align:center}
+#setupScreen h1{font-size:clamp(1.5rem,5vw,2.5rem);text-align:center;margin:8px 0 4px;letter-spacing:.08em}
+#setupScreen .setup-lead{text-align:center;color:#a9adba;font-size:.86rem;margin:0 0 18px}
+.setup-card{background:#191c26;border:1px solid #343949;border-radius:13px;padding:14px;margin:10px 0}
+.setup-card h2{margin:0 0 9px;color:#d8bd7b;font-size:.9rem;letter-spacing:.08em}
+.setup-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.setup-grid button{min-height:48px}
+.setup-start{width:100%;min-height:58px!important;font-size:1.08rem!important;letter-spacing:.08em;margin-top:8px}
+#setupBirthPlace{width:100%;padding:12px;border-radius:9px;border:1px solid #68718a;background:#171b27;color:#fff;font-size:.95rem}
+#simulationTop{position:sticky;top:0;z-index:25;background:#11121aee;backdrop-filter:blur(12px);border-bottom:1px solid #333746;padding:10px max(14px,calc((100% - 920px)/2));margin:0 -10px 12px}
+#simulationTop .sim-age-row{display:flex;align-items:center;gap:12px;margin-bottom:9px}
+#simulationTop .sim-age{font-size:2rem;font-weight:800;white-space:nowrap}
+#simulationTop .sim-season{color:#d6b45f;font-weight:700}
+#simulationTop .sim-progress{height:8px;border-radius:99px;background:#242936;overflow:hidden;flex:1}
+#simulationTop .sim-progress i{display:block;height:100%;width:0;background:#c6a04d;transition:width .2s}
+#simulationTop .sim-speeds{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;margin-bottom:8px}
+#simulationTop button{border:1px solid #343949;background:#151720;color:#eee;border-radius:8px;padding:8px 3px;min-height:42px}
+#simulationTop button.active{background:#c7a653;color:#171717;font-weight:800}
+#simulationTop .sim-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+#simulationTop .sim-actions button{font-size:.83rem}
+#simulationTop .sim-actions .sim-pause{border-color:#c7a653}
+body.v859-simulation>header,body.v859-simulation>#setupScreen{display:none!important}
+body.v859-simulation>#simulationTop{display:block}
+body.v859-setup>header,body.v859-setup>#setupScreen{display:block}
+body.v859-setup>#simulationTop,body.v859-setup>main,body.v859-setup>footer,body.v859-setup>#pauseQuickBtn,body.v859-setup>#v8Nav{display:none!important}
+body.v859-simulation>main{display:block}
+body.v859-simulation #timeFold,body.v859-simulation #titleFold,body.v859-simulation .restart-row,body.v859-simulation #v8Nav,body.v859-simulation .pause-quick,body.v859-simulation main>section.panel:nth-child(2)>.controls{display:none!important}
+body.v859-simulation #seasonInfo{display:none}
+@media(max-width:600px){#setupScreen{margin:8px 7px 24px;padding:13px 11px 22px}#simulationTop{margin:0 -7px 10px;padding:8px 10px}#simulationTop .sim-age{font-size:1.65rem}#simulationTop .sim-actions button{font-size:.72rem;padding:6px 2px}.setup-grid{gap:6px}}
+</style>
+<div id="setupScreen" aria-label="人生の準備">
+ <div class="setup-eyebrow">BAKE LIFE / CHRONOS RECORD TOWER</div>
+ <h1>PANIS ET CALAMITAS</h1>
+ <p class="setup-lead">人生を始める前に、記録・地域・世界の設定を確認できます。</p>
+ <section class="setup-card"><h2>NEW LIFE / 人生の開始</h2><p class="sub">新しい人生を始めると、専用のシミュレーション画面へ移動します。名前や既存個体の指定は開始操作の後に行えます。</p><button class="primary setup-start" onclick="newLife()">▶ 新しい人生を始める</button></section>
+ <section class="setup-card"><h2>WORLD & RECORD / 事前確認・設定</h2><div class="setup-grid">
+  <button onclick="showCollection()">🏅 称号図鑑・レアリティ</button>
+  <button onclick="showRegionInfo()">🗺️ マップ・地域情報</button>
+  <button onclick="showDeathCollection()">☠️ 死因図鑑</button>
+  <button onclick="showAscendedCollection()">😇 昇天使記録</button>
+  <button onclick="showSettings()">⚙️ ゲーム設定</button>
+  <button onclick="showSaveSlots()">▣ セーブスロット</button>
+  <button onclick="exportSave()">⇧ 記録を書き出す</button>
+  <button onclick="importSaveDialog()">⇩ 記録を読み込む</button>
+ </div></section>
+ <section class="setup-card"><h2>BIRTHPLACE / 出生地域の指定</h2><p class="sub">ランダムのままにすることも、開始する地域を指定することもできます。</p><select id="setupBirthPlace"><option value="">ランダム（全レイヤーを含む）</option></select><p class="sub" id="setupPlaceDesc">出生地を指定しない場合、通常・妖精・境界点の各地域から抽選されます。</p></section>
+ <p class="sub" style="text-align:center;margin:14px 0 0">準備画面の設定・図鑑は、人生を開始した後も「新しい人生」から戻って確認できます。</p>
+</div>
+<div id="simulationTop" style="display:none" aria-label="シミュレーション操作">
+ <div class="sim-age-row"><div class="sim-age" id="simAge">0歳</div><div class="sim-season" id="simSeason">春</div><div class="sim-progress"><i id="simProgress"></i></div><button onclick="togglePause()" aria-label="一時停止">⌃</button></div>
+ <div class="sim-speeds"><button data-speed="1" onclick="setSpeed(1)">×1</button><button data-speed="2" onclick="setSpeed(2)">×2</button><button data-speed="4" onclick="setSpeed(4)">×4</button><button data-speed="8" onclick="setSpeed(8)">×8</button><button data-speed="16" onclick="setSpeed(16)">×16</button><button data-speed="32" onclick="setSpeed(32)">×32</button></div>
+ <div class="sim-actions"><button class="sim-pause" id="simPause" onclick="togglePause()">Ⅱ 一時停止</button><button onclick="toggleAuto()">▶ 自動</button><button onclick="saveCurrent()">▣ 保存</button><button onclick="newLife()">⇥ 諦める</button></div>
+</div>
+<script id="v859-screen-script">
+(function(){
+ const oldNewLife=window.newLife, oldBeginLife=window.beginLife, oldPickBirthPlace=window.pickBirthPlace;
+ let selectedBirthPlace='';
+ function fillBirthPlaces(){const sel=document.getElementById('setupBirthPlace');if(!sel||sel.dataset.ready)return;sel.dataset.ready='1';const opts=[...places.filter(x=>!x.n.includes('ベイクドーム')).map(x=>({n:x.n,layer:'ノーマルレイヤー'})),...fairyBirthPlaces.map(x=>({n:x.n,layer:'フェアリーレイヤー'})),...boundaryBirthPlaces.map(x=>({n:x.n,layer:'境界点'}))];const seen=new Set();for(const x of opts){if(seen.has(x.n))continue;seen.add(x.n);const o=document.createElement('option');o.value=x.n;o.textContent=x.n+' · '+x.layer;sel.appendChild(o)}sel.addEventListener('change',()=>{selectedBirthPlace=sel.value;const item=opts.find(x=>x.n===selectedBirthPlace);document.getElementById('setupPlaceDesc').textContent=item?('開始地域：'+item.n+'（'+item.layer+'）。危険度や地域環境は通常どおり反映されます。'):'出生地を指定しない場合、通常・妖精・境界点の各地域から抽選されます。'});}
+ function setScreen(mode){document.body.classList.toggle('v859-setup',mode==='setup');document.body.classList.toggle('v859-simulation',mode==='simulation');const setup=document.getElementById('setupScreen'),top=document.getElementById('simulationTop');if(setup)setup.style.display=mode==='setup'?'block':'none';if(top)top.style.display=mode==='simulation'?'block':'none';if(mode==='setup'){fillBirthPlaces();window.scrollTo(0,0)}}
+ window.newLife=function(){if(typeof p!=='undefined'&&p&&!p.dead&&!confirm('現在の人生を終了して、準備画面へ戻りますか？'))return;clearInterval(timer);clearInterval(smallTimer);clearTimeout(autoTimer);decision=null;setScreen('setup');$('overlay').style.display='grid';$('modal').innerHTML=`<h2>新しい人生の準備</h2><p>このクッキーの名前を決めてください。自分で入力することも、ランダムに決めることもできます。</p><label style="display:block;margin:10px 0 5px;color:var(--muted)">名前（任意）</label><input id="customCookieName" maxlength="24" placeholder="例：マカロン味クッキー" style="width:100%;padding:12px;border-radius:9px;border:1px solid #68718a;background:#171b27;color:#fff"><div class="choices" style="margin-top:12px"><button class="primary" onclick="beginLifeFromInput()">この名前で始める</button><button onclick="beginLifeRandom()">名前をランダムに決める</button><button onclick="$('overlay').style.display='none'">キャンセル</button></div>`};
+ window.beginLife=function(){const result=oldBeginLife.apply(this,arguments);setScreen('simulation');return result};
+ window.pickBirthPlace=function(){if(selectedBirthPlace){const normal=places.find(q=>q.n===selectedBirthPlace),fairy=fairyBirthPlaces.find(q=>q.n===selectedBirthPlace),boundary=boundaryBirthPlaces.find(q=>q.n===selectedBirthPlace);const x=normal||fairy||boundary;if(x){const layer=x.layer||(fairy?'フェアリーレイヤー':boundary?'境界点':'ノーマルレイヤー');return {...x,layer}}}return oldPickBirthPlace.apply(this,arguments)};
+ const oldRender=window.render;window.render=function(){const r=oldRender.apply(this,arguments);try{if(typeof p!=='undefined'&&p){const age=document.getElementById('simAge'),season=document.getElementById('simSeason'),bar=document.getElementById('simProgress');if(age)age.textContent=p.afterlife?`${p.afterlifeAge||0}年`:`${p.age||0}歳`;if(season)season.textContent=p.afterlife?'昇天使':seasons?.[p.seasonIndex]||'春';if(bar)bar.style.width=`${p.afterlife?((p.afterlifeAge||0)/150*100):((p.seasonIndex||0)/4*100)}%`;document.querySelectorAll('#simulationTop [data-speed]').forEach(b=>b.classList.toggle('active',Number(b.dataset.speed)===speed));const pb=document.getElementById('simPause');if(pb)pb.textContent=paused?'▶ 再開':'Ⅱ 一時停止'}}catch(e){}return r};
+ window.saveCurrent=function(){if(typeof p!=='undefined'&&p){storage.set('bakeCurrent',JSON.stringify(p));alert('現在の人生を保存しました。')}};
+ const oldTogglePause=window.togglePause;window.togglePause=function(){const r=oldTogglePause.apply(this,arguments);const b=document.getElementById('simPause');if(b)b.textContent=paused?'▶ 再開':'Ⅱ 一時停止';return r};
+ document.addEventListener('DOMContentLoaded',()=>setScreen((typeof p!=='undefined'&&p&&!p.dead)?'simulation':'setup'));
+ setScreen((typeof p!=='undefined'&&p&&!p.dead)?'simulation':'setup');
 })();
 </script>
 
